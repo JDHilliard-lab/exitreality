@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXIT REALITY</title>
+    <title>Your Name - Creative Portfolio</title>
     <style>
         * {
             margin: 0;
@@ -135,14 +135,14 @@
         /* Portfolio Grid */
         .portfolio-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 0;
         }
 
         .portfolio-item {
             position: relative;
             aspect-ratio: 16/10;
-            background: #f5f5f5;
+            background: #000;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.4s ease;
@@ -156,11 +156,13 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: opacity 0.4s ease;
+            object-position: center;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .portfolio-item:hover img {
             opacity: 0.7;
+            transform: scale(1.05);
         }
 
         .portfolio-info {
@@ -245,7 +247,7 @@
             }
 
             .portfolio-item {
-                aspect-ratio: 4/3;
+                aspect-ratio: 16/10;
             }
         }
 
@@ -272,7 +274,7 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <div class="logo">EXIT REALITY</div>
+        <div class="logo">Your Name</div>
         <ul class="nav-links">
             <li><a href="#about">About</a></li>
             <li><a href="#work">Work</a></li>
@@ -317,40 +319,40 @@
         <div class="portfolio-grid">
             <!-- EDIT THIS: Replace with your actual projects and images -->
             <!-- Portfolio Item 1 -->
-            <div class="portfolio-item">
+            <a href="project1.html" class="portfolio-item">
                 <img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=500&fit=crop" alt="Project 1">
                 <div class="portfolio-info">
-                    <h3>Anceint Ruins</h3>
-                    <p>Archival, Generative, Animation</p>
+                    <h3>Project Name One</h3>
+                    <p>Brand Identity, Web Design</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Portfolio Item 2 -->
-            <div class="portfolio-item">
+            <a href="project2.html" class="portfolio-item">
                 <img src="https://images.unsplash.com/photo-1559028012-481c04fa702d?w=800&h=500&fit=crop" alt="Project 2">
                 <div class="portfolio-info">
                     <h3>Project Name Two</h3>
                     <p>Art Direction, Photography</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Portfolio Item 3 -->
-            <div class="portfolio-item">
+            <a href="project3.html" class="portfolio-item">
                 <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=500&fit=crop" alt="Project 3">
                 <div class="portfolio-info">
                     <h3>Project Name Three</h3>
                     <p>UI/UX Design, Strategy</p>
                 </div>
-            </div>
+            </a>
 
             <!-- Portfolio Item 4 -->
-            <div class="portfolio-item">
+            <a href="project4.html" class="portfolio-item">
                 <img src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=800&h=500&fit=crop" alt="Project 4">
                 <div class="portfolio-info">
                     <h3>Project Name Four</h3>
                     <p>Motion Design, Animation</p>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 
