@@ -297,6 +297,40 @@
                 transform: translateY(0);
             }
         }
+
+                    /* Selected Work Section - full bleed */
+            #work {
+              padding: 0; /* remove default side padding */
+            }
+            
+            #work .section-title {
+              padding: 8rem 4rem 2rem; /* keep the title aligned with other sections */
+              margin: 0;
+            }
+            
+            .portfolio-grid {
+              display: flex;
+              flex-direction: column; /* stack vertically */
+              width: 100%; 
+              margin: 0;
+              gap: 0; /* no gaps between items */
+            }
+            
+            .portfolio-item {
+              width: 100%;         /* take full width */
+              height: 100vh;       /* each banner fills the screen height */
+              min-height: 500px;   /* safety for smaller screens */
+              margin: 0;
+              border: none;
+            }
+            
+            .portfolio-item img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;   /* makes image scale like a background */
+              display: block;
+            }
+
     </style>
 </head>
 <body>
