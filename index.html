@@ -266,11 +266,18 @@
             }
 
             .portfolio-grid {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                width: 100vw;  /* force full viewport width */
+                margin: 0;     /* no extra margins */
             }
 
             .portfolio-item {
-                aspect-ratio: 16/10;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                border: none;
             }
         }
 
