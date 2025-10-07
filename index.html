@@ -456,6 +456,62 @@
   .hero h1, .hero p { max-width: 90%; }
 }
 
+        /* ===== HERO (consolidated, reliable) ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 520px;
+  margin-top: 80px;        /* accounts for fixed nav */
+  overflow: hidden;
+  padding: 0;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* fills frame (may crop slightly) */
+  object-position: center;
+  z-index: 0;              /* video at the back */
+  background: #000;        /* fallback while loading */
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;              /* above video */
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.45),
+    rgba(0,0,0,0.35) 35%,
+    rgba(0,0,0,0.55)
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;              /* above overlay */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;
+  color: #fff;
+}
+
+.hero h1 { color: #fff; }
+.hero p  { color: rgba(255,255,255,0.9); text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+
+/* ===== Mobile tweaks ===== */
+@media (max-width: 768px) {
+  .hero { height: 75vh; min-height: 420px; }
+  .hero-content { padding: 0 1.25rem; }
+  .hero h1, .hero p { max-width: 90%; margin-left: auto; margin-right: auto; }
+}
+
+
 
 
 
@@ -473,18 +529,28 @@
     </nav>
 
     <!-- Hero Section -->
-  <section class="hero">
-  <video class="hero-video" autoplay muted loop playsinline>
+<section class="hero">
+  <video class="hero-video"
+         autoplay
+         muted
+         playsinline
+         loop
+         preload="auto"
+         poster="Other World Fish/BigRED001-gpt.png">
+    <!-- Replace these paths with your actual files -->
     <source src="Other World Fish/BigRED001.mp4" type="video/mp4" />
+    <source src="assets/hero-video.webm" type="video/webm" />
+    <!-- If both fail, the poster will show -->
   </video>
 
-  <!-- contrast layer -->
   <div class="hero-overlay"></div>
 
-  <!-- keep your existing text inside this wrapper -->
   <div class="hero-content">
     <h1 class="fade-in">Creative<br>Explorations &<br>Designs</h1>
-    <p class="fade-in">A visual journey beyond the ordinary. Explore worlds where imagination materializes and boundaries between the real and surreal dissolve into pure creative expression.</p>
+    <p class="fade-in">
+      A visual journey beyond the ordinary. Explore worlds where imagination materializes and
+      boundaries between the real and surreal dissolve into pure creative expression.
+    </p>
   </div>
 </section>
 
