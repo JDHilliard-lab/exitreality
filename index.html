@@ -392,6 +392,18 @@
     margin: 0 auto;
   }
 }
+        @media (max-width: 768px) {
+  .portfolio-item {
+    height: 60vh;                 /* a bit shorter on phones */
+    min-height: 0;
+    aspect-ratio: auto !important;/* stop forcing 16:10 */
+  }
+  .portfolio-item img {
+    object-fit: cover;            /* stays full-bleed; some crop is inevitable */
+    object-position: center;      /* keep important center in frame */
+  }
+}
+
 
 
     </style>
