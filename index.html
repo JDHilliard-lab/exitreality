@@ -272,13 +272,16 @@
                 margin: 0;     /* no extra margins */
             }
 
-            .portfolio-item {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                border: none;
+                  .portfolio-item {
+                height: 60vh;                 /* a bit shorter on phones */
+                min-height: 0;
+                aspect-ratio: auto !important;/* stop forcing 16:10 */
+              }
+              .portfolio-item img {
+                object-fit: cover;            /* stays full-bleed; some crop is inevitable */
+                object-position: center;      /* keep important center in frame */
+              }
             }
-        }
 
         /* Smooth Scroll */
         html {
