@@ -335,6 +335,34 @@
               display: block;
             }
 
+        /* No-crop thumbnails on phones */
+@media (max-width: 768px) {
+  /* Let items size themselves by their media, not a forced ratio */
+  .portfolio-item {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;       /* overrides your current 16/10 rule */
+    background: #000;                     /* pleasant letterbox bars */
+  }
+  .portfolio-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain !important;       /* prevent side crop */
+  }
+
+  /* Optional: make the hero video no-crop too */
+  .hero {
+    min-height: auto;
+  }
+  .hero-video {
+    width: 100%;
+    height: auto;
+    object-fit: contain !important;       /* avoid side crop on vertical phones */
+    background: #000;
+  }
+}
+
+
     </style>
 </head>
 <body>
