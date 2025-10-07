@@ -361,6 +361,37 @@
     background: #000;
   }
 }
+/* Better mobile spacing */
+@media (max-width: 768px) {
+  /* Give all sections more breathing room */
+  section {
+    padding: 4rem 1.5rem;
+  }
+
+  /* Extra focus on hero text */
+  .hero {
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .hero h1,
+  .hero p {
+    max-width: 90%;        /* keep text from touching sides */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* About section text */
+  .about-content {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  /* Contact section too */
+  .contact-content {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+}
 
 
     </style>
