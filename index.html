@@ -573,6 +573,60 @@
     text-shadow: 0 2px 4px rgba(0,0,0,.6);
   }
 }
+        /* === FORCE-CROP HERO ON MOBILE === */
+@media (max-width: 768px) {
+  /* Lock the hero frame to the viewport height */
+  .hero {
+    position: relative;
+    height: 100vh;   /* fallback */
+    height: 100svh;  /* iOS 16+ */
+    height: 100dvh;  /* modern Chrome/Android */
+    min-height: 420px;
+    overflow: hidden;     /* hide the cropped edges */
+    padding: 0;           /* avoid pushing text outside the frame */
+  }
+
+  /* Make the video fill that frame and crop as needed */
+  .hero-video {
+    position: absolute !important;  /* beat any earlier rules */
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;   /* <-- the crop */
+    object-position: center !important; /* tweak focal point if needed */
+    display: block;                 /* remove inline-video baseline gaps */
+    z-index: 0;
+    background: #000;
+  }
+
+  /* Keep your overlay & text above the video and inside the frame */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: absolute;   /* ensure it stays over the video */
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 1.25rem;   /* safe side padding on phones */
+    /* optional: text-align: center; */
+  }
+
+  .hero h1, .hero p {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.6);
+  }
+}
+
 
     </style>
 </head>
