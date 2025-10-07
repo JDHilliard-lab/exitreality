@@ -403,6 +403,59 @@
     object-position: center;      /* keep important center in frame */
   }
 }
+        /* HERO: video under text, text stays inside video area */
+.hero {
+  position: relative;
+  height: 100vh;            /* text area = video area */
+  min-height: 520px;
+  margin-top: 80px;         /* keep clear of fixed nav */
+  overflow: hidden;         /* hide any video spill */
+  padding: 0;               /* we’ll pad the content wrapper instead */
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* allow slight crop so it fills */
+  object-position: center;  /* keep center framed */
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+               to bottom,
+               rgba(0,0,0,0.45),
+               rgba(0,0,0,0.35) 35%,
+               rgba(0,0,0,0.55)
+             );             /* subtle darkening for contrast */
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;               /* above video + overlay */
+  height: 100%;             /* vertically center within hero height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;          /* horizontal breathing room on desktop */
+  color: #fff;
+}
+
+.hero h1 { color: #fff; }   /* ensure heading is white */
+.hero p  { color: rgba(255,255,255,.9); text-shadow: 0 2px 4px rgba(0,0,0,.6); }
+
+/* Mobile tweaks: keep text inside video, avoid edge-touch */
+@media (max-width: 768px) {
+  .hero { height: 75vh; min-height: 420px; }
+  .hero-content { padding: 0 1.25rem; text-align: left; } /* or center if you prefer */
+  .hero h1, .hero p { max-width: 90%; }
+}
+
 
 
 
@@ -420,17 +473,21 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-    <video autoplay muted loop playsinline class="hero-video">
-        <source src="Other World Fish/BigRED001.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    
-    <div class="hero-content">
-        <h1 class="fade-in">Creative<br>Explorations &<br>Designs</h1>
-        <p class="fade-in">A visual journey beyond the ordinary. Explore worlds where imagination materializes and boundaries between the real and surreal dissolve into pure creative expression.</p>
-    </div>
+  <section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="your-video.mp4" type="video/mp4" />
+  </video>
+
+  <!-- contrast layer -->
+  <div class="hero-overlay"></div>
+
+  <!-- keep your existing text inside this wrapper -->
+  <div class="hero-content">
+    <h1 class="fade-in">Creative<br>Explorations &<br>Designs</h1>
+    <p class="fade-in">A visual journey beyond the ordinary. Explore worlds where imagination materializes and boundaries between the real and surreal dissolve into pure creative expression.</p>
+  </div>
 </section>
+
 
 
     <!-- About Section -->
