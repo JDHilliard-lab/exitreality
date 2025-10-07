@@ -510,6 +510,69 @@
   .hero-content { padding: 0 1.25rem; }
   .hero h1, .hero p { max-width: 90%; margin-left: auto; margin-right: auto; }
 }
+/* === Mobile "crop-in" hero === */
+@media (max-width: 768px) {
+  /* Lock the hero height to the visible mobile viewport.
+     Use a fallback stack for broader support. */
+  .hero {
+    height: 100vh;     /* fallback */
+    height: 100svh;    /* iOS 16+ & modern browsers */
+    height: 100dvh;    /* Android/Chrome modern */
+    min-height: 420px;
+    padding: 0;        /* don't let padding push text out */
+    position: relative;
+    overflow: hidden;  /* hide cropped edges */
+  }
+
+  /* Make the video fill the hero and crop as needed */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* <-- crops sides on tall screens */
+    object-position: center;  /* adjust focal point if needed */
+    z-index: 0;
+    background: #000;         /* nice fallback while loading */
+  }
+
+  /* Keep your dark overlay for contrast (if you’re using it) */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    /* keep your existing gradient or use this: */
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,.45),
+      rgba(0,0,0,.35) 35%,
+      rgba(0,0,0,.55)
+    );
+  }
+
+  /* Ensure text stays on top and within the hero bounds */
+  .hero-content {
+    position: absolute;    /* sit on top of the video */
+    inset: 0;              /* fill the hero */
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertically center text */
+    padding: 0 1.25rem;      /* safe side padding on phones */
+    text-align: left;        /* or center, if you prefer */
+  }
+
+  /* Keep readable line length and contrast */
+  .hero h1,
+  .hero p {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.6);
+  }
+}
 
 
 
