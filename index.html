@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #000;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.5;
+        }
+
+        /* Hero Section */
+        .hero {
+             position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 300;
+            letter-spacing: -3px;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .hero p {
+                font-size: clamp(1.2rem, 2vw, 1.5rem);
+                font-weight: 300;
+                color: rgba(255, 255, 255, 0.85);  /* lighter, softer white */
+                max-width: 600px;
+                margin-bottom: 3rem;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.6); /* adds readability on bright video */
+        }
+
+            .hero-video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: -1; /* keeps video behind text */
+            }
+            
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                color: white; /* text stands out */
+            }
+
+        /* Section Styling */
+        section {
+            padding: 8rem 4rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 4rem;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 800px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .services {
+            margin-top: 4rem;
+        }
+
+        .services h3 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .service-list li {
+            padding: 1rem 0;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+        }
+
+        .portfolio-item {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            background: #000;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: scale(0.98);
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .portfolio-item:hover img {
+            opacity: 0.7;
+            transform: scale(1.05);
+        }
+
+        .portfolio-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio-item:hover .portfolio-info {
+            transform: translateY(0);
+        }
+
+        .portfolio-info h3 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .portfolio-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+
+        /* Contact Section */
+        .contact-content {
+            max-width: 600px;
+        }
+
+        .contact-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .contact-email {
+            font-size: 1.5rem;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #000;
+            transition: opacity 0.3s ease;
+        }
+
+        .contact-email:hover {
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 4rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1.5rem 2rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .hero {
+                padding: 0 2rem;
+            }
+
+            section {
+                padding: 0;   /* removes side spacing */
+            }
+
+            .portfolio-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                width: 100vw;  /* force full viewport width */
+                margin: 0;     /* no extra margins */
+            }
+
+                  .portfolio-item {
+                height: 60vh;                 /* a bit shorter on phones */
+                min-height: 0;
+                aspect-ratio: auto !important;/* stop forcing 16:10 */
+              }
+              .portfolio-item img {
+                object-fit: cover;            /* stays full-bleed; some crop is inevitable */
+                object-position: center;      /* keep important center in frame */
+              }
+            }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animation on scroll */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+                    /* Selected Work Section - full bleed */
+            #work {
+              padding: 0; /* remove default side padding */
+            }
+            
+            #work .section-title {
+              padding: 8rem 4rem 2rem; /* keep the title aligned with other sections */
+              margin: 0;
+            }
+            
+            .portfolio-grid {
+              display: flex;
+              flex-direction: column; /* stack vertically */
+              width: 100%; 
+              margin: 0;
+              gap: 0; /* no gaps between items */
+            }
+            
+            .portfolio-item {
+              width: 100%;         /* take full width */
+              height: 100vh;       /* each banner fills the screen height */
+              min-height: 500px;   /* safety for smaller screens */
+              margin: 0;
+              border: none;
+            }
+            
+            .portfolio-item img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;   /* makes image scale like a background */
+              display: block;
+            }
+
+        /* No-crop thumbnails on phones */
+@media (max-width: 768px) {
+  /* Let items size themselves by their media, not a forced ratio */
+  .portfolio-item {
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;       /* overrides your current 16/10 rule */
+    background: #000;                     /* pleasant letterbox bars */
+  }
+  .portfolio-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain !important;       /* prevent side crop */
+  }
+
+  /* Optional: make the hero video no-crop too */
+  .hero {
+    min-height: auto;
+  }
+  .hero-video {
+    width: 100%;
+    height: auto;
+    object-fit: contain !important;       /* avoid side crop on vertical phones */
+    background: #000;
+  }
+}
+/* Better mobile spacing */
+@media (max-width: 768px) {
+  /* Give all sections more breathing room */
+  section {
+    padding: 4rem 1.5rem;
+  }
+
+  /* Extra focus on hero text */
+  .hero {
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .hero h1,
+  .hero p {
+    max-width: 90%;        /* keep text from touching sides */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* About section text */
+  .about-content {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  /* Contact section too */
+  .contact-content {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+}
+        @media (max-width: 768px) {
+  .portfolio-item {
+    height: 60vh;                 /* a bit shorter on phones */
+    min-height: 0;
+    aspect-ratio: auto !important;/* stop forcing 16:10 */
+  }
+  .portfolio-item img {
+    object-fit: cover;            /* stays full-bleed; some crop is inevitable */
+    object-position: center;      /* keep important center in frame */
+  }
+}
+        /* HERO: video under text, text stays inside video area */
+.hero {
+  position: relative;
+  height: 100vh;            /* text area = video area */
+  min-height: 520px;
+  margin-top: 80px;         /* keep clear of fixed nav */
+  overflow: hidden;         /* hide any video spill */
+  padding: 0;               /* we’ll pad the content wrapper instead */
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* allow slight crop so it fills */
+  object-position: center;  /* keep center framed */
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+               to bottom,
+               rgba(0,0,0,0.45),
+               rgba(0,0,0,0.35) 35%,
+               rgba(0,0,0,0.55)
+             );             /* subtle darkening for contrast */
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;               /* above video + overlay */
+  height: 100%;             /* vertically center within hero height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;          /* horizontal breathing room on desktop */
+  color: #fff;
+}
+
+.hero h1 { color: #fff; }   /* ensure heading is white */
+.hero p  { color: rgba(255,255,255,.9); text-shadow: 0 2px 4px rgba(0,0,0,.6); }
+
+/* Mobile tweaks: keep text inside video, avoid edge-touch */
+@media (max-width: 768px) {
+  .hero { height: 75vh; min-height: 420px; }
+  .hero-content { padding: 0 1.25rem; text-align: left; } /* or center if you prefer */
+  .hero h1, .hero p { max-width: 90%; }
+}
+
+        /* ===== HERO (consolidated, reliable) ===== */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 520px;
+  margin-top: 80px;        /* accounts for fixed nav */
+  overflow: hidden;
+  padding: 0;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* fills frame (may crop slightly) */
+  object-position: center;
+  z-index: 0;              /* video at the back */
+  background: #000;        /* fallback while loading */
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;              /* above video */
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.45),
+    rgba(0,0,0,0.35) 35%,
+    rgba(0,0,0,0.55)
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;              /* above overlay */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;
+  color: #fff;
+}
+
+.hero h1 { color: #fff; }
+.hero p  { color: rgba(255,255,255,0.9); text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+
+/* ===== Mobile tweaks ===== */
+@media (max-width: 768px) {
+  .hero { height: 75vh; min-height: 420px; }
+  .hero-content { padding: 0 1.25rem; }
+  .hero h1, .hero p { max-width: 90%; margin-left: auto; margin-right: auto; }
+}
+/* === Mobile "crop-in" hero === */
+@media (max-width: 768px) {
+  /* Lock the hero height to the visible mobile viewport.
+     Use a fallback stack for broader support. */
+  .hero {
+    height: 100vh;     /* fallback */
+    height: 100svh;    /* iOS 16+ & modern browsers */
+    height: 100dvh;    /* Android/Chrome modern */
+    min-height: 420px;
+    padding: 0;        /* don't let padding push text out */
+    position: relative;
+    overflow: hidden;  /* hide cropped edges */
+  }
+
+  /* Make the video fill the hero and crop as needed */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* <-- crops sides on tall screens */
+    object-position: center;  /* adjust focal point if needed */
+    z-index: 0;
+    background: #000;         /* nice fallback while loading */
+  }
+
+  /* Keep your dark overlay for contrast (if you’re using it) */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    /* keep your existing gradient or use this: */
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,.45),
+      rgba(0,0,0,.35) 35%,
+      rgba(0,0,0,.55)
+    );
+  }
+
+  /* Ensure text stays on top and within the hero bounds */
+  .hero-content {
+    position: absolute;    /* sit on top of the video */
+    inset: 0;              /* fill the hero */
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertically center text */
+    padding: 0 1.25rem;      /* safe side padding on phones */
+    text-align: left;        /* or center, if you prefer */
+  }
+
+  /* Keep readable line length and contrast */
+  .hero h1,
+  .hero p {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.6);
+  }
+}
+        /* === FORCE-CROP HERO ON MOBILE === */
+@media (max-width: 768px) {
+  /* Lock the hero frame to the viewport height */
+  .hero {
+    position: relative;
+    height: 100vh;   /* fallback */
+    height: 100svh;  /* iOS 16+ */
+    height: 100dvh;  /* modern Chrome/Android */
+    min-height: 420px;
+    overflow: hidden;     /* hide the cropped edges */
+    padding: 0;           /* avoid pushing text outside the frame */
+  }
+
+  /* Make the video fill that frame and crop as needed */
+  .hero-video {
+    position: absolute !important;  /* beat any earlier rules */
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;   /* <-- the crop */
+    object-position: center !important; /* tweak focal point if needed */
+    display: block;                 /* remove inline-video baseline gaps */
+    z-index: 0;
+    background: #000;
+  }
+
+  /* Keep your overlay & text above the video and inside the frame */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: absolute;   /* ensure it stays over the video */
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 1.25rem;   /* safe side padding on phones */
+    /* optional: text-align: center; */
+  }
+
+  .hero h1, .hero p {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.6);
+  }
+}
+        @media (max-width: 768px) {
+  .section-title,
+  .about-content,
+  .contact-content {
+    text-align: center;
+  }
+
+  /* Optional: center service list too */
+  .service-list {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+
+
+    
+/* --- Full-bleed on desktop: nav + images line up to true viewport edges --- */
+@media (min-width: 641px) {
+  nav { left: 50%; right: auto; width: 100vw; transform: translateX(-50%); }
+  .full-image { width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); overflow: visible; }
+  .ba { border: none; border-radius: 0; }
+}
+
+html { scrollbar-gutter: stable; }
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">Exit Reality</div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+\1 id="hero" class="hero">
+  <video class="hero-video"
+         autoplay
+         muted
+         playsinline
+         loop
+         preload="auto"
+         poster="Other World Fish/BigRED001-gpt.png">
+    <!-- Replace these paths with your actual files -->
+    <source src="randomvideos/randomcollecton.mp4" type="video/mp4" />
+    <source src="assets/hero-video.webm" type="video/webm" />
+    <!-- If both fail, the poster will show -->
+  </video>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <h1 class="fade-in">Creative<br>Explorations &<br>Designs</h1>
+    <p class="fade-in">
+      A visual journey beyond the ordinary. Explore worlds where imagination materializes and
+      boundaries between the real and surreal dissolve into pure creative expression.
+    </p>
+  </div>
+</section>
+
+
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about-content">
+            <p><!-- EDIT THIS: Add your introduction --></p>
+            <p>I'm a creative professional with expertise in design, strategy, and execution. My work spans across multiple disciplines, always focused on creating impactful and meaningful solutions.</p>
+            
+            <p><!-- EDIT THIS: Add more about your background --></p>
+            <p>With years of experience collaborating with brands and agencies, I bring a unique perspective that blends creativity with strategic thinking.</p>
+
+            <div class="services">
+                <h3>Services</h3>
+                <!-- EDIT THIS: Replace with your services -->
+                <ul class="service-list">
+                    <li>Brand Strategy</li>
+                    <li>Art Direction</li>
+                    <li>UI/UX Design</li>
+                    <li>Motion Graphics</li>
+                    <li>Visual Identity</li>
+                    <li>Creative Direction</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="work">
+        <h2 class="section-title">Selected Works</h2>
+        <div class="portfolio-grid">
+            <!-- EDIT THIS: Replace with your actual projects and images -->
+            <!-- Portfolio Item 1 -->
+            <a href="project1ancientruins.html" class="portfolio-item">
+                <img src="Ancient Ruins/EGYPT.0005-GPT-16x9.webp" alt="Project 1">
+                <div class="portfolio-info">
+                    <h3>Acient Ruins</h3>
+                    <p>Achival, Generative, Animation</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 2 -->
+            <a href="project2.html" class="portfolio-item">
+                <img src="Other World Fish/BigRED001-gpt.png" alt="Project 2">
+                <div class="portfolio-info">
+                    <h3>Ocean Oddities</h3>
+                    <p>Concept Art, Generative ai, Animation</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 3 -->
+            <a href="project3.html" class="portfolio-item">
+                <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=500&fit=crop" alt="Project 3">
+                <div class="portfolio-info">
+                    <h3>Project Name Three</h3>
+                    <p>UI/UX Design, Strategy</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 4 -->
+            <a href="project4.html" class="portfolio-item">
+                <img src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=800&h=500&fit=crop" alt="Project 4">
+                <div class="portfolio-info">
+                    <h3>Project Name Four</h3>
+                    <p>Motion Design, Animation</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact-content">
+            <!-- EDIT THIS: Add your contact information -->
+            <p>If you have a project you would like to collaborate on or simply want to say hello, please reach out.</p>
+            <a href="mailto:your.email@example.com" class="contact-email">your.email@example.com</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Your Name. Always learning. Always growing.</p>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+
+<script>
+  // --- Navigation link safeguard for GitHub Pages base paths ---
+  (function() {
+    try {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const base = parts.length ? `/${parts[0]}` : '';
+      const here = window.location.pathname || '/';
+      const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
+
+      document.querySelectorAll('nav a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const low = href.toLowerCase();
+        const isHashOnly   = href.startsWith('#');
+        const isIndex      = low === 'index.html' || low === './index.html' || low === '/index.html';
+        const isIndexHash  = low.startsWith('index.html#') || low.startsWith('./index.html#') || low.startsWith('/index.html#');
+
+        // Logo → homepage root (works with or without custom domain)
+        if (isIndex || href === '/' || href === './' || href === (base + '/')) {
+          link.setAttribute('href', base || '/');
+          return;
+        }
+
+        // On the homepage: leave hash-only links as-is for smooth scrolling
+        if (isHome && isHashOnly) {
+          return;
+        }
+
+        // Elsewhere (e.g., on project pages):
+        if (!isHome && (isHashOnly || isIndexHash)) {
+          const anchor = isHashOnly ? href.slice(1) : (href.split('#')[1] || '');
+          const newHref = (base ? base : '') + '/index.html' + (anchor ? ('#' + anchor) : '');
+          link.setAttribute('href', newHref);
+        }
+      });
+    } catch (e) {
+      console && console.warn && console.warn('Nav safeguard error:', e);
+    }
+  })();
+</script>
+</body>
+</html>
