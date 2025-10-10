@@ -81,6 +81,7 @@
         .ba + .ba { margin-top: 2rem; }
 
         .ba__range { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; }
+        
         /* -------- Mobile alignment to match index + full-bleed sliders -------- */
 
             /* Match mobile nav spacing to index */
@@ -88,7 +89,7 @@
               nav { padding: 12px 16px; }
               .project-header { padding: 24px 16px; }
               /* Reduce left/right padding so content aligns with index on mobile */
-              .content-section { padding: 10px 0; }
+              .content-section { padding: 32px 0; }
             }
             
             /* Make slider go edge-to-edge on phones */
@@ -115,6 +116,16 @@
               .ba { aspect-ratio: 9 / 10; }
             }
         */
+                /* --- Reduce slider spacing on mobile --- */
+        @media (max-width: 640px) {
+          .ba + .ba {
+            margin-top: 0.75rem; /* smaller gap between sliders */
+          }
+          .full-image {
+            margin: 1.5rem 0; /* tighten top/bottom spacing */
+          }
+        }
+
 
     </style>
 </head>
