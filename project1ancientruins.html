@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anceint Ruins</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #000;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.5;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #000;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.5;
+        }
+
+        /* Project Header */
+        .project-header {
+            margin-top: 80px;
+            padding: 4rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .project-title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 300;
+            letter-spacing: -2px;
+            margin-bottom: 3rem;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .meta-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meta-value {
+            font-size: 1.1rem;
+            color: #000;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 6rem 4rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            max-width: 900px;
+            margin-bottom: 3rem;
+        }
+
+        /* Full Width Image */
+        .full-image {
+            width: 100%;
+            margin: 3rem 0;
+        }
+
+        .full-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Credits Section */
+        .credits-section {
+            padding: 4rem;
+            background: #f5f5f5;
+        }
+
+        .credits-label {
+            font-size: 0.85rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2rem;
+        }
+
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 600px;
+        }
+
+        .credit-item {
+            font-size: 1rem;
+            color: #000;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ---------- Minimalist Before/After Slider ---------- */
+        .ba {
+            position: relative;
+            width: 100%;
+            /* Use 16:9 since your after image name suggests 16x9; adjust if needed */
+            aspect-ratio: 16 / 9;
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            overflow: clip;
+            --x: 50%;
+        }
+        .ba__layer {
+            position: absolute;
+            inset: 0;
+        }
+        .ba__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .ba__after {
+            /* Reveal left portion by default */
+            clip-path: polygon(0 0, var(--x) 0, var(--x) 100%, 0 100%);
+        }
+        .ba__divider {
+            position: absolute;
+            left: var(--x);
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.1); /* thin, subtle divider to blend with white theme */
+            transform: translateX(-0.5px);
+            pointer-events: none;
+        }
+        /* Arrow-only, fade-in handle */
+        .ba__handle {
+            position: absolute;
+            left: var(--x);
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ew-resize;
+            user-select: none;
+            color: rgba(0,0,0,0);
+            font-size: 24px;
+            font-weight: 400;
+            transition: color 0.35s ease;
+        }
+        .ba:hover .ba__handle { color: rgba(0,0,0,0.4); }
+        .ba__handle:hover { color: rgba(0,0,0,0.6); }
+        .ba__handle::before { content: '<'; margin-right: 10px; }
+        .ba__handle::after  { content: '>'; margin-left: 10px; }
+
+        /* Visually hidden but accessible range for AT/keyboard */
+        .ba__range {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+<nav>
+    <a href="index.html" class="logo">Exit Reality</a>
+    <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+</nav>
+
+
+    <!-- Project Header -->
+    <div class="project-header">
+        <h1 class="project-title">Ancient Ruins</h1>
+        
+        <div class="project-meta">
+            <div class="meta-item">
+                <div class="meta-label">Project</div>
+                <div class="meta-value">Reconstructed Memory</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Year</div>
+                <div class="meta-value">2025</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">Archival, Architecture, Animation, Generative ai</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Synopsis Section -->
+    <div class="content-section">
+        <div class="section-label">Synopsis</div>
+        <div class="section-description">
+            <!-- EDIT THIS: Add your project synopsis/overview -->
+            <p>Ancient Ruins explores the intersection of history, art, and technology. Starting with public 
+                domain sketches of Egyptian ruins, I used generative AI tools to transform these antique drawings into photorealistic, 
+                cinematic scenes, imagining what these ancient worlds might look like through a modern lens. Through AI-powered video generation, 
+                the still images were brought to life with sweeping camera movements and atmospheric motion, reanimating fragments of 
+                the past using the cutting edge of digital creativity.</p>
+        </div>
+    </div>
+
+    <!-- Concept Section 1 -->
+    <div class="content-section">
+        <div class="section-label">Stage 1</div>
+        <div class="section-title">Image Reconstruction  </div>
+        <div class="section-description">
+            <!-- EDIT THIS: Describe this specific aspect of the project -->
+            <p>This phase focused on reinterpreting archival imagery through the lens of generative AI. 
+                Each historical sketch was processed with prompts designed to “photograph” the past 
+                turning ancient lines and textures into cinematic landscapes rendered with striking realism.</p>
+        </div>
+        
+        <!-- Before/After Slider inserted here, using your two Stage 1 images -->
+        <div class="full-image">
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0005">
+                <!-- BEFORE (archival) -->
+                <div class="ba__layer ba__before">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0005-REF.png" alt="Archival sketch reference of Egyptian ruins">
+                </div>
+                <!-- AFTER (photoreal) -->
+                <div class="ba__layer ba__after">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0005-GPT-16x9.png" alt="Photorealistic AI rendering of Egyptian ruins">
+                </div>
+                <div class="ba__divider" aria-hidden="true"></div>
+                <div class="ba__handle" aria-hidden="true"></div>
+                <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+            </div>
+        </div>
+    </div>
+
+    <!-- Concept Section 2 -->
+    <div class="content-section">
+        <div class="section-label">Concept Art</div>
+        <div class="section-title">Another Section (e.g., "World Building")</div>
+        <div class="section-description">
+            <!-- EDIT THIS: Describe this section -->
+            <p>Detail another aspect of your project. Talk about specific challenges, creative decisions, or techniques you employed.</p>
+        </div>
+        
+        <!-- Full Width Image -->
+        <div class="full-image">
+            <img src="images/project1-section2.jpg" alt="Section 2">
+        </div>
+    </div>
+
+    <!-- Concept Section 3 -->
+    <div class="content-section">
+        <div class="section-label">Concept Art</div>
+        <div class="section-title">Third Section (e.g., "Final Renders")</div>
+        <div class="section-description">
+            <!-- EDIT THIS: Describe this section -->
+            <p>Describe the final stage or another key component of your work. Share insights about the evolution of the project.</p>
+        </div>
+        
+        <!-- Image Grid (for multiple images) -->
+        <div class="image-grid">
+            <img src="images/project1-detail1.jpg" alt="Detail 1">
+            <img src="images/project1-detail2.jpg" alt="Detail 2">
+        </div>
+    </div>
+
+    <!-- Add more sections as needed -->
+    <div class="content-section">
+        <div class="section-label">Concept Art</div>
+        <div class="section-title">Additional Section</div>
+        <div class="section-description">
+            <!-- EDIT THIS: Add more sections as needed for your project -->
+            <p>You can duplicate this section structure as many times as needed to showcase different aspects of your work.</p>
+        </div>
+        
+        <div class="full-image">
+            <img src="images/project1-section4.jpg" alt="Section 4">
+        </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-section">
+        <div class="credits-label">Credits</div>
+        <div class="credits-list">
+            <!-- EDIT THIS: Add your credits/roles -->
+            <div class="credit-item">3D Artist - Your Name</div>
+            <div class="credit-item">Animation - Your Name</div>
+            <div class="credit-item">Art Direction - Your Name</div>
+        </div>
+    </div>
+
+    <script>
+        // Minimal, dependency-free slider logic (mouse, touch, and keyboard via range input)
+        document.querySelectorAll('.ba').forEach((root) => {
+            const range = root.querySelector('.ba__range');
+            const setPct = (p) => {
+                const clamped = Math.max(0, Math.min(100, p));
+                root.style.setProperty('--x', clamped + '%');
+                range.value = clamped;
+            };
+
+            const toPctFromClientX = (clientX) => {
+                const rect = root.getBoundingClientRect();
+                return ((clientX - rect.left) / rect.width) * 100;
+            };
+
+            // Mouse/pointer
+            const onPointerDown = (e) => {
+                setPct(toPctFromClientX(e.clientX));
+                const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+                const onUp = () => {
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            };
+            root.addEventListener('mousedown', onPointerDown);
+
+            // Touch
+            root.addEventListener('touchstart', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+            root.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+
+            // Range (keyboard + screen readers)
+            range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+
+            // Initialize
+            setPct(parseFloat(range.value) || 50);
+        });
+    </script>
+</body>
+</html>
