@@ -130,6 +130,27 @@
     transform: translateX(-50%);
   }
 }
+/* --- Center text on mobile for content sections --- */
+@media (max-width: 640px) {
+  /* Target everything from Synopsis and beyond */
+  .content-section {
+    text-align: center;
+  }
+
+  /* Center the labels and titles cleanly */
+  .section-label,
+  .section-title,
+  .section-description {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Limit max width so text stays readable */
+  .section-description {
+    max-width: 90%;
+  }
+}
 
 
 
