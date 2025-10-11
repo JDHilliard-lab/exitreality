@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anceint Ruins</title>
+
+        <!-- Global Styles -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script defer src="js/scripts.js"></script>
+
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+         /* Let project sections use their original full width (not the shared max-width) */
+  .content-section {
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+
+  /* Keep mobile padding comfy and aligned */
+  @media (max-width: 640px){
+    .content-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+  }
+
+  /* Ensure full-bleed media really goes edge to edge (works with your shared .full-image rules) */
+  .full-image img,
+  .full-image video { display:block; width:100%; height:auto; }
+</style>
+<style>
+/* Project page overrides (restore full-width layout) */
+.content-section {
+  max-width: none !important;
+  margin: 0 !important;
+  padding-left: 4rem;
+  padding-right: 4rem;
+}
+@media (max-width: 640px){
+  .content-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+}
+.full-image img, .full-image video { display:block; width:100%; height:auto; }
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+<nav>
+        <a href="index.html" class="logo">Exit Reality</a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Project Header -->
+    <div class="project-header">
+        <h1 class="project-title">Ancient Ruins</h1>
+
+        <div class="project-meta">
+            <div class="meta-item">
+                <div class="meta-label">Project</div>
+                <div class="meta-value">Reconstructed Memory</div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-label">Year</div>
+                <div class="meta-value">2025</div>
+            </div>
+
+            <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">Archival, Architecture, Animation, Generative ai</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Synopsis Section -->
+    <div class="content-section">
+        <div class="section-label">Synopsis</div>
+        <div class="section-description">
+            <p>Ancient Ruins explores the intersection of history, art, and technology. Starting with public
+                domain sketches of Egyptian ruins, I used generative AI tools to transform these antique drawings into photorealistic,
+                cinematic scenes, imagining what these ancient worlds might look like through a modern lens. Through AI-powered video generation,
+                the still images were brought to life with sweeping camera movements and atmospheric motion, reanimating fragments of
+                the past using the cutting edge of digital creativity.</p>
+        </div>
+    </div>
+
+   <!-- Concept Section 1 -->
+<div class="content-section">
+  <div class="section-label">Stage 1</div>
+  <div class="section-title">Image Reconstruction</div>
+  <div class="section-description">
+    <p>This phase focused on reinterpreting archival imagery through the lens of generative AI.
+      Each historical sketch was processed with prompts designed to “photograph” the past
+      turning ancient lines and textures into cinematic landscapes rendered with striking realism.</p>
+  </div>
+
+  <!-- All sliders share the SAME wrapper so they render at identical size -->
+  <div class="full-image">
+    <!-- Slider 1 -->
+    <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0005">
+      <div class="ba__layer ba__before">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0005-GPT-16x9.webp" alt="Archival sketch reference of Egyptian ruins">
+      </div>
+      <div class="ba__layer ba__after">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0005-REF.webp" alt="Photorealistic AI rendering of Egyptian ruins">
+      </div>
+      <div class="ba__divider" aria-hidden="true"></div>
+      <div class="ba__handle" aria-hidden="true"></div>
+      <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+    </div>
+
+    <!-- Slider 2 -->
+    <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0008">
+      <div class="ba__layer ba__before">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0008-REF.webp" alt="Archival sketch reference of Egyptian ruins">
+      </div>
+      <div class="ba__layer ba__after">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0008.1-GPT-16x9.webp" alt="Photorealistic AI rendering of Egyptian ruins">
+      </div>
+      <div class="ba__divider" aria-hidden="true"></div>
+      <div class="ba__handle" aria-hidden="true"></div>
+      <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+    </div>
+
+    <!-- Slider 3 -->
+    <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0038">
+      <div class="ba__layer ba__before">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0038-REF.webp" alt="Archival sketch reference of Egyptian ruins">
+      </div>
+      <div class="ba__layer ba__after">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0038-GPT.webp" alt="Photorealistic AI rendering of Egyptian ruins">
+      </div>
+      <div class="ba__divider" aria-hidden="true"></div>
+      <div class="ba__handle" aria-hidden="true"></div>
+      <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+    </div>
+
+      <!-- Slider 4 -->
+    <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0038">
+      <div class="ba__layer ba__before">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0003-GPT-16x9.webp" alt="Archival sketch reference of Egyptian ruins">
+      </div>
+      <div class="ba__layer ba__after">
+        <img class="ba__img" src="Ancient Ruins/EGYPT.0003-REF.webp" alt="Photorealistic AI rendering of Egyptian ruins">
+      </div>
+      <div class="ba__divider" aria-hidden="true"></div>
+      <div class="ba__handle" aria-hidden="true"></div>
+      <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+    </div>
+  </div>
+</div>
+
+    <!-- Concept Section 2 -->
+    <div class="content-section">
+        <div class="section-label">Stage 2</div>
+        <div class="section-title">Color Matching</div>
+        <div class="section-description">
+            <p>The phase, all images are carefully color matched to one another to give a cohesive look and feel which will help in the next phase of geneateing animations from each image</p>
+        </div>
+
+        <div class="full-image">
+            <img src="Ancient Ruins/EGPYPT-GRID0001.webp" alt="Section 2">
+        </div>
+    </div>
+
+    <!-- Concept Section 3 -->
+    <div class="content-section">
+        <div class="section-label">Concept Art</div>
+        <div class="section-title">Third Section (e.g., "Final Renders")</div>
+        <div class="section-description">
+            <p>Describe the final stage or another key component of your work. Share insights about the evolution of the project.</p>
+        </div>
+
+        <div class="image-grid">
+            <img src="images/project1-detail1.jpg" alt="Detail 1">
+            <img src="images/project1-detail2.jpg" alt="Detail 2">
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="section-label">Concept Art</div>
+        <div class="section-title">Additional Section</div>
+        <div class="section-description">
+            <p>You can duplicate this section structure as many times as needed to showcase different aspects of your work.</p>
+        </div>
+
+        <div class="full-image">
+            <img src="images/project1-section4.jpg" alt="Section 4">
+        </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-section">
+        <div class="credits-label">Credits</div>
+        <div class="credits-list">
+            <div class="credit-item">3D Artist - Your Name</div>
+            <div class="credit-item">Animation - Your Name</div>
+            <div class="credit-item">Art Direction - Your Name</div>
+        </div>
+    </div>
+
+    <script>
+        // Minimal, dependency-free slider logic (mouse, touch, and keyboard via range input)
+        document.querySelectorAll('.ba').forEach((root) => {
+            const range = root.querySelector('.ba__range');
+            const setPct = (p) => {
+                const clamped = Math.max(0, Math.min(100, p));
+                root.style.setProperty('--x', clamped + '%');
+                range.value = clamped;
+            };
+
+            const toPctFromClientX = (clientX) => {
+                const rect = root.getBoundingClientRect();
+                return ((clientX - rect.left) / rect.width) * 100;
+            };
+
+            // Mouse/pointer
+            const onPointerDown = (e) => {
+                setPct(toPctFromClientX(e.clientX));
+                const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+                const onUp = () => {
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            };
+            root.addEventListener('mousedown', onPointerDown);
+
+            // Touch
+            root.addEventListener('touchstart', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+            root.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+
+            // Range (keyboard + screen readers)
+            range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+
+            // Initialize
+            setPct(parseFloat(range.value) || 50);
+        });
+    </script>
+
+</body>
+</html>

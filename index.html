@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER</title>
+
+    <!-- Global Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+    <script defer src="js/scripts.js"></script>
+
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Navigation */
+
+        /* Hero Section */
+        .hero {
+             position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 300;
+            letter-spacing: -3px;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .hero p {
+                font-size: clamp(1.2rem, 2vw, 1.5rem);
+                font-weight: 300;
+                color: rgba(255, 255, 255, 0.85);  /* lighter, softer white */
+                max-width: 600px;
+                margin-bottom: 3rem;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.6); /* adds readability on bright video */
+        }
+
+            .hero-video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: -1; /* keeps video behind text */
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 1;
+                color: white; /* text stands out */
+            }
+
+        /* Section Styling */
+        section {
+            padding: 8rem 4rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 4rem;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 800px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .services {
+            margin-top: 4rem;
+        }
+
+        .services h3 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .service-list li {
+            padding: 1rem 0;
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+        }
+
+        .portfolio-item {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            background: #000;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: scale(0.98);
+        }
+
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .portfolio-item:hover img {
+            opacity: 0.7;
+            transform: scale(1.05);
+        }
+
+        .portfolio-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio-item:hover .portfolio-info {
+            transform: translateY(0);
+        }
+
+        .portfolio-info h3 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .portfolio-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            max-width: 600px;
+        }
+
+        .contact-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .contact-email {
+            font-size: 1.5rem;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #000;
+            transition: opacity 0.3s ease;
+        }
+
+        .contact-email:hover {
+            opacity: 0.5;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 4rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            .hero {
+                padding: 0 2rem;
+            }
+
+            section {
+                padding: 0;   /* removes side spacing */
+            }
+
+            .portfolio-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                width: 100vw;  /* force full viewport width */
+                margin: 0;     /* no extra margins */
+            }
+
+                  .portfolio-item {
+                height: 60vh;                 /* a bit shorter on phones */
+                min-height: 0;
+                aspect-ratio: auto !important;/* stop forcing 16:10 */
+              }
+              .portfolio-item img {
+                object-fit: cover;            /* stays full-bleed; some crop is inevitable */
+                object-position: center;      /* keep important center in frame */
+              }
+            }
+
+        /* Smooth Scroll */
+
+        /* Stop the global body padding from pushing the hero down */
+
+  /* Push only the hero down by the exact nav height */
+  .hero { margin-top: var(--nav-h) !important; }
+
+  /* Ensure hero video is truly full width and not adding stray gaps */
+  .hero video,
+  .hero img { display:block; width:100%; height:auto; }
+</style>
+<style>
+/* Homepage overrides (keep hero snug under fixed nav) */
+body { padding-top: 0 !important; }
+.hero { margin-top: var(--nav-h) !important; }
+.hero video, .hero img { display:block; width:100%; height:auto; }
+</style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a class="logo" href="#hero" aria-label="Exit Reality — Top">Exit Reality</a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+<section class="hero" id="hero">
+  <video class="hero-video"
+         autoplay
+         muted
+         playsinline
+         loop
+         preload="auto"
+         poster="Other World Fish/BigRED001-gpt.png">
+    <!-- Replace these paths with your actual files -->
+    <source src="randomvideos/randomcollecton.mp4" type="video/mp4" />
+    <source src="assets/hero-video.webm" type="video/webm" />
+    <!-- If both fail, the poster will show -->
+  </video>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <h1 class="fade-in">Creative<br>Explorations &<br>Designs</h1>
+    <p class="fade-in">
+      A visual journey beyond the ordinary. Explore worlds where imagination materializes and
+      boundaries between the real and surreal dissolve into pure creative expression.
+    </p>
+  </div>
+</section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about-content">
+            <p><!-- EDIT THIS: Add your introduction --></p>
+            <p>I'm a creative professional with expertise in design, strategy, and execution. My work spans across multiple disciplines, always focused on creating impactful and meaningful solutions.</p>
+
+            <p><!-- EDIT THIS: Add more about your background --></p>
+            <p>With years of experience collaborating with brands and agencies, I bring a unique perspective that blends creativity with strategic thinking.</p>
+
+            <div class="services">
+                <h3>Services</h3>
+                <!-- EDIT THIS: Replace with your services -->
+                <ul class="service-list">
+                    <li>Brand Strategy</li>
+                    <li>Art Direction</li>
+                    <li>UI/UX Design</li>
+                    <li>Motion Graphics</li>
+                    <li>Visual Identity</li>
+                    <li>Creative Direction</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="work">
+        <h2 class="section-title">Selected Works</h2>
+        <div class="portfolio-grid">
+            <!-- EDIT THIS: Replace with your actual projects and images -->
+            <!-- Portfolio Item 1 -->
+            <a href="project1ancientruins.html" class="portfolio-item">
+                <img src="Ancient Ruins/EGYPT.0005-GPT-16x9.webp" alt="Project 1">
+                <div class="portfolio-info">
+                    <h3>Acient Ruins</h3>
+                    <p>Achival, Generative, Animation</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 2 -->
+            <a href="project2.html" class="portfolio-item">
+                <img src="Other World Fish/BigRED001-gpt.png" alt="Project 2">
+                <div class="portfolio-info">
+                    <h3>Ocean Oddities</h3>
+                    <p>Concept Art, Generative ai, Animation</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 3 -->
+            <a href="project3.html" class="portfolio-item">
+                <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=500&fit=crop" alt="Project 3">
+                <div class="portfolio-info">
+                    <h3>Project Name Three</h3>
+                    <p>UI/UX Design, Strategy</p>
+                </div>
+            </a>
+
+            <!-- Portfolio Item 4 -->
+            <a href="project4.html" class="portfolio-item">
+                <img src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=800&h=500&fit=crop" alt="Project 4">
+                <div class="portfolio-info">
+                    <h3>Project Name Four</h3>
+                    <p>Motion Design, Animation</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact-content">
+            <!-- EDIT THIS: Add your contact information -->
+            <p>If you have a project you would like to collaborate on or simply want to say hello, please reach out.</p>
+            <a href="mailto:your.email@example.com" class="contact-email">your.email@example.com</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Your Name. Always learning. Always growing.</p>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+
+</body>
+</html>
