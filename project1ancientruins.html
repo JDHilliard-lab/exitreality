@@ -257,6 +257,24 @@ nav {
 /* Full-bleed stability */
 html { scrollbar-gutter: stable; }
 body { overflow-y: scroll; overflow-x: hidden; }
+
+         /* Let project sections use their original full width (not the shared max-width) */
+  .content-section { 
+    max-width: none !important; 
+    margin: 0 !important; 
+    padding-left: 4rem; 
+    padding-right: 4rem; 
+  }
+
+  /* Keep mobile padding comfy and aligned */
+  @media (max-width: 640px){
+    .content-section { padding-left: 1.25rem; padding-right: 1.25rem; }
+  }
+
+  /* Ensure full-bleed media really goes edge to edge (works with your shared .full-image rules) */
+  .full-image img, 
+  .full-image video { display:block; width:100%; height:auto; }
+        
 </style>
 </head>
 <body>
