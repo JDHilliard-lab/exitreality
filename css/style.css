@@ -568,10 +568,22 @@ footer {
     text-align: center;
   }
 
+  /* Portfolio grid - edge-to-edge on mobile */
+  .portfolio-grid {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+  }
+
   /* Portfolio items */
   .portfolio-item {
     height: 60vh;
-    min-height: 400px;
+    min-height: 350px;
   }
 
   /* About/Contact text */
