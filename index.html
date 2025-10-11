@@ -699,6 +699,18 @@ nav {
 /* Full-bleed stability */
 html { scrollbar-gutter: stable; }
 body { overflow-y: scroll; overflow-x: hidden; }
+
+        /* Stop the global body padding from pushing the hero down */
+  body { padding-top: 0 !important; }
+
+  /* Push only the hero down by the exact nav height */
+  .hero { margin-top: var(--nav-h) !important; }
+
+  /* Ensure hero video is truly full width and not adding stray gaps */
+  .hero video, 
+  .hero img { display:block; width:100%; height:auto; }
+
+        
 </style>
 </head>
 <body>
