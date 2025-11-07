@@ -385,8 +385,14 @@ footer {
 
 /* ===== FULL-WIDTH IMAGES ===== */
 .full-image {
-  width: 100%;
-  margin: 3rem 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
 }
 
 .full-image img,
@@ -614,12 +620,8 @@ footer {
     gap: 2rem;
   }
 
-  /* Full-bleed sliders */
-  .full-image {
-    width: 100vw;
-    margin-left: 50%;
-    transform: translateX(-50%);
-  }
+  /* Full-bleed sliders and images - already handled by global .full-image */
+  /* No need for mobile-specific transform since it's already full-bleed */
 
   /* Image grid */
   .image-grid {
