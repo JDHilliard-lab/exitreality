@@ -184,6 +184,26 @@ section {
 .content-section {
   padding: 6rem 4rem;
   border-bottom: 1px solid #e0e0e0;
+  position: relative;
+}
+
+/* Make the border line full-bleed */
+.content-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+/* Remove the original border since we're using ::after */
+.content-section {
+  border-bottom: none;
 }
 
 .section-label {
