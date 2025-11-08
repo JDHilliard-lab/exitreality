@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="css/style.css">
     <script defer src="js/scripts.js"></script>
 
-    <!-- Project-specific slider styles (not in global stylesheet) -->
+    <!-- Project-specific slider styles -->
     <style>
         /* Before/After Slider Styles */
         .ba {
             position: relative;
-            width: 100%;https://github.com/JDHilliard-lab/exitreality/blob/main/project2Oceanoddities.html
+            width: 100%;
             aspect-ratio: 16 / 9;
             background: #fff;
             border: none;
@@ -117,7 +117,6 @@
 
     <!-- Project Header -->
     <div class="project-header">
-        
         <div class="project-meta">
             <div class="meta-item">
                 <div class="meta-label">Project</div>
@@ -131,13 +130,13 @@
             
             <div class="meta-item">
                 <div class="meta-label">Category</div>
-                <div class="meta-value">Creature design, Animation, Generative AI</div>
+                <div class="meta-value">Creature Design, Animation, Generative AI</div>
             </div>
-       
+        </div>
     </div>
 
-    <!-- video section -->
-   <div class="full-image">
+    <!-- Hero Video -->
+    <div class="full-image">
         <video autoplay muted loop playsinline controls>
             <source src="Other World Fish/oceanoddities001_1-sm.mp4" type="video/mp4">
             Your browser does not support the video tag.
@@ -148,17 +147,14 @@
     <div class="content-section">
         <div class="section-label">Synopsis</div>
         <div class="section-description">
-            <p>This project imagines aquatic life on distant worlds through traditional and digital techniques.
-Watercolor paintings of fictional fish were transformed with generative AI into photorealistic 
-images, converted into 3D models, and composed in Blender. Final stills were animated with
- image-to-video generation, bringing these imagined extraterrestrial creatures to life.</p>
+            <p>This project imagines aquatic life on distant worlds through traditional and digital techniques. Watercolor paintings of fictional fish were transformed with generative AI into photorealistic images, converted into 3D models, and composed in Blender. Final stills were animated with image-to-video generation, bringing these imagined extraterrestrial creatures to life.</p>
         </div>
     </div>
 
-    <!-- Stage 1: Image Reconstruction -->
+    <!-- Stage 1: Image Transformation -->
     <div class="content-section">
         <div class="section-label">Process</div>
-        <div class="section-title">Image Transformationn</div>
+        <div class="section-title">Image Transformation</div>
         <div class="section-description">
             <p>Hand-painted watercolor fish were transformed into photorealistic underwater creatures using generative AI.</p>
         </div>
@@ -166,12 +162,12 @@ images, converted into 3D models, and composed in Blender. Final stills were ani
         <!-- Before/After Sliders -->
         <div class="full-image">
             <!-- Slider 1 -->
-            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0005">
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 1">
                 <div class="ba__layer ba__before">
-                    <img class="ba__img" src="Other World Fish/BigRED001-gpt-paint.webp" alt="fish watercolor">
+                    <img class="ba__img" src="Other World Fish/BigRED001-gpt-paint.webp" alt="Fish watercolor painting">
                 </div>
                 <div class="ba__layer ba__after">
-                    <img class="ba__img" src="Other World Fish/BigRED001-gpt-pass.webp" alt="generative photorealistic">
+                    <img class="ba__img" src="Other World Fish/BigRED001-gpt-pass.webp" alt="Photorealistic generative AI version">
                 </div>
                 <div class="ba__divider" aria-hidden="true"></div>
                 <div class="ba__handle" aria-hidden="true"></div>
@@ -179,12 +175,12 @@ images, converted into 3D models, and composed in Blender. Final stills were ani
             </div>
 
             <!-- Slider 2 -->
-            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0008">
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 2">
                 <div class="ba__layer ba__before">
-                    <img class="ba__img" src="Other World Fish/blueRedShark001.1-painted.webp" alt="fish watercolor">
+                    <img class="ba__img" src="Other World Fish/blueRedShark001.1-painted.webp" alt="Fish watercolor painting">
                 </div>
                 <div class="ba__layer ba__after">
-                    <img class="ba__img" src="Other World Fish/blueRedShark001.1-GPT.webp" alt="Photorealistic AI">
+                    <img class="ba__img" src="Other World Fish/blueRedShark001.1-GPT.webp" alt="Photorealistic AI version">
                 </div>
                 <div class="ba__divider" aria-hidden="true"></div>
                 <div class="ba__handle" aria-hidden="true"></div>
@@ -192,32 +188,31 @@ images, converted into 3D models, and composed in Blender. Final stills were ani
             </div>
 
             <!-- Slider 3 -->
-            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0038">
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 3">
                 <div class="ba__layer ba__before">
-                    <img class="ba__img" src="Other World Fish/fishy-red.0001-gpt01-paint.webp" alt="watercolor painting">
+                    <img class="ba__img" src="Other World Fish/fishy-red.0001-gpt01-paint.webp" alt="Watercolor painting">
                 </div>
                 <div class="ba__layer ba__after">
-                    <img class="ba__img" src="Other World Fish/fishy-red.0001-gpt.webp" alt="Generative ai photorealistic version">
+                    <img class="ba__img" src="Other World Fish/fishy-red.0001-gpt.webp" alt="Generative AI photorealistic version">
                 </div>
                 <div class="ba__divider" aria-hidden="true"></div>
                 <div class="ba__handle" aria-hidden="true"></div>
                 <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
             </div>
-            
 
             <!-- Slider 4 -->
-            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison: EGYPT.0003">
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 4">
                 <div class="ba__layer ba__before">
-                    <img class="ba__img" src="Other World Fish/fishy-putpred.cucumber.0001-Paint.webp" alt="watercolor painting">
+                    <img class="ba__img" src="Other World Fish/fishy-putpred.cucumber.0001-Paint.webp" alt="Watercolor painting">
                 </div>
                 <div class="ba__layer ba__after">
-                    <img class="ba__img" src="Other World Fish/fishy-putpred.cucumber.0001-GPT.webp" alt="Generative ai photorealistic version">
+                    <img class="ba__img" src="Other World Fish/fishy-putpred.cucumber.0001-GPT.webp" alt="Generative AI photorealistic version">
                 </div>
                 <div class="ba__divider" aria-hidden="true"></div>
                 <div class="ba__handle" aria-hidden="true"></div>
                 <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
             </div>
-        
+        </div>
     </div>
 
     <!-- Stage 2: Image to 3D -->
@@ -225,50 +220,52 @@ images, converted into 3D models, and composed in Blender. Final stills were ani
         <div class="section-label">Stage 2</div>
         <div class="section-title">Image to 3D</div>
         <div class="section-description">
-            <p>In this phase, the photorealistic versions are placed on a clean white background for easy processing from image to 3D generative assets</p>
+            <p>In this phase, the photorealistic versions are placed on a clean white background for easy processing from image to 3D generative assets.</p>
         </div>
 
         <div class="image-grid">
-        <img src="Other World Fish/BigRED001.1-W.LG-gpt.1.webp" alt="1">
-        <img src="Other World Fish/fishy-putpred.cucumber.0001-gpt05.1.webp" alt="2">
-    </div>
+            <img src="Other World Fish/BigRED001.1-W.LG-gpt.1.webp" alt="White background fish 1">
+            <img src="Other World Fish/fishy-putpred.cucumber.0001-gpt05.1.webp" alt="White background fish 2">
+        </div>
         
         <div class="full-image">
-        <video autoplay muted loop playsinline controls>
-            <source src="Other World Fish/BigRED001-360-ClaytoColor_1.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+            <video autoplay muted loop playsinline controls>
+                <source src="Other World Fish/BigRED001-360-ClaytoColor_1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
 
-            <div class="full-image">
-        <video autoplay muted loop playsinline controls>
-            <source src="Other World Fish/fishy-putpred-cucumber-0001-gpt05-1-gpt-360-ClaytoColor.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="full-image">
+            <video autoplay muted loop playsinline controls>
+                <source src="Other World Fish/fishy-putpred-cucumber-0001-gpt05-1-gpt-360-ClaytoColor.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
     </div>
-</div>
+
     <!-- Stage 3: Animation & Motion -->
     <div class="content-section">
         <div class="section-label">Stage 3</div>
         <div class="section-title">Animation & Motion</div>
         <div class="section-description">
-            <p>The final stage brings these static images to life through AI-powered video generation. Each rendered scene receives dynamic camera movements and atmospheric effects, creating immersive cinematic sequences that explore these reconstructed ancient worlds.</p>
+            <p>The final stage brings these static images to life through AI-powered video generation. Each rendered scene receives dynamic camera movements and atmospheric effects, creating immersive cinematic sequences.</p>
         </div>
         
         <div class="full-image">
-        <video autoplay muted loop playsinline controls>
-            <source src="Other World Fish/oceanoddities001_1-sm.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+            <video autoplay muted loop playsinline controls>
+                <source src="Other World Fish/oceanoddities001_1-sm.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
     </div>
-</div>
 
     <!-- Credits Section -->
     <div class="credits-section">
         <div class="credits-label">Credits</div>
         <div class="credits-list">
             <div class="credit-item">Concept & AI Direction — Your Name</div>
-            <div class="credit-item">Archival Research — Your Name</div>
-            <div class="credit-item">Color Grading & Post-Production — Your Name</div>
+            <div class="credit-item">Watercolor Painting — Your Name</div>
+            <div class="credit-item">3D Composition & Animation — Your Name</div>
         </div>
     </div>
 
