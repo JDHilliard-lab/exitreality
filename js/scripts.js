@@ -131,3 +131,50 @@
   });
 
 })();
+
+/* ===== SLIDESHOW: prev/next arrows ===== */
+(function () {
+  'use strict';
+
+  function initSlideshow(root) {
+    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+    if (!slides.length) return;
+
+    // Ensure exactly one active slide
+    let idx = slides.findIndex(s => s.classList.contains('active'));
+    if (idx < 0) {
+      idx = 0;
+      slides[0].classList.add('active');
+    }
+
+    const prevBtn = root.querySelector('.slideshow__arrow--prev');
+    const nextBtn = root.querySelector('.slideshow__arrow--next');
+
+    function show(n) {
+      slides[idx]?.classList.remove('active');
+      idx = (n + slides.length) % slides.length;
+      slides[idx].classList.add('active');
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => show(idx - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => show(idx + 1));
+
+    // Keyboard support when the slideshow is focused
+    root.setAttribute('tabindex', root.getAttribute('tabindex') || '0');
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(idx - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
+    });
+  }
+
+  function initAll() {
+    document.querySelectorAll('.slideshow').forEach(initSlideshow);
+  }
+
+  // Run on DOM ready (and again if content is injected later)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  } else {
+    initAll();
+  }
+})();
