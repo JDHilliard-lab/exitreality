@@ -367,7 +367,7 @@ footer {
 
 /* ===== PROJECT PAGE SPECIFIC ===== */
 .project-header {
-  padding: 4rem;
+  padding: padding: 2rem 4rem 4rem 4rem;  /* Less top, normal sides & bottom */
   border-bottom: 1px solid #e0e0e0;
 }
 
