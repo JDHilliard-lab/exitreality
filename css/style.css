@@ -367,7 +367,7 @@ footer {
 
 /* ===== PROJECT PAGE SPECIFIC ===== */
 .project-header {
-  padding: 1rem 4rem 1rem 4rem;  /* Less top, normal sides & bottom */
+  padding: 4rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -757,4 +757,17 @@ footer {
   .section-title {
     margin-bottom: 2rem;
   }
+}
+
+/* ===== PROJECT PAGE SPACING TWEAK ===== */
+body.project-page {
+  padding-top: calc(var(--nav-h) - 30px);
+}
+
+body.project-page .project-header {
+  padding: 1rem 4rem 1rem 4rem; /* top, right, bottom, left */
+}
+
+body.project-page .full-image:first-of-type {
+  margin-top: 1rem; /* reduce gap between header and first video */
 }
