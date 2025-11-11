@@ -763,15 +763,18 @@ body.project-page .full-image:first-of-type {
   }
 }
 
-/* ===== PROJECT PAGE SPACING TWEAK ===== */
+/* ===== PROJECT PAGE SPACING TWEAK (balanced top/bottom gaps) ===== */
 body.project-page {
-  padding-top: calc(var(--nav-h) - 30px);
+  padding-top: var(--nav-h); /* maintain standard nav offset */
 }
 
 body.project-page .project-header {
-  padding: 1rem 4rem 1rem 4rem; /* top, right, bottom, left */
+  padding: 1rem 4rem; /* equal top & bottom spacing */
+  margin-top: 0; /* ensure no extra offset */
+  margin-bottom: 1rem; /* same as top */
 }
 
 body.project-page .full-image:first-of-type {
-  margin-top: 1rem; /* reduce gap between header and first video */
+  margin-top: 0; /* make the gap match the header’s bottom spacing */
 }
+
