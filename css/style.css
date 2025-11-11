@@ -378,6 +378,10 @@ footer {
   margin-bottom: 0rem;
 }
 
+body.project-page .full-image:first-of-type {
+  margin-top: 1rem; /* reduce gap between header and first video */
+}
+
 .project-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
