@@ -367,7 +367,7 @@ footer {
 
 /* ===== PROJECT PAGE SPECIFIC ===== */
 .project-header {
-  padding: 4rem;
+  padding: 1rem 4rem 1rem 4rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -375,7 +375,7 @@ footer {
   font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 300;
   letter-spacing: -2px;
-  margin-bottom: 3rem;
+  margin-bottom: 0rem;
 }
 
 .project-meta {
