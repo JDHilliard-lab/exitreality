@@ -399,7 +399,7 @@ footer {
 .project-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
+  gap: 3rem;
   max-width: 1200px;
 }
 
