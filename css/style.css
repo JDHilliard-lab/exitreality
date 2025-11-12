@@ -448,6 +448,11 @@ footer {
   margin-bottom: 3rem;
 }
 
+/* Override for first image on project pages */
+.project-header + .full-image {
+  margin-top: 0 !important;
+}
+
 .full-image img,
 .full-image video {
   width: 100%;
