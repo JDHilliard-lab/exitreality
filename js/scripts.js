@@ -246,14 +246,20 @@
     smoothScrollToId(id);
   });
 
-  /*** 5) Global Slideshow Support ***/
+  /*** 5) Global Slideshow Support (fade + slide variant) ***/
   function initSlideshows() {
     document.querySelectorAll('.slideshow').forEach(function (root) {
-      var slides = Array.prototype.slice.call(root.querySelectorAll('.slideshow__image'));
+      var slides = Array.prototype.slice.call(
+        root.querySelectorAll('.slideshow__image')
+      );
       var prevBtn = root.querySelector('.slideshow__arrow--prev');
       var nextBtn = root.querySelector('.slideshow__arrow--next');
       if (!slides.length) return;
 
+      // Check if this slideshow should SLIDE (vs fade)
+      var isSlide = root.classList.contains('slideshow--slide');
+
+      // Find initial active slide
       var index = slides.findIndex(function (s) {
         return s.classList.contains('active');
       });
@@ -262,16 +268,40 @@
         slides[0].classList.add('active');
       }
 
+      // For slide variant: position slides side-by-side using translateX
+      function layout() {
+        if (!isSlide) return; // fade version doesn’t need layout
+
+        slides.forEach(function (slide, idx) {
+          var offset = idx - index; // 0 = current, -1 = left, +1 = right
+          slide.style.transform = 'translateX(' + (offset * 100) + '%)';
+        });
+      }
+
       function show(i) {
         slides[index].classList.remove('active');
         index = (i + slides.length) % slides.length;
         slides[index].classList.add('active');
+        layout();
       }
 
-      if (prevBtn) prevBtn.addEventListener('click', function () { show(index - 1); });
-      if (nextBtn) nextBtn.addEventListener('click', function () { show(index + 1); });
+      // Initial positioning (for slide carousels)
+      layout();
 
-      // Keyboard control
+      // Prev/Next arrows
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function () {
+          show(index - 1);
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', function () {
+          show(index + 1);
+        });
+      }
+
+      // Keyboard control when slideshow has focus
       root.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft') show(index - 1);
         if (e.key === 'ArrowRight') show(index + 1);
@@ -279,14 +309,23 @@
 
       // Optional autoplay (pause on hover)
       var autoplayMs = 6000;
-      var timer = setInterval(function () { show(index + 1); }, autoplayMs);
-      root.addEventListener('mouseenter', function () { clearInterval(timer); });
+      var timer = setInterval(function () {
+        show(index + 1);
+      }, autoplayMs);
+
+      root.addEventListener('mouseenter', function () {
+        clearInterval(timer);
+      });
+
       root.addEventListener('mouseleave', function () {
-        timer = setInterval(function () { show(index + 1); }, autoplayMs);
+        timer = setInterval(function () {
+          show(index + 1);
+        }, autoplayMs);
       });
     });
   }
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
+
 
 })();
