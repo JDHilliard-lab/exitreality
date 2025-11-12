@@ -367,7 +367,7 @@ footer {
 
 /* ===== PROJECT PAGE SPECIFIC ===== */
 .project-header {
-  padding: 1.5rem 4rem;
+  padding: 0.75rem 4rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -698,7 +698,7 @@ body.project-page .full-image:first-of-type {
 
   /* Project page adjustments */
   .project-header {
-    padding: 1.5rem 1.5rem;
+    padding: 0.75rem 1.5rem;
   }
 
   .content-section {
@@ -751,7 +751,7 @@ body.project-page .full-image:first-of-type {
   }
 
   .project-header {
-    padding: 1.5rem 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .content-section {
@@ -769,12 +769,12 @@ body.project-page {
 }
 
 body.project-page .project-header {
-  padding: 1.5rem 4rem; /* tighter, even spacing */
+  padding: 0.75rem 4rem; /* super tight, even spacing */
   margin-top: 0;
   margin-bottom: 0;
 }
 
 body.project-page .full-image:first-of-type {
-  margin-top: 1.5rem; /* match header padding for visual balance */
+  margin-top: 0.75rem; /* match header padding for visual balance */
   margin-bottom: 3rem;
 }
