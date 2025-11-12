@@ -387,6 +387,21 @@ footer {
 .project-header {
   padding: 0.75rem 4rem;
   border-bottom: 1px solid #e0e0e0;
+  background: #ffffff; /* Default white background */
+}
+
+/* Custom project header themes */
+.project-header.dark-theme {
+  background: #000000;
+  border-bottom: 1px solid #333333;
+}
+
+.project-header.dark-theme .meta-label {
+  color: #999999;
+}
+
+.project-header.dark-theme .meta-value {
+  color: #ffffff;
 }
 
 .project-title {
