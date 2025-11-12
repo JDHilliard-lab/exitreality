@@ -171,10 +171,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav>
-      <div id="navbar-placeholder"></div>
-        </ul>
-    </nav>
+    <div id="navbar-placeholder"></div>
 
     <!-- Project Header -->
     <div class="project-header">
@@ -328,5 +325,19 @@
             setPct(parseFloat(range.value) || 50);
         });
     </script>
+
+    <!-- Inject shared navbar -->
+    <script>
+      (function() {
+        fetch('navbar.html')
+          .then(function(res){ return res.text(); })
+          .then(function(html){
+            var mount = document.getElementById('navbar-placeholder');
+            if (mount) mount.innerHTML = html;
+          })
+          .catch(function(e){ console.error('Navbar load failed:', e); });
+      })();
+    </script>
+
 </body>
 </html>
