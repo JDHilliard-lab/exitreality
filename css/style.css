@@ -43,7 +43,7 @@ body {
   left: 0;
   width: 0%;
   height: 3px;
-  background: linear-gradient(90deg, #000 0%, #666 100%);
+  background: linear-gradient(90deg, #ff0000 0%, #cc0000 100%);
   z-index: 9999;
   transition: width 0.3s ease, opacity 0.3s ease;
   opacity: 1;
@@ -114,15 +114,6 @@ nav {
 .nav-links a:focus {
   outline: none;
 }
-.logo .exit-text {
-  color: red;
-  letter-spacing: 1px;
-}
-
-.logo .reality-text {
-  color: black;
-}
-
 
 /* ===== HERO SECTION ===== */
 .hero {
@@ -408,14 +399,14 @@ footer {
 .project-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 3rem;
+  gap: 2rem;
   max-width: 1200px;
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
 .meta-label {
