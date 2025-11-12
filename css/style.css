@@ -677,6 +677,13 @@ footer {
 .slideshow--slide .slideshow__image.active {
   z-index: 1;
 }
+/* Disabled slideshow arrows for strip mode */
+.slideshow__arrow[disabled] {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
