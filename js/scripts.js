@@ -1,8 +1,8 @@
-
 /* ===== GLOBAL SITE SCRIPT =====
    - Base-path safeguard for GitHub Pages
    - Dynamic --nav-h (nav height) CSS var
    - Smooth scrolling with fixed-nav offset
+   - Loading bar for page and video content
 */
 
 (function () {
@@ -16,6 +16,122 @@
       t = setTimeout(() => fn.apply(this, arguments), wait);
     };
   }
+
+  /*** LOADING BAR ***/
+  (function initLoadingBar() {
+    // Create loading bar element
+    const loadingBar = document.createElement('div');
+    loadingBar.id = 'loading-bar';
+    document.body.insertBefore(loadingBar, document.body.firstChild);
+
+    let progress = 0;
+    let totalVideos = 0;
+    let loadedVideos = 0;
+    let totalImages = 0;
+    let loadedImages = 0;
+
+    function updateProgress() {
+      const totalMedia = totalVideos + totalImages;
+      const loadedMedia = loadedVideos + loadedImages;
+      
+      if (totalMedia === 0) {
+        progress = 100;
+      } else {
+        progress = (loadedMedia / totalMedia) * 100;
+      }
+      
+      loadingBar.style.width = progress + '%';
+      
+      if (progress >= 100) {
+        setTimeout(() => {
+          loadingBar.classList.add('complete');
+          setTimeout(() => {
+            loadingBar.remove();
+          }, 300);
+        }, 200);
+      }
+    }
+
+    function trackVideos() {
+      const videos = document.querySelectorAll('video');
+      totalVideos = videos.length;
+
+      if (totalVideos === 0) {
+        updateProgress();
+        return;
+      }
+
+      videos.forEach(video => {
+        // Check if video is already loaded
+        if (video.readyState >= 3) {
+          loadedVideos++;
+          updateProgress();
+        } else {
+          video.addEventListener('canplaythrough', function onLoad() {
+            loadedVideos++;
+            updateProgress();
+            video.removeEventListener('canplaythrough', onLoad);
+          }, { once: true });
+
+          video.addEventListener('error', function onError() {
+            loadedVideos++;
+            updateProgress();
+            video.removeEventListener('error', onError);
+          }, { once: true });
+        }
+      });
+    }
+
+    function trackImages() {
+      const images = document.querySelectorAll('img');
+      totalImages = images.length;
+
+      if (totalImages === 0) {
+        updateProgress();
+        return;
+      }
+
+      images.forEach(img => {
+        if (img.complete) {
+          loadedImages++;
+          updateProgress();
+        } else {
+          img.addEventListener('load', function onLoad() {
+            loadedImages++;
+            updateProgress();
+            img.removeEventListener('load', onLoad);
+          }, { once: true });
+
+          img.addEventListener('error', function onError() {
+            loadedImages++;
+            updateProgress();
+            img.removeEventListener('error', onError);
+          }, { once: true });
+        }
+      });
+    }
+
+    // Start tracking when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        trackVideos();
+        trackImages();
+      });
+    } else {
+      trackVideos();
+      trackImages();
+    }
+
+    // Fallback: ensure bar completes even if something fails
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (progress < 100) {
+          progress = 100;
+          updateProgress();
+        }
+      }, 500);
+    });
+  })();
 
   /*** 1) Dynamic --nav-h CSS variable ***/
   function setNavHeightVar() {
@@ -130,51 +246,4 @@
     smoothScrollToId(id);
   });
 
-})();
-
-/* ===== SLIDESHOW: prev/next arrows ===== */
-(function () {
-  'use strict';
-
-  function initSlideshow(root) {
-    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-    if (!slides.length) return;
-
-    // Ensure exactly one active slide
-    let idx = slides.findIndex(s => s.classList.contains('active'));
-    if (idx < 0) {
-      idx = 0;
-      slides[0].classList.add('active');
-    }
-
-    const prevBtn = root.querySelector('.slideshow__arrow--prev');
-    const nextBtn = root.querySelector('.slideshow__arrow--next');
-
-    function show(n) {
-      slides[idx]?.classList.remove('active');
-      idx = (n + slides.length) % slides.length;
-      slides[idx].classList.add('active');
-    }
-
-    if (prevBtn) prevBtn.addEventListener('click', () => show(idx - 1));
-    if (nextBtn) nextBtn.addEventListener('click', () => show(idx + 1));
-
-    // Keyboard support when the slideshow is focused
-    root.setAttribute('tabindex', root.getAttribute('tabindex') || '0');
-    root.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); show(idx - 1); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
-    });
-  }
-
-  function initAll() {
-    document.querySelectorAll('.slideshow').forEach(initSlideshow);
-  }
-
-  // Run on DOM ready (and again if content is injected later)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll, { once: true });
-  } else {
-    initAll();
-  }
 })();
