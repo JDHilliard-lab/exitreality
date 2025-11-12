@@ -104,18 +104,16 @@
         }
     </style>
 </head>
-<body>
+<body class="project-page">
     <!-- Navigation -->
-     <div id="navbar-placeholder"></div>
+    <div id="navbar-placeholder"></div>
 
     <!-- Project Header --> 
     <div class="project-header">
-      
-        
         <div class="project-meta">
             <div class="meta-item">
                 <div class="meta-label">Project</div>
-                <div class="meta-value">Anceint Ruins</div>
+                <div class="meta-value">Ancient Ruins</div>
             </div>
             
             <div class="meta-item">
@@ -127,14 +125,16 @@
                 <div class="meta-label">Category</div>
                 <div class="meta-value">Archival, Architecture, Animation, Generative AI</div>
             </div>
-        <!-- add div here for line -->
+        </div>
     </div>
-            <!-- video section -->
-         <div class="full-image">
+
+    <!-- Hero Video -->
+    <div class="full-image">
         <video autoplay muted loop playsinline controls>
             <source src="Ancient Ruins/Sandy_Temple_Compilation-test25mb.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+    </div>
 
     <!-- Synopsis Section -->
     <div class="content-section">
@@ -215,7 +215,8 @@
         <div class="section-label">Stage 2</div>
         <div class="section-title">Color Matching</div>
         <div class="section-description">
-            <p>In this phase, all images are carefully color matched to one another to give a cohesive look and feel which will help in the next phase of generating animations from each image.</p>
+            <p>In this phase, all images are carefully color matched to one another to give a cohesive look and feel
+                which will help in the next phase of generating animations from each image.</p>
         </div>
         
         <div class="full-image">
@@ -228,16 +229,18 @@
         <div class="section-label">Stage 3</div>
         <div class="section-title">Animation & Motion</div>
         <div class="section-description">
-            <p>The final stage brings these static images to life through AI-powered video generation. Each rendered scene receives dynamic camera movements and atmospheric effects, creating immersive cinematic sequences that explore these reconstructed ancient worlds.</p>
+            <p>The final stage brings these static images to life through AI-powered video generation.
+                Each rendered scene receives dynamic camera movements and atmospheric effects, 
+                creating immersive cinematic sequences that explore these reconstructed ancient worlds.</p>
         </div>
         
         <div class="full-image">
-        <video autoplay muted loop playsinline controls>
-            <source src="Ancient Ruins/Sandy_Temple_Compilation-test25mb.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+            <video autoplay muted loop playsinline controls>
+                <source src="Ancient Ruins/Sandy_Temple_Compilation-test25mb.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
     </div>
-</div>
 
     <!-- Credits Section -->
     <div class="credits-section">
@@ -296,5 +299,19 @@
             setPct(parseFloat(range.value) || 50);
         });
     </script>
+
+    <!-- Inject shared navbar -->
+    <script>
+      (function() {
+        fetch('navbar.html')
+          .then(function(res){ return res.text(); })
+          .then(function(html){
+            var mount = document.getElementById('navbar-placeholder');
+            if (mount) mount.innerHTML = html;
+          })
+          .catch(function(e){ console.error('Navbar load failed:', e); });
+      })();
+    </script>
+
 </body>
 </html>
