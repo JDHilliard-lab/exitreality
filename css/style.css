@@ -114,6 +114,15 @@ nav {
 .nav-links a:focus {
   outline: none;
 }
+.logo .exit-text {
+  color: red;
+  letter-spacing: 1px;
+}
+
+.logo .reality-text {
+  color: black;
+}
+
 
 /* ===== HERO SECTION ===== */
 .hero {
