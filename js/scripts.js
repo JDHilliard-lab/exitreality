@@ -246,68 +246,89 @@
     smoothScrollToId(id);
   });
 
-  /*** 5) Global Slideshow Support (fade + slide variant) ***/
-  function initSlideshows() {
-    document.querySelectorAll('.slideshow').forEach(function (root) {
-      var slides = Array.prototype.slice.call(
-        root.querySelectorAll('.slideshow__image')
-      );
-      var prevBtn = root.querySelector('.slideshow__arrow--prev');
-      var nextBtn = root.querySelector('.slideshow__arrow--next');
-      if (!slides.length) return;
+ /*** 5) Global Slideshow Support (fade + strip slide) ***/
+function initSlideshows() {
+  document.querySelectorAll('.slideshow').forEach(function (root) {
+    var slides = Array.prototype.slice.call(
+      root.querySelectorAll('.slideshow__image')
+    );
+    var prevBtn = root.querySelector('.slideshow__arrow--prev');
+    var nextBtn = root.querySelector('.slideshow__arrow--next');
+    if (!slides.length) return;
 
-      // Check if this slideshow should SLIDE (vs fade)
-      var isSlide = root.classList.contains('slideshow--slide');
+    // Is this a strip/track slideshow?
+    var isStrip = root.classList.contains('slideshow--strip');
 
-      // Find initial active slide
-      var index = slides.findIndex(function (s) {
-        return s.classList.contains('active');
+    // Find initial active slide
+    var index = slides.findIndex(function (s) {
+      return s.classList.contains('active');
+    });
+    if (index < 0) {
+      index = 0;
+      slides[0].classList.add('active');
+    }
+
+    // For strip variant: arrange slides side-by-side as a track
+    function layout() {
+      if (!isStrip) return; // fade version doesn't use transform
+
+      slides.forEach(function (slide, idx) {
+        var offset = idx - index; // 0 = current, -1 = left, +1 = right
+        slide.style.transform = 'translateX(' + (offset * 100) + '%)';
       });
-      if (index < 0) {
-        index = 0;
-        slides[0].classList.add('active');
+    }
+
+    // Enable/disable arrows at the ends for strip mode
+    function updateArrows() {
+      if (!isStrip) return;
+      if (prevBtn) prevBtn.disabled = (index === 0);
+      if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
+    }
+
+    function show(nextIndex) {
+      if (isStrip) {
+        // Clamp instead of wrap
+        if (nextIndex < 0 || nextIndex >= slides.length) return;
+      } else {
+        // Wrap-around behavior for non-strip slideshows
+        nextIndex = (nextIndex + slides.length) % slides.length;
       }
 
-      // For slide variant: position slides side-by-side using translateX
-      function layout() {
-        if (!isSlide) return; // fade version doesn’t need layout
+      if (nextIndex === index) return;
 
-        slides.forEach(function (slide, idx) {
-          var offset = idx - index; // 0 = current, -1 = left, +1 = right
-          slide.style.transform = 'translateX(' + (offset * 100) + '%)';
-        });
-      }
+      slides[index].classList.remove('active');
+      index = nextIndex;
+      slides[index].classList.add('active');
 
-      function show(i) {
-        slides[index].classList.remove('active');
-        index = (i + slides.length) % slides.length;
-        slides[index].classList.add('active');
-        layout();
-      }
-
-      // Initial positioning (for slide carousels)
       layout();
+      updateArrows();
+    }
 
-      // Prev/Next arrows
-      if (prevBtn) {
-        prevBtn.addEventListener('click', function () {
-          show(index - 1);
-        });
-      }
+    // Initial setup
+    layout();
+    updateArrows();
 
-      if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
-          show(index + 1);
-        });
-      }
-
-      // Keyboard control when slideshow has focus
-      root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(index - 1);
-        if (e.key === 'ArrowRight') show(index + 1);
+    // Prev/Next arrows
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        show(index - 1);
       });
+    }
 
-      // Optional autoplay (pause on hover)
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        show(index + 1);
+      });
+    }
+
+    // Keyboard control
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
+
+    // Autoplay only for non-strip (fade) slideshows
+    if (!isStrip) {
       var autoplayMs = 6000;
       var timer = setInterval(function () {
         show(index + 1);
@@ -322,10 +343,11 @@
           show(index + 1);
         }, autoplayMs);
       });
-    });
-  }
+    }
+  });
+}
 
-  window.addEventListener('DOMContentLoaded', initSlideshows);
+window.addEventListener('DOMContentLoaded', initSlideshows);
 
 
 })();
