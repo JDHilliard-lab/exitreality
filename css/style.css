@@ -400,20 +400,6 @@ footer {
   color: #999999;
 }
 
-/* Blue theme example */
-.project-header.blue-theme {
-  background: #0066cc;
-  border-bottom: 1px solid #0052a3;
-}
-
-.project-header.blue-theme .meta-label {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.project-header.blue-theme .meta-value {
-  color: #ffffff;
-}
-
 .project-header.dark-theme .meta-value {
   color: #ffffff;
 }
@@ -822,7 +808,7 @@ body.project-page .project-header {
 }
 
 body.project-page .full-image:first-of-type {
-  margin-top: 0.75rem; /* match header padding for visual balance */
+  margin-top: 0; /* no gap between header and first video */
   margin-bottom: 3rem;
 }
 
