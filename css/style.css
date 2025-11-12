@@ -796,3 +796,13 @@ body.project-page .full-image:first-of-type {
   margin-top: 0.75rem; /* match header padding for visual balance */
   margin-bottom: 3rem;
 }
+
+/* ===== COLORED LOGO ===== */
+.logo .exit-text { 
+  color: #ff0000 !important; 
+  letter-spacing: 1px; 
+}
+
+.logo .reality-text { 
+  color: #000000 !important; 
+}
