@@ -106,7 +106,14 @@
 </head>
 <body>
     <!-- Navigation -->
-    <div id="navbar-placeholder"></div>
+    <nav>
+        <a href="index.html" class="logo">Exit Reality</a>
+        <ul class="nav-links">
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#work">Projects</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+    </nav>
 
     <!-- Project Header --> 
     <div class="project-header">
@@ -128,7 +135,7 @@
                 <div class="meta-value">Archival, Architecture, Animation, Generative AI</div>
             </div>
         <!-- add div here for line -->
-
+    </div>
             <!-- video section -->
          <div class="full-image">
         <video autoplay muted loop playsinline controls>
@@ -296,19 +303,5 @@
             setPct(parseFloat(range.value) || 50);
         });
     </script>
-
-    <!-- Inject shared navbar -->
-    <script>
-      (function() {
-        fetch('navbar.html')
-          .then(function(res){ return res.text(); })
-          .then(function(html){
-            var mount = document.getElementById('navbar-placeholder');
-            if (mount) mount.innerHTML = html;
-          })
-          .catch(function(e){ console.error('Navbar load failed:', e); });
-      })();
-    </script>
-
 </body>
 </html>
