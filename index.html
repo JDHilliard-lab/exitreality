@@ -11,9 +11,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav>
-      <div id="navbar-placeholder"></div>
-    </nav>
+    <div id="navbar-placeholder"></div>
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
@@ -140,5 +138,19 @@
             observer.observe(section);
         });
     </script>
+
+    <!-- Inject shared navbar -->
+    <script>
+      (function() {
+        fetch('navbar.html')
+          .then(function(res){ return res.text(); })
+          .then(function(html){
+            var mount = document.getElementById('navbar-placeholder');
+            if (mount) mount.innerHTML = html;
+          })
+          .catch(function(e){ console.error('Navbar load failed:', e); });
+      })();
+    </script>
+
 </body>
 </html>
