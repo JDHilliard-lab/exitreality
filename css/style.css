@@ -663,34 +663,19 @@ footer {
     padding: 1rem;
   }
 }
-/* ============================================================
-   SLIDESHOW — SLIDE VARIANT (LEFT/RIGHT TRANSITION)
-   Use by adding:  <div class="slideshow slideshow--slide">
-   Keeps same arrows and JS logic.
-   ============================================================ */
+/* ===== IMAGE SLIDESHOW — SLIDE VARIANT (SIDE-BY-SIDE STRIP) ===== */
+/* Use on: <div class="slideshow slideshow--slide"> */
 
-.slideshow--slide {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Base state: images sit offscreen to the right */
 .slideshow--slide .slideshow__image {
-  opacity: 0;
-  transform: translateX(100%);
-  transition: transform 0.6s ease, opacity 0.6s ease;
-}
-
-/* Active image: visible and centered */
-.slideshow--slide .slideshow__image.active {
+  /* We override the fade behavior: all slides are fully opaque,
+     and JS will position them horizontally via translateX. */
   opacity: 1;
-  transform: translateX(0);
-  z-index: 1;
+  transition: transform 0.6s ease;
 }
 
-/* Optional: when the slide becomes inactive, move it right again */
-.slideshow--slide .slideshow__image:not(.active) {
-  transform: translateX(100%);
+/* Keep active on top if you ever need overlays, but visibility is from position */
+.slideshow--slide .slideshow__image.active {
+  z-index: 1;
 }
 
 /* ===== MOBILE RESPONSIVE ===== */
