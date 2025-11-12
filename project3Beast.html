@@ -12,70 +12,71 @@
     <!-- Project-specific slider styles -->
     <style>
         /* ===== IMAGE SLIDESHOW ===== */
-.slideshow {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background: #000;
-}
+        .slideshow {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          overflow: hidden;
+          background: #000;
+        }
 
-.slideshow__image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 2.5s ease-in-out;
-}
+        .slideshow__image {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 2.5s ease-in-out;
+        }
 
-.slideshow__image.active {
-  opacity: 1;
-  z-index: 1;
-}
+        .slideshow__image.active {
+          opacity: 1;
+          z-index: 1;
+        }
 
-.slideshow__arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.85);
-  mix-blend-mode: difference;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
-  font-size: 48px;
-  font-weight: 300;
-  cursor: pointer;
-  padding: 2rem;
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  user-select: none;
-}
+        .slideshow__arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 10;
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.85);
+          mix-blend-mode: difference;
+          text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+          font-size: 48px;
+          font-weight: 300;
+          cursor: pointer;
+          padding: 2rem;
+          opacity: 0;
+          transition: opacity 0.35s ease;
+          user-select: none;
+        }
 
-.slideshow:hover .slideshow__arrow {
-  opacity: 1;
-}
+        .slideshow:hover .slideshow__arrow {
+          opacity: 1;
+        }
 
-.slideshow__arrow:hover {
-  opacity: 1 !important;
-}
+        .slideshow__arrow:hover {
+          opacity: 1 !important;
+        }
 
-.slideshow__arrow--prev {
-  left: 0;
-}
+        .slideshow__arrow--prev {
+          left: 0;
+        }
 
-.slideshow__arrow--next {
-  right: 0;
-}
+        .slideshow__arrow--next {
+          right: 0;
+        }
 
-@media (max-width: 640px) {
-  .slideshow__arrow {
-    font-size: 36px;
-    padding: 1rem;
-  }
-}
+        @media (max-width: 640px) {
+          .slideshow__arrow {
+            font-size: 36px;
+            padding: 1rem;
+          }
+        }
+
         /* Before/After Slider Styles */
         .ba {
             position: relative;
@@ -194,14 +195,13 @@
     </div>
 
     <!-- Hero Video -->
-   <div class="full-image">
+    <div class="full-image">
         <video autoplay muted loop playsinline controls>
             <source src="BEAST/sketch-tigerLizard001-GPT001-16x9-FinalEdits2.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-   
+    </div>
 
-    
     <!-- Synopsis Section -->
     <div class="content-section">
         <div class="section-label">Synopsis</div>
@@ -223,7 +223,7 @@
             <!-- Slider 1 -->
             <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 1">
                 <div class="ba__layer ba__before">
-                    <img class="ba__img" src="BEAST/sketch-tigerLizard001-GPT001-16x9.jpg">
+                    <img class="ba__img" src="BEAST/sketch-tigerLizard001-GPT001-16x9.jpg" alt="Watercolor creature painting">
                 </div>
                 <div class="ba__layer ba__after">
                     <img class="ba__img" src="BEAST/sketch-tigerLizard001-19x16.jpg" alt="Photorealistic generative AI version">
@@ -245,9 +245,9 @@
     
         <div class="full-image">
             <div class="slideshow">
-                <img class="slideshow__image active" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render06-GPT.1edit.webp" alt="Image 1">
-                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render07-GPT.1-edit.webp" alt="Image 2">
-                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render01-GPT.1.webp" alt="Image 3">
+                <img class="slideshow__image active" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render06-GPT.1edit.webp" alt="Creature 3D view 1">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render07-GPT.1-edit.webp" alt="Creature 3D view 2">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render01-GPT.1.webp" alt="Creature 3D view 3">
                 
                 <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
                 <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
@@ -263,7 +263,7 @@
             <p>The final stage brings these static images to life through AI-powered video generation. Each rendered scene receives dynamic camera movements and atmospheric effects, creating immersive cinematic sequences.</p>
         </div>
         
-   <div class="full-image">
+        <div class="full-image">
             <video autoplay muted loop playsinline controls>
                 <source src="BEAST/sketch-tigerLizard001-GPT001-16x9-FinalEdits2.mp4" type="video/mp4">
                 Your browser does not support the video tag.
@@ -271,13 +271,13 @@
         </div>
     </div>
 
-     <!-- Credits Section -->
+    <!-- Credits Section -->
     <div class="credits-section">
         <div class="credits-label">Credits</div>
         <div class="credits-list">
             <div class="credit-item">Concept & AI Direction — Your Name</div>
-            <div class="credit-item">Archival Research — Your Name</div>
-            <div class="credit-item">Color Grading & Post-Production — Your Name</div>
+            <div class="credit-item">Watercolor Painting — Your Name</div>
+            <div class="credit-item">3D Composition & Animation — Your Name</div>
         </div>
     </div>
 
@@ -341,7 +341,5 @@
           .catch(function(e){ console.error('Navbar load failed:', e); });
       })();
     </script>
-
-
-    </body>
+</body>
 </html>
