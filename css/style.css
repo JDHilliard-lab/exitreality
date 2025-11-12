@@ -436,10 +436,6 @@ footer {
   color: #000;
 }
 
-body.project-page .full-image:first-of-type {
-  margin-top: 1rem; /* reduce gap between header and first video */
-}
-
 /* ===== FULL-WIDTH IMAGES ===== */
 .full-image {
   width: 100vw;
