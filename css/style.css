@@ -808,7 +808,7 @@ body.project-page .project-header {
 }
 
 body.project-page .full-image:first-of-type {
-  margin-top: 0; /* no gap between header and first video */
+  margin-top: 0 !important; /* no gap between header and first video */
   margin-bottom: 3rem;
 }
 
