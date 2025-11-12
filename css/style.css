@@ -1,14 +1,14 @@
 /* ===== GLOBAL STYLES FOR ALL PAGES ===== */
 
 :root {
-  --nav-h: 88px;
+  --nav-h: 56px;
   --nav-pad-x: 4rem;
   --transition: 0.3s ease;
 }
 
 @media (max-width: 768px) {
   :root {
-    --nav-h: 64px;
+    --nav-h: 48px;
     --nav-pad-x: 2rem;
   }
 }
@@ -36,6 +36,24 @@ body {
 }
 
 /* ===== NAVIGATION (Fixed on all pages) ===== */
+/* Loading Bar */
+#loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #000 0%, #666 100%);
+  z-index: 9999;
+  transition: width 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+#loading-bar.complete {
+  width: 100%;
+  opacity: 0;
+}
+
 nav {
   position: fixed;
   top: 0;
@@ -367,7 +385,7 @@ footer {
 
 /* ===== PROJECT PAGE SPECIFIC ===== */
 .project-header {
-  padding: 1rem 4rem 1rem 4rem;
+  padding: 0.75rem 4rem;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -381,7 +399,7 @@ footer {
 .project-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 3rem;
+  gap: 2rem;
   max-width: 1200px;
 }
 
@@ -698,7 +716,7 @@ body.project-page .full-image:first-of-type {
 
   /* Project page adjustments */
   .project-header {
-    padding: 2rem 1.5rem;
+    padding: 0.75rem 1.5rem;
   }
 
   .content-section {
@@ -751,7 +769,7 @@ body.project-page .full-image:first-of-type {
   }
 
   .project-header {
-    padding: 1.5rem 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .content-section {
@@ -769,11 +787,12 @@ body.project-page {
 }
 
 body.project-page .project-header {
-  padding: 1rem 4rem; /* equal top & bottom spacing */
-  margin-top: 0; /* ensure no extra offset */
-  margin-bottom: 1rem; /* same as top */
+  padding: 0.75rem 4rem; /* super tight, even spacing */
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 body.project-page .full-image:first-of-type {
-  margin-top: 0; /* make the gap match the header’s bottom spacing */
+  margin-top: 0.75rem; /* match header padding for visual balance */
+  margin-bottom: 3rem;
 }
