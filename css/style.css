@@ -794,12 +794,16 @@ footer {
 
 /* ===== PROJECT PAGE SPACING TWEAK (balanced top/bottom gaps) ===== */
 body.project-page {
-  padding-top: var(--nav-h); /* maintain standard nav offset */
+  padding-top: 0; /* remove default body padding for project pages */
+}
+
+.project-header {
+  margin-top: var(--nav-h); /* offset for fixed navbar */
 }
 
 body.project-page .project-header {
   padding: 0.75rem 4rem; /* super tight, even spacing */
-  margin-top: 0;
+  margin-top: var(--nav-h); /* maintain nav offset */
   margin-bottom: 0;
 }
 
