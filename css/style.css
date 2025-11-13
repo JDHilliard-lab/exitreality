@@ -446,6 +446,7 @@ footer {
   margin-right: -50vw;
   margin-top: 3rem;
   margin-bottom: 3rem;
+  overflow: hidden;
 }
 
 /* Override for first image on project pages */
@@ -458,6 +459,11 @@ footer {
   width: 100%;
   height: auto;
   display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  vertical-align: middle;
 }
 
 /* Hide video controls on mobile until interaction */
@@ -893,6 +899,19 @@ body.project-page .project-header {
   margin-bottom: 0;
 }
 
+/* Mobile overrides for project header alignment */
+@media (max-width: 768px) {
+  body.project-page .project-header {
+    padding: 0.75rem 1.5rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.project-page .project-header {
+    padding: 0.75rem 1rem !important;
+  }
+}
+
 body.project-page .full-image:first-of-type {
   margin-top: 0 !important; /* no gap between header and first video */
   margin-bottom: 3rem;
@@ -907,78 +926,3 @@ body.project-page .full-image:first-of-type {
 .logo .reality-text { 
   color: #000000 !important; 
 }
-/* ===== PROJECT PAGES: MOBILE LAYOUT TWEAKS ===== */
-@media (max-width: 768px) {
-  /* Left-align everything on project pages */
-  body.project-page .project-header,
-  body.project-page .project-meta,
-  body.project-page .meta-item,
-  body.project-page .meta-label,
-  body.project-page .meta-value,
-  body.project-page .content-section,
-  body.project-page .section-label,
-  body.project-page .section-title,
-  body.project-page .section-description {
-    text-align: left !important;
-    margin-left: 0;
-    margin-right: auto;
-  }
-
-  /* Make the header more compact on mobile */
-  body.project-page .project-header {
-    padding: 0.75rem 1.5rem 1rem;
-  }
-
-  body.project-page .project-meta {
-    max-width: 100%;
-    grid-template-columns: 1fr;   /* stack rows */
-    gap: 0.75rem;                 /* tighter spacing */
-  }
-
-  body.project-page .meta-item {
-    gap: 0.2rem;
-  }
-
-  body.project-page .meta-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-  }
-
-  body.project-page .meta-value {
-    font-size: 1rem;
-  }
-}
-
-/* Fix white lines on sides of videos/images on mobile */
-@media (max-width: 768px) {
-  .full-image {
-    width: 100%;
-    left: 0;
-    right: 0;
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .full-image video,
-  .full-image img {
-    width: 100%;
-    display: block;
-  }
-}
-/* Restore full-bleed images/videos on mobile without white lines */
-@media (max-width: 768px) {
-  .full-image {
-    width: 100dvw;              /* correct width on iOS + Android */
-    left: 50%;
-    right: 50%;
-    margin-left: -50dvw;
-    margin-right: -50dvw;
-  }
-
-  .full-image img,
-  .full-image video {
-    width: 100dvw;
-    display: block;
-  }
-}
-
