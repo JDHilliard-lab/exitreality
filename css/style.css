@@ -460,21 +460,20 @@ footer {
   display: block;
 }
 
-/* Hide video controls initially on mobile, show on interaction */
+/* Hide video controls on mobile until interaction */
 @media (max-width: 768px) {
-  .full-image video {
+  .full-image video:not(.show-controls) {
     pointer-events: auto;
   }
   
-  .full-image video::-webkit-media-controls {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  .full-image video:not(.show-controls)::-webkit-media-controls-panel {
+    display: none !important;
+    opacity: 0 !important;
   }
   
-  .full-image video:hover::-webkit-media-controls,
-  .full-image video:focus::-webkit-media-controls,
-  .full-image video:active::-webkit-media-controls {
-    opacity: 1;
+  .full-image video.show-controls::-webkit-media-controls-panel {
+    display: flex !important;
+    opacity: 1 !important;
   }
 }
 
