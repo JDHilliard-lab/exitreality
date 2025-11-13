@@ -776,6 +776,7 @@ footer {
   body.project-page .project-header {
     padding: 0.75rem 1.5rem;
     text-align: left !important;
+    border-bottom: none !important;
   }
 
   body.project-page .project-header .project-meta {
@@ -915,6 +916,18 @@ body.project-page .project-header {
 body.project-page .full-image:first-of-type {
   margin-top: 0 !important; /* no gap between header and first video */
   margin-bottom: 3rem;
+}
+
+/* Mobile: Remove any border/gap between header and first video */
+@media (max-width: 768px) {
+  body.project-page .project-header {
+    margin-bottom: 0 !important;
+    border-bottom: none !important;
+  }
+  
+  body.project-page .full-image:first-of-type {
+    margin-top: 0 !important;
+  }
 }
 
 /* ===== COLORED LOGO ===== */
