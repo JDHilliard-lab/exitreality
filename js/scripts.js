@@ -246,7 +246,7 @@
     smoothScrollToId(id);
   });
 
- /*** 5) Global Slideshow Support (fade + strip slide) ***/
+/*** 5) Global Slideshow Support (fade + slide variant) ***/
 function initSlideshows() {
   document.querySelectorAll('.slideshow').forEach(function (root) {
     var slides = Array.prototype.slice.call(
@@ -256,8 +256,8 @@ function initSlideshows() {
     var nextBtn = root.querySelector('.slideshow__arrow--next');
     if (!slides.length) return;
 
-    // Is this a strip/track slideshow?
-    var isStrip = root.classList.contains('slideshow--strip');
+    // Is this the side-to-side sliding version?
+    var isSlide = root.classList.contains('slideshow--slide');
 
     // Find initial active slide
     var index = slides.findIndex(function (s) {
@@ -268,9 +268,9 @@ function initSlideshows() {
       slides[0].classList.add('active');
     }
 
-    // For strip variant: arrange slides side-by-side as a track
+    // For slide variant: arrange slides side-by-side as a track
     function layout() {
-      if (!isStrip) return; // fade version doesn't use transform
+      if (!isSlide) return; // fade version doesn't use transform
 
       slides.forEach(function (slide, idx) {
         var offset = idx - index; // 0 = current, -1 = left, +1 = right
@@ -278,19 +278,19 @@ function initSlideshows() {
       });
     }
 
-    // Enable/disable arrows at the ends for strip mode
+    // Enable/disable arrows at the ends for slide mode
     function updateArrows() {
-      if (!isStrip) return;
+      if (!isSlide) return;
       if (prevBtn) prevBtn.disabled = (index === 0);
       if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
     }
 
     function show(nextIndex) {
-      if (isStrip) {
+      if (isSlide) {
         // Clamp instead of wrap
         if (nextIndex < 0 || nextIndex >= slides.length) return;
       } else {
-        // Wrap-around behavior for non-strip slideshows
+        // Wrap-around behavior for non-slide (fade) slideshows
         nextIndex = (nextIndex + slides.length) % slides.length;
       }
 
@@ -327,8 +327,8 @@ function initSlideshows() {
       if (e.key === 'ArrowRight') show(index + 1);
     });
 
-    // Autoplay only for non-strip (fade) slideshows
-    if (!isStrip) {
+    // Autoplay only for non-slide (fade) slideshows
+    if (!isSlide) {
       var autoplayMs = 6000;
       var timer = setInterval(function () {
         show(index + 1);
