@@ -333,6 +333,24 @@
         });
     </script>
 
+    <!-- Hide video controls on mobile until user taps -->
+<script>
+    (function() {
+        if (window.innerWidth <= 768) {
+            const videos = document.querySelectorAll('.full-image video');
+            
+            videos.forEach(video => {
+                video.removeAttribute('controls');
+                
+                video.addEventListener('click', function() {
+                    this.setAttribute('controls', '');
+                    this.classList.add('show-controls');
+                }, { once: true });
+            });
+        }
+    })();
+</script>
+
     <!-- Inject shared navbar -->
     <script>
       (function() {
