@@ -411,6 +411,20 @@ footer {
   color: #ffffff;
 }
 
+/* Ensure no white/grey line between dark header and video */
+@media (max-width: 768px) {
+  body.project-page .project-header.dark-theme {
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0.75rem !important;
+  }
+  
+  body.project-page .project-header.dark-theme + .full-image {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
 .project-title {
   font-size: clamp(3rem, 6vw, 5rem);
   font-weight: 300;
@@ -930,10 +944,23 @@ body.project-page .full-image:first-of-type {
   body.project-page .project-header {
     margin-bottom: 0 !important;
     border-bottom: none !important;
+    padding-bottom: 0.75rem !important;
+  }
+  
+  body.project-page .project-header.dark-theme {
+    border-bottom: none !important;
+    padding-bottom: 1rem !important;
   }
   
   body.project-page .full-image:first-of-type {
-    margin-top: 0 !important;
+    margin-top: -1px !important;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Ensure video background is black to match header */
+  body.project-page .project-header.dark-theme + .full-image {
+    background: #000000;
   }
 }
 
