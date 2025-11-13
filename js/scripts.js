@@ -303,6 +303,41 @@ function initSlideshows() {
       layout();
       updateArrows();
     }
+     // AUTOPLAY — ONLY for slide variant (smooth bouncing)
+if (isSlide) {
+  var direction = 1; // 1 = forward, -1 = backward
+
+  var autoTimer = setInterval(function () {
+
+    // If at the last slide, reverse direction
+    if (index === slides.length - 1) {
+      direction = -1;
+    }
+
+    // If at the first slide, reverse direction
+    if (index === 0) {
+      direction = 1;
+    }
+
+    show(index + direction);
+
+  }, 4000); // autoplay speed in ms
+
+  // Pause autoplay on hover
+  root.addEventListener('mouseenter', function () {
+    clearInterval(autoTimer);
+  });
+
+  // Resume on un-hover
+  root.addEventListener('mouseleave', function () {
+    autoTimer = setInterval(function () {
+      if (index === slides.length - 1) direction = -1;
+      if (index === 0) direction = 1;
+      show(index + direction);
+    }, 4000);
+  });
+}
+
 
     // Initial setup
     layout();
