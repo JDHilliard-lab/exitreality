@@ -677,12 +677,11 @@ footer {
 .slideshow--slide .slideshow__image.active {
   z-index: 1;
 }
-/* Disabled slideshow arrows for strip mode */
+/* Completely hide disabled arrows in the slideshow */
 .slideshow__arrow[disabled] {
-  opacity: 0.25;
-  cursor: default;
-  pointer-events: none;
+  display: none;
 }
+
 
 
 /* ===== MOBILE RESPONSIVE ===== */
