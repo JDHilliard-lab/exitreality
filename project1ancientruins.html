@@ -246,9 +246,9 @@
     <div class="credits-section">
         <div class="credits-label">Credits</div>
         <div class="credits-list">
-            <div class="credit-item">Concept & AI Direction — Your Name</div>
-            <div class="credit-item">Archival Research — Your Name</div>
-            <div class="credit-item">Color Grading & Post-Production — Your Name</div>
+            <div class="credit-item">Concept & AI Direction – Your Name</div>
+            <div class="credit-item">Archival Research – Your Name</div>
+            <div class="credit-item">Color Grading & Post-Production – Your Name</div>
         </div>
     </div>
 
@@ -298,6 +298,31 @@
             // Initialize
             setPct(parseFloat(range.value) || 50);
         });
+    </script>
+
+    <!-- Hide video controls on mobile until user interaction -->
+    <script>
+        (function() {
+            if (window.innerWidth <= 768) {
+                const videos = document.querySelectorAll('.full-image video');
+                
+                videos.forEach(video => {
+                    video.removeAttribute('controls');
+                    
+                    video.addEventListener('click', function() {
+                        this.setAttribute('controls', '');
+                        this.classList.add('show-controls');
+                    }, { once: true });
+                    
+                    video.addEventListener('play', function() {
+                        setTimeout(() => {
+                            this.setAttribute('controls', '');
+                            this.classList.add('show-controls');
+                        }, 2000);
+                    }, { once: true });
+                });
+            }
+        })();
     </script>
 
     <!-- Inject shared navbar -->
