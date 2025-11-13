@@ -663,7 +663,7 @@ footer {
     padding: 1rem;
   }
 }
-/* ===== IMAGE SLIDESHOW — SLIDE VARIANT (SIDE-BY-SIDE STRIP) ===== */
+/* ===== IMAGE SLIDESHOW – SLIDE VARIANT (SIDE-BY-SIDE STRIP) ===== */
 /* Use on: <div class="slideshow slideshow--slide"> */
 
 .slideshow--slide .slideshow__image {
@@ -707,6 +707,19 @@ footer {
   section {
     padding: 4rem 1.5rem;
     text-align: center;
+  }
+
+  /* Left-align project page content on mobile */
+  body.project-page .content-section {
+    text-align: left;
+  }
+
+  body.project-page .project-header {
+    text-align: left;
+  }
+
+  body.project-page .credits-section {
+    text-align: left;
   }
 
   #work {
@@ -757,7 +770,6 @@ footer {
 
   .content-section {
     padding: 4rem 1.5rem;
-    text-align: center;
   }
 
   .project-meta {
@@ -775,7 +787,6 @@ footer {
   /* Credits */
   .credits-section {
     padding: 2rem 1.5rem;
-    text-align: center;
   }
 
   footer {
