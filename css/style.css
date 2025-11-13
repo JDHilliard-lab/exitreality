@@ -758,20 +758,23 @@ footer {
   #work,
   #contact {
     text-align: left;
+    padding: 4rem 1.5rem;
   }
 
   #about .section-title,
   #work .section-title,
   #contact .section-title {
     text-align: left;
+    padding-left: 0;
+    margin-left: 0;
   }
 
   #work {
-    padding: 4rem 0 0 0;
+    padding: 4rem 1.5rem 0 1.5rem;
   }
 
   #work .section-title {
-    padding: 0 1.5rem 2rem 1.5rem;
+    padding: 0 0 2rem 0;
     text-align: left;
   }
 
@@ -797,13 +800,15 @@ footer {
   .about-content,
   .contact-content {
     max-width: 90%;
-    margin-left: auto;
+    margin-left: 0;
     margin-right: auto;
+    text-align: left;
   }
 
-  /* Service list centered */
+  /* Service list - left aligned */
   .service-list {
-    justify-content: center;
+    justify-content: flex-start;
+    text-align: left;
   }
 
   /* PROJECT PAGE - LEFT ALIGN EVERYTHING */
@@ -888,6 +893,13 @@ footer {
 
   section {
     padding: 3rem 1rem;
+  }
+
+  /* Keep sections left-aligned on mobile */
+  #about,
+  #work,
+  #contact {
+    text-align: left;
   }
 
   /* PROJECT PAGE - LEFT ALIGN */
