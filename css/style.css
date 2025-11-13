@@ -827,6 +827,30 @@ footer {
     text-align: left;
   }
 
+  /* Compact service list on mobile - inline with slashes */
+  @media (max-width: 768px) {
+    .service-list {
+      display: block;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .service-list li {
+      display: inline;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .service-list li::after {
+      content: ' / ';
+      color: #666;
+    }
+    
+    .service-list li:last-child::after {
+      content: '';
+    }
+  }
+
   /* PROJECT PAGE - LEFT ALIGN EVERYTHING */
   body.project-page .project-header {
     padding: 0.75rem 1.5rem;
