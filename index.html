@@ -42,9 +42,10 @@
         <div class="about-content">
             <p>A multidisciplinary creative practice driven by design, strategy, and purposeful execution. 
                 Rooted in curiosity and innovation, it reflects art evolving through technology where ideas 
-                transform into new forms of expression.</p
+                transform into new forms of expression.</p>
                                                                                                                                                     
-            <p></p                                                                                                                                    
+            <p></p>
+                                                                                                                                    
 
             <div class="services">
                 <h3>Services</h3>
@@ -150,6 +151,35 @@
           })
           .catch(function(e){ console.error('Navbar load failed:', e); });
       })();
+    </script>
+
+    <!-- Portfolio item auto-reveal on mobile -->
+    <script>
+    (function() {
+        if (window.innerWidth <= 768) {
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '-20% 0px -20% 0px', // Trigger when item is in center 60% of viewport
+                threshold: [0.5, 0.75, 1.0]
+            };
+            
+            const portfolioObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                        entry.target.classList.add('in-view');
+                    } else {
+                        entry.target.classList.remove('in-view');
+                    }
+                });
+            }, observerOptions);
+            
+            portfolioItems.forEach(item => {
+                portfolioObserver.observe(item);
+            });
+        }
+    })();
     </script>
 
 </body>
