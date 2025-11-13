@@ -703,23 +703,10 @@ footer {
     margin-right: auto;
   }
 
-  /* Adjust sections */
+  /* Adjust sections - CENTER for homepage */
   section {
     padding: 4rem 1.5rem;
     text-align: center;
-  }
-
-  /* Left-align project page content on mobile */
-  body.project-page .content-section {
-    text-align: left;
-  }
-
-  body.project-page .project-header {
-    text-align: left;
-  }
-
-  body.project-page .credits-section {
-    text-align: left;
   }
 
   #work {
@@ -751,8 +738,7 @@ footer {
 
   /* About/Contact text */
   .about-content,
-  .contact-content,
-  .section-description {
+  .contact-content {
     max-width: 90%;
     margin-left: auto;
     margin-right: auto;
@@ -763,30 +749,51 @@ footer {
     justify-content: center;
   }
 
-  /* Project page adjustments */
-  .project-header {
+  /* PROJECT PAGE - LEFT ALIGN EVERYTHING */
+  body.project-page .project-header {
     padding: 0.75rem 1.5rem;
+    text-align: left !important;
   }
 
-  .content-section {
-    padding: 4rem 1.5rem;
-  }
-
-  .project-meta {
+  body.project-page .project-meta {
     gap: 2rem;
+    text-align: left !important;
   }
 
-  /* Full-bleed sliders and images - already handled by global .full-image */
-  /* No need for mobile-specific transform since it's already full-bleed */
+  body.project-page .content-section {
+    padding: 4rem 1.5rem;
+    text-align: left !important;
+  }
+
+  body.project-page .section-label {
+    text-align: left !important;
+  }
+
+  body.project-page .section-title {
+    text-align: left !important;
+  }
+
+  body.project-page .section-description {
+    max-width: 100%;
+    text-align: left !important;
+  }
+
+  body.project-page .credits-section {
+    padding: 2rem 1.5rem;
+    text-align: left !important;
+  }
+
+  body.project-page .credits-label {
+    text-align: left !important;
+  }
+
+  body.project-page .credits-list {
+    text-align: left !important;
+  }
 
   /* Image grid */
   .image-grid {
     grid-template-columns: 1fr;
-  }
-
-  /* Credits */
-  .credits-section {
-    padding: 2rem 1.5rem;
   }
 
   footer {
@@ -815,16 +822,28 @@ footer {
     padding: 3rem 1rem;
   }
 
-  .project-header {
+  /* PROJECT PAGE - LEFT ALIGN */
+  body.project-page .project-header {
     padding: 0.75rem 1rem;
+    text-align: left !important;
   }
 
-  .content-section {
+  body.project-page .content-section {
     padding: 2.5rem 1rem;
+    text-align: left !important;
   }
 
-  .section-title {
+  body.project-page .section-title {
     margin-bottom: 2rem;
+    text-align: left !important;
+  }
+
+  body.project-page .section-description {
+    text-align: left !important;
+  }
+
+  body.project-page .credits-section {
+    text-align: left !important;
   }
 }
 
