@@ -753,13 +753,26 @@ footer {
     text-align: center;
   }
 
+  /* LEFT ALIGN: About, Work, Contact sections on homepage */
+  #about,
+  #work,
+  #contact {
+    text-align: left;
+  }
+
+  #about .section-title,
+  #work .section-title,
+  #contact .section-title {
+    text-align: left;
+  }
+
   #work {
     padding: 4rem 0 0 0;
   }
 
   #work .section-title {
     padding: 0 1.5rem 2rem 1.5rem;
-    text-align: center;
+    text-align: left;
   }
 
   /* Portfolio grid - edge-to-edge on mobile */
