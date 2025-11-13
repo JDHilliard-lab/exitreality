@@ -965,3 +965,20 @@ body.project-page .full-image:first-of-type {
     display: block;
   }
 }
+/* Restore full-bleed images/videos on mobile without white lines */
+@media (max-width: 768px) {
+  .full-image {
+    width: 100dvw;              /* correct width on iOS + Android */
+    left: 50%;
+    right: 50%;
+    margin-left: -50dvw;
+    margin-right: -50dvw;
+  }
+
+  .full-image img,
+  .full-image video {
+    width: 100dvw;
+    display: block;
+  }
+}
+
