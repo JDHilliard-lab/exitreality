@@ -907,3 +907,19 @@ body.project-page .full-image:first-of-type {
 .logo .reality-text { 
   color: #000000 !important; 
 }
+/* Fix white lines on sides of videos/images on mobile */
+@media (max-width: 768px) {
+  .full-image {
+    width: 100%;
+    left: 0;
+    right: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .full-image video,
+  .full-image img {
+    width: 100%;
+    display: block;
+  }
+}
