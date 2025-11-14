@@ -436,5 +436,46 @@
           .catch(function(e){ console.error('Navbar load failed:', e); });
       })();
     </script>
+
+    <!-- Add swipe gestures to slide slideshows -->
+    <script>
+      (function() {
+        document.querySelectorAll('.slideshow--slide').forEach(function(slideshow) {
+          let touchStartX = 0;
+          let touchEndX = 0;
+          
+          const prevBtn = slideshow.querySelector('.slideshow__arrow--prev');
+          const nextBtn = slideshow.querySelector('.slideshow__arrow--next');
+          
+          slideshow.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+          }, { passive: true });
+          
+          slideshow.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+          }, { passive: true });
+          
+          function handleSwipe() {
+            const swipeThreshold = 50; // Minimum distance for swipe
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+              if (diff > 0) {
+                // Swiped left - go to next
+                if (nextBtn && !nextBtn.disabled) {
+                  nextBtn.click();
+                }
+              } else {
+                // Swiped right - go to previous
+                if (prevBtn && !prevBtn.disabled) {
+                  prevBtn.click();
+                }
+              }
+            }
+          }
+        });
+      })();
+    </script>
 </body>
 </html>
