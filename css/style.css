@@ -736,12 +736,6 @@ footer {
 /* ===== IMAGE SLIDESHOW – SLIDE VARIANT (SIDE-BY-SIDE STRIP) ===== */
 /* Use on: <div class="slideshow slideshow--slide"> */
 
-.slideshow--slide {
-  line-height: 0 !important;
-  font-size: 0 !important;
-  background: transparent;
-}
-
 .slideshow--slide .slideshow__image {
   /* We override the fade behavior: all slides are fully opaque,
      and JS will position them horizontally via translateX. */
@@ -750,12 +744,6 @@ footer {
   line-height: 0;
   font-size: 0;
   display: block;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 /* Keep active on top if you ever need overlays, but visibility is from position */
@@ -766,6 +754,12 @@ footer {
 /* Completely hide disabled arrows in the slideshow */
 .slideshow__arrow[disabled] {
   display: none;
+}
+
+/* Fix for white background images showing dark line */
+.slideshow--slide {
+  line-height: 0 !important;
+  font-size: 0 !important;
 }
 
 
