@@ -3,6 +3,7 @@
    - Dynamic --nav-h (nav height) CSS var
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
+   - Swipe gestures for slide slideshows
 */
 
 (function () {
@@ -303,7 +304,7 @@ function initSlideshows() {
       layout();
       updateArrows();
     }
-     // AUTOPLAY — ONLY for slide variant (smooth bouncing)
+     // AUTOPLAY – ONLY for slide variant (smooth bouncing)
 if (isSlide) {
   var direction = 1; // 1 = forward, -1 = backward
 
@@ -378,6 +379,40 @@ if (isSlide) {
           show(index + 1);
         }, autoplayMs);
       });
+    }
+
+    // Add swipe gesture support for slide variant
+    if (isSlide) {
+      let touchStartX = 0;
+      let touchEndX = 0;
+      
+      root.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      
+      root.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+      
+      function handleSwipe() {
+        const swipeThreshold = 50; // Minimum distance for swipe
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > swipeThreshold) {
+          if (diff > 0) {
+            // Swiped left - go to next
+            if (nextBtn && !nextBtn.disabled) {
+              show(index + 1);
+            }
+          } else {
+            // Swiped right - go to previous
+            if (prevBtn && !prevBtn.disabled) {
+              show(index - 1);
+            }
+          }
+        }
+      }
     }
   });
 }
