@@ -667,6 +667,7 @@ footer {
   background: #000;
   display: block;
   line-height: 0;
+  font-size: 0;
 }
 
 .slideshow__image {
@@ -678,7 +679,8 @@ footer {
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
   display: block;
-  vertical-align: middle;
+  vertical-align: top;
+  line-height: 0;
 }
 
 .slideshow__image.active {
