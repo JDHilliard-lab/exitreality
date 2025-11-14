@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - All Display Options</title>
+    
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <script defer src="js/scripts.js"></script>
+
+    <!-- Project-specific styles -->
+    <style>
+        /* ===== IMAGE SLIDESHOW ===== */
+        .slideshow {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          overflow: hidden;
+          background: #000;
+        }
+
+        .slideshow__image {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 2.5s ease-in-out;
+        }
+
+        .slideshow__image.active {
+          opacity: 1;
+          z-index: 1;
+        }
+
+        .slideshow__arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 10;
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.85);
+          mix-blend-mode: difference;
+          text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+          font-size: 48px;
+          font-weight: 300;
+          cursor: pointer;
+          padding: 2rem;
+          opacity: 0;
+          transition: opacity 0.35s ease;
+          user-select: none;
+        }
+
+        .slideshow:hover .slideshow__arrow {
+          opacity: 1;
+        }
+
+        .slideshow__arrow:hover {
+          opacity: 1 !important;
+        }
+
+        .slideshow__arrow--prev {
+          left: 0;
+        }
+
+        .slideshow__arrow--next {
+          right: 0;
+        }
+
+        @media (max-width: 640px) {
+          .slideshow__arrow {
+            font-size: 36px;
+            padding: 1rem;
+          }
+        }
+
+        /* Before/After Slider Styles */
+        .ba {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            overflow: clip;
+            --x: 50%;
+        }
+
+        .ba__layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .ba__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .ba__after {
+            clip-path: polygon(0 0, var(--x) 0, var(--x) 100%, 0 100%);
+        }
+
+        .ba__divider {
+            position: absolute;
+            left: var(--x);
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            transform: translateX(-0.5px);
+            pointer-events: none;
+        }
+
+        .ba__handle {
+            position: absolute;
+            left: var(--x);
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ew-resize;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            color: rgba(255, 255, 255, 0.85);
+            mix-blend-mode: difference;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .ba:hover .ba__handle {
+            opacity: 1;
+        }
+
+        .ba__handle::before {
+            content: '<';
+            margin-right: 10px;
+        }
+
+        .ba__handle::after {
+            content: '>';
+            margin-left: 10px;
+        }
+
+        .ba + .ba {
+            margin-top: 0.5rem;
+        }
+
+        .ba__range {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+            .ba {
+                border: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- Project Header with Dark Theme -->
+    <div class="project-header dark-theme">
+        <div class="project-meta">
+            <div class="meta-item">
+                <div class="meta-label">Project</div>
+                <div class="meta-value">Complete Display Showcase</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Year</div>
+                <div class="meta-value">2025</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">Demo, All Display Options, Reference</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPTION 1: Hero Full-Width Video -->
+    <div class="full-image">
+        <video autoplay muted loop playsinline controls>
+            <source src="randomvideos/randomcollecton.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Synopsis Section -->
+    <div class="content-section">
+        <div class="section-label">Introduction</div>
+        <div class="section-description">
+            <p>This showcase project demonstrates all available display options for your portfolio. From full-width videos to before/after sliders, image grids, and slideshow variants—this page serves as a complete reference for building compelling project presentations.</p>
+        </div>
+    </div>
+
+    <!-- OPTION 2: Before/After Slider (Multiple) -->
+    <div class="content-section">
+        <div class="section-label">Display Option 1</div>
+        <div class="section-title">Before/After Slider</div>
+        <div class="section-description">
+            <p>The before/after slider allows visitors to compare two images by dragging a handle left or right. Perfect for showing transformations, AI enhancements, color grading comparisons, or design iterations. You can stack multiple sliders vertically for sequential comparisons.</p>
+        </div>
+
+        <div class="full-image">
+            <!-- Slider 1 -->
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 1">
+                <div class="ba__layer ba__before">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0005-GPT-16x9.webp" alt="Before image">
+                </div>
+                <div class="ba__layer ba__after">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0005-REF.webp" alt="After image">
+                </div>
+                <div class="ba__divider" aria-hidden="true"></div>
+                <div class="ba__handle" aria-hidden="true"></div>
+                <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+            </div>
+
+            <!-- Slider 2 -->
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 2">
+                <div class="ba__layer ba__before">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0008-REF.webp" alt="Before image">
+                </div>
+                <div class="ba__layer ba__after">
+                    <img class="ba__img" src="Ancient Ruins/EGYPT.0008.1-GPT-16x9.webp" alt="After image">
+                </div>
+                <div class="ba__divider" aria-hidden="true"></div>
+                <div class="ba__handle" aria-hidden="true"></div>
+                <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+            </div>
+        </div>
+    </div>
+
+    <!-- OPTION 3: Full-Width Single Image -->
+    <div class="content-section">
+        <div class="section-label">Display Option 2</div>
+        <div class="section-title">Full-Width Single Image</div>
+        <div class="section-description">
+            <p>A simple full-width image display that bleeds edge-to-edge across the viewport. Ideal for hero images, final renders, or any standalone visual that deserves maximum impact and attention without distractions.</p>
+        </div>
+        
+        <div class="full-image">
+            <img src="Ancient Ruins/EGPYPT-GRID0001.webp" alt="Full-width showcase image">
+        </div>
+    </div>
+
+    <!-- OPTION 4: Image Grid (2-Column) -->
+    <div class="content-section">
+        <div class="section-label">Display Option 3</div>
+        <div class="section-title">Image Grid (Side-by-Side)</div>
+        <div class="section-description">
+            <p>The image grid displays multiple images side-by-side in a responsive layout. On desktop, images appear in rows; on mobile, they stack vertically. Perfect for showing variations, multiple angles, or related designs in a clean, organized format.</p>
+        </div>
+
+        <div class="image-grid">
+            <img src="Other World Fish/BigRED001.1-W.LG-gpt.1.webp" alt="Grid image 1" />
+            <img src="Other World Fish/fishy-putpred.cucumber.0001-gpt05.1.webp" alt="Grid image 2" />
+        </div>
+    </div>
+
+    <!-- OPTION 5: Full-Width Video with Controls -->
+    <div class="content-section">
+        <div class="section-label">Display Option 4</div>
+        <div class="section-title">Full-Width Video</div>
+        <div class="section-description">
+            <p>Full-width video players that automatically loop and can be controlled by visitors. On mobile, video controls are hidden initially and appear when tapped, creating a clean, cinematic presentation. Ideal for animations, motion graphics, or process videos.</p>
+        </div>
+
+        <div class="full-image">
+            <video autoplay muted loop playsinline controls>
+                <source src="Other World Fish/BigRED001-360-ClaytoColor_1.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <div class="full-image">
+            <video autoplay muted loop playsinline controls>
+                <source src="Other World Fish/fishy-putpred-cucumber-0001-gpt05-1-gpt-360-ClaytoColor.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <!-- OPTION 6: Fade Slideshow (Manual Navigation) -->
+    <div class="content-section">
+        <div class="section-label">Display Option 5</div>
+        <div class="section-title">Fade Slideshow with Auto-Play</div>
+        <div class="section-description">
+            <p>This slideshow fades between images with automatic progression (6 seconds per slide). Visitors can manually navigate using left/right arrows that appear on hover. The slideshow loops infinitely and pauses when you hover over it. Great for showing a series of related images or process steps.</p>
+        </div>
+    
+        <div class="full-image">
+            <div class="slideshow">
+                <img class="slideshow__image active" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render06-GPT.1edit.webp" alt="Slideshow image 1">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render07-GPT.1-edit.webp" alt="Slideshow image 2">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render01-GPT.1.webp" alt="Slideshow image 3">
+                
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPTION 7: Slide Slideshow (Side-to-Side with Bounce) -->
+    <div class="content-section">
+        <div class="section-label">Display Option 6</div>
+        <div class="section-title">Sliding Slideshow with Auto-Bounce</div>
+        <div class="section-description">
+            <p>This variant slides images horizontally (left to right) with smooth transitions. It auto-plays with a "bounce" effect—moving forward to the last image, then reversing back to the first, creating a seamless loop. Arrows are hidden at the ends. Use this for sequential narratives or progressive reveals where order matters.</p>
+        </div>
+        
+        <div class="full-image">
+            <div class="slideshow slideshow--slide">
+                <img class="slideshow__image active" src="Other World Fish/BigRED001-gpt-paint.webp" alt="Slide 1">
+                <img class="slideshow__image" src="Other World Fish/blueRedShark001.1-painted.webp" alt="Slide 2">
+                <img class="slideshow__image" src="Other World Fish/fishy-red.0001-gpt01-paint.webp" alt="Slide 3">
+                <img class="slideshow__image" src="Other World Fish/fishy-putpred.cucumber.0001-Paint.webp" alt="Slide 4">
+                
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="content-section">
+        <div class="section-label">Reference Summary</div>
+        <div class="section-title">Complete Display Options</div>
+        <div class="section-description">
+            <p><strong>Option 1: Hero Video</strong> - Full-width autoplay video at page top</p>
+            <p><strong>Option 2: Before/After Slider</strong> - Interactive comparison with draggable handle</p>
+            <p><strong>Option 3: Full-Width Image</strong> - Single impactful image edge-to-edge</p>
+            <p><strong>Option 4: Image Grid</strong> - Multiple images in responsive columns</p>
+            <p><strong>Option 5: Video Player</strong> - Full-width video with controls (mobile tap-to-show)</p>
+            <p><strong>Option 6: Fade Slideshow</strong> - Auto-playing with manual arrows, infinite loop</p>
+            <p><strong>Option 7: Slide Slideshow</strong> - Horizontal sliding with auto-bounce animation</p>
+        </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-section">
+        <div class="credits-label">Credits</div>
+        <div class="credits-list">
+            <div class="credit-item">Design & Development – Exit Reality Studio</div>
+            <div class="credit-item">All Assets – Sample Portfolio Projects</div>
+            <div class="credit-item">Purpose – Display Options Reference Guide</div>
+        </div>
+    </div>
+
+    <!-- Before/After Slider JavaScript -->
+    <script>
+        document.querySelectorAll('.ba').forEach((root) => {
+            const range = root.querySelector('.ba__range');
+            
+            const setPct = (p) => {
+                const clamped = Math.max(0, Math.min(100, p));
+                root.style.setProperty('--x', clamped + '%');
+                range.value = clamped;
+            };
+
+            const toPctFromClientX = (clientX) => {
+                const rect = root.getBoundingClientRect();
+                return ((clientX - rect.left) / rect.width) * 100;
+            };
+
+            const onPointerDown = (e) => {
+                setPct(toPctFromClientX(e.clientX));
+                const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+                const onUp = () => {
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            };
+            root.addEventListener('mousedown', onPointerDown);
+
+            root.addEventListener('touchstart', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+            
+            root.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+
+            range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+            setPct(parseFloat(range.value) || 50);
+        });
+    </script>
+
+    <!-- Hide video controls on mobile until user taps -->
+    <script>
+        (function() {
+            if (window.innerWidth <= 768) {
+                const videos = document.querySelectorAll('.full-image video');
+                
+                videos.forEach(video => {
+                    video.removeAttribute('controls');
+                    
+                    video.addEventListener('click', function() {
+                        this.setAttribute('controls', '');
+                        this.classList.add('show-controls');
+                    }, { once: true });
+                });
+            }
+        })();
+    </script>
+
+    <!-- Inject shared navbar -->
+    <script>
+      (function() {
+        fetch('navbar.html')
+          .then(function(res){ return res.text(); })
+          .then(function(html){
+            var mount = document.getElementById('navbar-placeholder');
+            if (mount) mount.innerHTML = html;
+          })
+          .catch(function(e){ console.error('Navbar load failed:', e); });
+      })();
+    </script>
+</body>
+</html>
