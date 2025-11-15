@@ -4,6 +4,7 @@
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
    - Swipe gestures for slide slideshows
+   - Parallax scrolling effect
 */
 
 (function () {
@@ -420,7 +421,6 @@ if (isSlide) {
 }
 
 window.addEventListener('DOMContentLoaded', initSlideshows);
-   window.addEventListener('DOMContentLoaded', initSlideshows);
 
 /*** 6) Parallax scrolling effect ***/
 (function initParallax() {
@@ -465,9 +465,6 @@ window.addEventListener('DOMContentLoaded', initSlideshows);
   
   // Initial call
   handleScroll();
-})();
-
-
 })();
 
 
