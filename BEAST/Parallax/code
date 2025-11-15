@@ -1,4 +1,6 @@
-
+data-speed="0.2"  → Very slow (sky, distant)
+data-speed="0.5"  → Medium (mid-ground)
+data-speed="0.8"  → Fast (foreground)
 
 🎨 How to Use:
 -------------------------With text overlay------------------------
