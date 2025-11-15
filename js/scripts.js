@@ -275,7 +275,9 @@ function initSlideshows() {
 
       slides.forEach(function (slide, idx) {
         var offset = idx - index; // 0 = current, -1 = left, +1 = right
-        slide.style.transform = 'translateX(' + (offset * 100) + '%)';
+        // Use translate3d for better rendering and to avoid subpixel gaps
+        slide.style.transform = 'translate3d(' + (offset * 100) + '%, 0, 0)';
+        slide.style.webkitTransform = 'translate3d(' + (offset * 100) + '%, 0, 0)';
       });
     }
 
