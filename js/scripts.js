@@ -420,6 +420,55 @@ if (isSlide) {
 }
 
 window.addEventListener('DOMContentLoaded', initSlideshows);
+   window.addEventListener('DOMContentLoaded', initSlideshows);
+
+/*** 6) Parallax scrolling effect ***/
+(function initParallax() {
+  const parallaxSections = document.querySelectorAll('.parallax-section');
+  
+  if (parallaxSections.length === 0) return;
+  
+  // Disable on mobile for performance
+  if (window.innerWidth <= 768) return;
+  
+  function handleScroll() {
+    parallaxSections.forEach(section => {
+      const layers = section.querySelectorAll('.parallax-layer');
+      const rect = section.getBoundingClientRect();
+      const scrolled = rect.top;
+      
+      // Only apply effect when section is in viewport
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        layers.forEach((layer, index) => {
+          // Get speed from data attribute or use index-based default
+          const speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
+          const yPos = -(scrolled * speed);
+          
+          layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
+        });
+      }
+    });
+  }
+  
+  // Use requestAnimationFrame for smooth performance
+  let ticking = false;
+  
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        handleScroll();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+  
+  // Initial call
+  handleScroll();
+})();
+
+
+})();
 
 
 })();
