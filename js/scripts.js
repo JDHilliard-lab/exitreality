@@ -4,7 +4,7 @@
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
    - Swipe gestures for slide slideshows
-   - Parallax scrolling effect (works on mobile with reduced intensity)
+   - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
 */
 
 (function () {
@@ -373,14 +373,14 @@
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
-  /*** 6) Parallax scrolling effect - Works on mobile with reduced intensity ***/
+  /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
     const parallaxSections = document.querySelectorAll('.parallax-section');
     
     if (parallaxSections.length === 0) return;
     
     const isMobile = window.innerWidth <= 768;
-    const mobileMultiplier = 0.08; // Very minimal movement on mobile
+    const mobileMultiplier = 0.3; // Reduced movement on mobile
     
     function handleScroll() {
       parallaxSections.forEach(section => {
@@ -393,15 +393,11 @@
             let speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
             
             if (isMobile) {
-              // Extremely subtle movement to prevent spillover with transparent PNGs
               speed *= mobileMultiplier;
-              // Clamp the movement to a very small range
-              const yPos = Math.max(Math.min(-(scrolled * speed), 20), -20);
-              layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
-            } else {
-              const yPos = -(scrolled * speed);
-              layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
             }
+            
+            const yPos = -(scrolled * speed);
+            layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
           });
         }
       });
