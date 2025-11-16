@@ -1,422 +1,411 @@
-/* ===== GLOBAL SITE SCRIPT =====
-   - Base-path safeguard for GitHub Pages
-   - Dynamic --nav-h (nav height) CSS var
-   - Smooth scrolling with fixed-nav offset
-   - Loading bar for page and video content
-   - Swipe gestures for slide slideshows
-   - Parallax scrolling effect (works on mobile with reduced intensity)
-*/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beast</title>
+    
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <script defer src="js/scripts.js"></script>
 
-(function () {
-  'use strict';
-
-  /*** Utils ***/
-  function debounce(fn, wait) {
-    let t;
-    return function () {
-      clearTimeout(t);
-      t = setTimeout(() => fn.apply(this, arguments), wait);
-    };
-  }
-
-  /*** LOADING BAR ***/
-  (function initLoadingBar() {
-    const loadingBar = document.createElement('div');
-    loadingBar.id = 'loading-bar';
-    document.body.insertBefore(loadingBar, document.body.firstChild);
-
-    let progress = 0;
-    let totalVideos = 0;
-    let loadedVideos = 0;
-    let totalImages = 0;
-    let loadedImages = 0;
-
-    function updateProgress() {
-      const totalMedia = totalVideos + totalImages;
-      const loadedMedia = loadedVideos + loadedImages;
-      
-      if (totalMedia === 0) {
-        progress = 100;
-      } else {
-        progress = (loadedMedia / totalMedia) * 100;
-      }
-      
-      loadingBar.style.width = progress + '%';
-      
-      if (progress >= 100) {
-        setTimeout(() => {
-          loadingBar.classList.add('complete');
-          setTimeout(() => {
-            loadingBar.remove();
-          }, 300);
-        }, 200);
-      }
-    }
-
-    function trackVideos() {
-      const videos = document.querySelectorAll('video');
-      totalVideos = videos.length;
-
-      if (totalVideos === 0) {
-        updateProgress();
-        return;
-      }
-
-      videos.forEach(video => {
-        if (video.readyState >= 3) {
-          loadedVideos++;
-          updateProgress();
-        } else {
-          video.addEventListener('canplaythrough', function onLoad() {
-            loadedVideos++;
-            updateProgress();
-            video.removeEventListener('canplaythrough', onLoad);
-          }, { once: true });
-
-          video.addEventListener('error', function onError() {
-            loadedVideos++;
-            updateProgress();
-            video.removeEventListener('error', onError);
-          }, { once: true });
-        }
-      });
-    }
-
-    function trackImages() {
-      const images = document.querySelectorAll('img');
-      totalImages = images.length;
-
-      if (totalImages === 0) {
-        updateProgress();
-        return;
-      }
-
-      images.forEach(img => {
-        if (img.complete) {
-          loadedImages++;
-          updateProgress();
-        } else {
-          img.addEventListener('load', function onLoad() {
-            loadedImages++;
-            updateProgress();
-            img.removeEventListener('load', onLoad);
-          }, { once: true });
-
-          img.addEventListener('error', function onError() {
-            loadedImages++;
-            updateProgress();
-            img.removeEventListener('error', onError);
-          }, { once: true });
-        }
-      });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        trackVideos();
-        trackImages();
-      });
-    } else {
-      trackVideos();
-      trackImages();
-    }
-
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        if (progress < 100) {
-          progress = 100;
-          updateProgress();
-        }
-      }, 500);
-    });
-  })();
-
-  /*** 1) Dynamic --nav-h CSS variable ***/
-  function setNavHeightVar() {
-    const nav = document.querySelector('nav');
-    if (!nav) return;
-    const h = nav.offsetHeight || 0;
-    document.documentElement.style.setProperty('--nav-h', h + 'px');
-  }
-  
-  window.addEventListener('load', setNavHeightVar);
-  window.addEventListener('resize', debounce(setNavHeightVar, 150));
-
-  /*** 2) Base-path safeguard (home preserves hashes) ***/
-  function basePathSafeguard() {
-    try {
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      const base = parts.length ? '/' + parts[0] : '';
-      const here = window.location.pathname || '/';
-      const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
-
-      document.querySelectorAll('nav a').forEach(function (link) {
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        const low = href.toLowerCase();
-        const isHashOnly = href.charAt(0) === '#';
-        const isIndex = low === 'index.html' || low === './index.html' || low === '/index.html';
-        const isIndexHash = low.indexOf('index.html#') === 0 || low.indexOf('./index.html#') === 0 || low.indexOf('/index.html#') === 0;
-        const isLogo = link.classList.contains('logo');
-
-        if (isLogo) {
-          if (!isHome && !isHashOnly) {
-            link.setAttribute('href', base || '/');
-          }
-          return;
+    <!-- Project-specific slider styles -->
+    <style>
+        /* ===== IMAGE SLIDESHOW ===== */
+        .slideshow {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          overflow: hidden;
+          background: #000;
         }
 
-        if (isIndex) {
-          link.setAttribute('href', base || '/');
-          return;
+        .slideshow__image {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 2.5s ease-in-out;
         }
 
-        if (isHome && isHashOnly) {
-          return;
+        .slideshow__image.active {
+          opacity: 1;
+          z-index: 1;
         }
 
-        if (!isHome && (isHashOnly || isIndexHash)) {
-          const anchor = isHashOnly ? href.slice(1) : (href.split('#')[1] || '');
-          link.setAttribute('href', (base ? base : '') + '/index.html' + (anchor ? ('#' + anchor) : ''));
-        }
-      });
-    } catch (e) {
-      if (window.console && console.warn) console.warn('Nav safeguard error:', e);
-    }
-  }
-  
-  window.addEventListener('DOMContentLoaded', basePathSafeguard);
-
-  /*** 3) Smooth scroll with fixed-nav offset (homepage only) ***/
-  function getNavHeight() {
-    const v = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
-    const n = parseInt(v, 10);
-    return isNaN(n) ? 0 : n;
-  }
-
-  function smoothScrollToId(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const navH = getNavHeight();
-    const target = window.scrollY + rect.top - (navH || 0);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-  }
-
-  function interceptHashClicks() {
-    const here = window.location.pathname || '/';
-    const parts = here.split('/').filter(Boolean);
-    const base = parts.length ? '/' + parts[0] : '';
-    const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
-    if (!isHome) return;
-
-    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        const href = a.getAttribute('href');
-        if (!href || href === '#') return;
-        const id = href.slice(1);
-        if (!id) return;
-        e.preventDefault();
-        smoothScrollToId(id);
-        history.pushState(null, '', '#' + id);
-      });
-    });
-  }
-  
-  window.addEventListener('DOMContentLoaded', interceptHashClicks);
-
-  /*** 4) Correct deep links on load/hashchange (fixed-nav offset) ***/
-  function correctInitialHash() {
-    const hash = window.location.hash;
-    if (!hash || hash.length < 2) return;
-    const id = hash.slice(1);
-    setTimeout(function () { smoothScrollToId(id); }, 0);
-  }
-  
-  window.addEventListener('load', correctInitialHash);
-  window.addEventListener('hashchange', function () {
-    const id = (window.location.hash || '').replace(/^#/, '');
-    if (!id) return;
-    smoothScrollToId(id);
-  });
-
-  /*** 5) Global Slideshow Support (fade + slide variant) ***/
-  function initSlideshows() {
-    document.querySelectorAll('.slideshow').forEach(function (root) {
-      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-      const prevBtn = root.querySelector('.slideshow__arrow--prev');
-      const nextBtn = root.querySelector('.slideshow__arrow--next');
-      if (!slides.length) return;
-
-      const isSlide = root.classList.contains('slideshow--slide');
-
-      let index = slides.findIndex(s => s.classList.contains('active'));
-      if (index < 0) {
-        index = 0;
-        slides[0].classList.add('active');
-      }
-
-      function layout() {
-        if (!isSlide) return;
-
-        slides.forEach(function (slide, idx) {
-          const offset = idx - index;
-          slide.style.transform = `translate3d(${offset * 100}%, 0, 0)`;
-          slide.style.webkitTransform = `translate3d(${offset * 100}%, 0, 0)`;
-        });
-      }
-
-      function updateArrows() {
-        if (!isSlide) return;
-        if (prevBtn) prevBtn.disabled = (index === 0);
-        if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
-      }
-
-      function show(nextIndex) {
-        if (isSlide) {
-          if (nextIndex < 0 || nextIndex >= slides.length) return;
-        } else {
-          nextIndex = (nextIndex + slides.length) % slides.length;
+        .slideshow__arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 10;
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.85);
+          mix-blend-mode: difference;
+          text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+          font-size: 48px;
+          font-weight: 300;
+          cursor: pointer;
+          padding: 2rem;
+          opacity: 0;
+          transition: opacity 0.35s ease;
+          user-select: none;
         }
 
-        if (nextIndex === index) return;
+        .slideshow:hover .slideshow__arrow {
+          opacity: 1;
+        }
 
-        slides[index].classList.remove('active');
-        index = nextIndex;
-        slides[index].classList.add('active');
+        .slideshow__arrow:hover {
+          opacity: 1 !important;
+        }
 
-        layout();
-        updateArrows();
-      }
+        .slideshow__arrow--prev {
+          left: 0;
+        }
 
-      if (isSlide) {
-        let direction = 1;
+        .slideshow__arrow--next {
+          right: 0;
+        }
 
-        let autoTimer = setInterval(function () {
-          if (index === slides.length - 1) direction = -1;
-          if (index === 0) direction = 1;
-          show(index + direction);
-        }, 4000);
-
-        root.addEventListener('mouseenter', function () {
-          clearInterval(autoTimer);
-        });
-
-        root.addEventListener('mouseleave', function () {
-          autoTimer = setInterval(function () {
-            if (index === slides.length - 1) direction = -1;
-            if (index === 0) direction = 1;
-            show(index + direction);
-          }, 4000);
-        });
-      }
-
-      layout();
-      updateArrows();
-
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => show(index - 1));
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => show(index + 1));
-      }
-
-      root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(index - 1);
-        if (e.key === 'ArrowRight') show(index + 1);
-      });
-
-      if (!isSlide) {
-        const autoplayMs = 6000;
-        let timer = setInterval(() => show(index + 1), autoplayMs);
-
-        root.addEventListener('mouseenter', () => clearInterval(timer));
-        root.addEventListener('mouseleave', () => {
-          timer = setInterval(() => show(index + 1), autoplayMs);
-        });
-      }
-
-      if (isSlide) {
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        root.addEventListener('touchstart', function(e) {
-          touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-        
-        root.addEventListener('touchend', function(e) {
-          touchEndX = e.changedTouches[0].screenX;
-          handleSwipe();
-        }, { passive: true });
-        
-        function handleSwipe() {
-          const swipeThreshold = 50;
-          const diff = touchStartX - touchEndX;
-          
-          if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0) {
-              if (nextBtn && !nextBtn.disabled) {
-                show(index + 1);
-              }
-            } else {
-              if (prevBtn && !prevBtn.disabled) {
-                show(index - 1);
-              }
-            }
+        @media (max-width: 640px) {
+          .slideshow__arrow {
+            font-size: 36px;
+            padding: 1rem;
           }
         }
-      }
-    });
-  }
 
-  window.addEventListener('DOMContentLoaded', initSlideshows);
-
-  /*** 6) Parallax scrolling effect - Works on mobile with reduced intensity ***/
-  (function initParallax() {
-    const parallaxSections = document.querySelectorAll('.parallax-section');
-    
-    if (parallaxSections.length === 0) return;
-    
-    const isMobile = window.innerWidth <= 768;
-    const mobileMultiplier = 0.2; // Reduced for mobile to prevent too much movement
-    
-    function handleScroll() {
-      parallaxSections.forEach(section => {
-        const layers = section.querySelectorAll('.parallax-layer');
-        const rect = section.getBoundingClientRect();
-        const scrolled = rect.top;
-        
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-          layers.forEach((layer, index) => {
-            let speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
-            
-            if (isMobile) {
-              // Reduce speed significantly on mobile
-              speed *= mobileMultiplier;
-            }
-            
-            const yPos = -(scrolled * speed);
-            layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
-          });
+        /* Before/After Slider Styles */
+        .ba {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #fff;
+            border: none;
+            border-radius: 0;
+            overflow: clip;
+            --x: 50%;
         }
-      });
-    }
-    
-    let ticking = false;
-    
-    window.addEventListener('scroll', function() {
-      if (!ticking) {
-        window.requestAnimationFrame(function() {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-    
-    handleScroll();
-  })();
 
-})();
+        .ba__layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .ba__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .ba__after {
+            clip-path: polygon(0 0, var(--x) 0, var(--x) 100%, 0 100%);
+        }
+
+        .ba__divider {
+            position: absolute;
+            left: var(--x);
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            transform: translateX(-0.5px);
+            pointer-events: none;
+        }
+
+        .ba__handle {
+            position: absolute;
+            left: var(--x);
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ew-resize;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            color: rgba(255, 255, 255, 0.85);
+            mix-blend-mode: difference;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .ba:hover .ba__handle {
+            opacity: 1;
+        }
+
+        .ba__handle::before {
+            content: '<';
+            margin-right: 10px;
+        }
+
+        .ba__handle::after {
+            content: '>';
+            margin-left: 10px;
+        }
+
+        .ba + .ba {
+            margin-top: 0.5rem;
+        }
+
+        .ba__range {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mobile adjustments for sliders */
+        @media (max-width: 640px) {
+            .ba {
+                border: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body class="project-page">
+    <!-- Navigation -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- Project Header with Dark Theme -->
+    <div class="project-header dark-theme">
+        <div class="project-meta">
+            <div class="meta-item">
+                <div class="meta-label">Project</div>
+                <div class="meta-value">Beast</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Year</div>
+                <div class="meta-value">2025</div>
+            </div>
+            
+            <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">Creature Design, Animation, Generative AI</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Video -->
+    <div class="full-image">
+        <video autoplay muted loop playsinline controls>
+            <source src="BEAST/sketch-tigerLizard001-GPT001-16x9-FinalEdits2.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Synopsis Section -->
+    <div class="content-section">
+        <div class="section-label">Synopsis</div>
+        <div class="section-description">
+            <p>This project imagines aquatic life on distant worlds through traditional and digital techniques. Watercolor paintings of fictional fish were transformed with generative AI into photorealistic images, converted into 3D models, and composed in Blender. Final stills were animated with image-to-video generation, bringing these imagined extraterrestrial creatures to life.</p>
+        </div>
+    </div>
+
+    <!-- Stage 1: Image Transformation -->
+    <div class="content-section">
+        <div class="section-label">Process</div>
+        <div class="section-title">Image Transformation</div>
+        <div class="section-description">
+            <p>Hand-painted watercolor fish were transformed into photorealistic underwater creatures using generative AI.</p>
+        </div>
+
+        <!-- Before/After Sliders -->
+        <div class="full-image">
+            <!-- Slider 1 -->
+            <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 1">
+                <div class="ba__layer ba__before">
+                    <img class="ba__img" src="BEAST/sketch-tigerLizard001-GPT001-16x9.jpg" alt="Watercolor creature painting">
+                </div>
+                <div class="ba__layer ba__after">
+                    <img class="ba__img" src="BEAST/sketch-tigerLizard001-19x16.jpg" alt="Photorealistic generative AI version">
+                </div>
+                <div class="ba__divider" aria-hidden="true"></div>
+                <div class="ba__handle" aria-hidden="true"></div>
+                <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Reveal amount">
+            </div>
+        </div>
+    </div>
+ <!-- Process: Body parts -->
+    <div class="content-section">
+        <div class="section-label">Process</div>
+        <div class="section-title">Image to 3D</div>
+        <div class="section-description">
+            <p>Isolating the creature’s body parts allowed a focused generative pass that sharpened details 
+                ahead of 3D generation. </p>
+        </div>
+        
+        <div class="full-image">
+            <div class="slideshow slideshow--slide">
+                <img class="slideshow__image active" src="BEAST/Beast_Body_FullBody.webp" alt="Creature 3D view 1">
+                <img class="slideshow__image" src="BEAST/Beast_Body_Head.webp" alt="Creature 3D view 2">
+                <img class="slideshow__image" src="BEAST/Beast_BodyARMS.webp" alt="Creature 3D view 3">
+                <img class="slideshow__image" src="BEAST/Beast_Body_FullBodySide.webp" alt="Creature 3D view 4">
+                
+                
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+             </div>
+        </div>
+    </div>
+
+
+    <!-- Parallax BG -->
+         <section class="parallax-section">
+    <div class="parallax-bg">
+        <div class="parallax-layer" data-speed="0.1" style="background-image: url('BEAST/Parallax/PL_0005_PL6-Beast-Parallax_bg.png');"></div>
+        <div class="parallax-layer" data-speed="0.2" style="background-image: url('BEAST/Parallax/PL_0004_PL5-Beast-Parallax_treebg.png');"></div>
+        <div class="parallax-layer" data-speed="0.3" style="background-image: url('BEAST/Parallax/PL_0003_PL4-mid-creature.png');"></div>
+        <div class="parallax-layer" data-speed="0.4" style="background-image: url('BEAST/Parallax/PL_0002_PL3-Mid-dust.png');"></div>
+        <div class="parallax-layer" data-speed="0.3" style="background-image: url('BEAST/Parallax/PL_0001_PL2.1-Beast-Parallax_shrub-treeRight-fg.png');"></div>
+        <div class="parallax-layer" data-speed="0.4" style="background-image: url('BEAST/Parallax/PL_0000_PL1-Beast-Parallax_shrub-tree-fg.png');"></div> 
+    </div>
+</section>
+
+      
+    
+   <!-- 360 Showcase -->
+      <div class="full-image">
+        <video autoplay muted loop playsinline controls>
+            <source src="BEAST/beast-360W.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <!-- Stage 2: Image to 3D -->
+    <div class="content-section">
+        <div class="section-label">Process</div>
+        <div class="section-title">Image to 3D</div>
+        <div class="section-description">
+            <p>In this phase, the photorealistic versions are placed on a clean white background for easy processing from image to 3D generative assets.</p>
+        </div>
+    
+        <div class="full-image">
+            <div class="slideshow">
+                <img class="slideshow__image active" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render06-GPT.1edit.webp" alt="Creature 3D view 1">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render07-GPT.1-edit.webp" alt="Creature 3D view 2">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render01-GPT.1.webp" alt="Creature 3D view 3">
+                
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage 3: Animation & Motion -->
+    <div class="content-section">
+        <div class="section-label">Process</div>
+        <div class="section-title">Animation & Motion</div>
+        <div class="section-description">
+            <p>The final stage brings these static images to life through AI-powered video generation. Each rendered scene receives dynamic camera movements and atmospheric effects, creating immersive cinematic sequences.</p>
+        </div>
+        
+        <div class="full-image">
+            <div class="slideshow slideshow--slide">
+                <img class="slideshow__image active" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render06-GPT.1edit.webp" alt="Creature 3D view 1">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render07-GPT.1-edit.webp" alt="Creature 3D view 2">
+                <img class="slideshow__image" src="BEAST/sketch-tigerLizard001-GPT001-Head.1-GPT.1-edit-gpt-quater-Ten3.0-render01-GPT.1.webp" alt="Creature 3D view 3">
+                
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-section">
+        <div class="credits-label">Credits</div>
+        <div class="credits-list">
+            <div class="credit-item">Concept & AI Direction — Your Name</div>
+            <div class="credit-item">Watercolor Painting — Your Name</div>
+            <div class="credit-item">3D Composition & Animation — Your Name</div>
+        </div>
+    </div>
+
+    <!-- Before/After Slider JavaScript -->
+    <script>
+        document.querySelectorAll('.ba').forEach((root) => {
+            const range = root.querySelector('.ba__range');
+            
+            const setPct = (p) => {
+                const clamped = Math.max(0, Math.min(100, p));
+                root.style.setProperty('--x', clamped + '%');
+                range.value = clamped;
+            };
+
+            const toPctFromClientX = (clientX) => {
+                const rect = root.getBoundingClientRect();
+                return ((clientX - rect.left) / rect.width) * 100;
+            };
+
+            // Mouse/pointer
+            const onPointerDown = (e) => {
+                setPct(toPctFromClientX(e.clientX));
+                const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+                const onUp = () => {
+                    window.removeEventListener('mousemove', onMove);
+                    window.removeEventListener('mouseup', onUp);
+                };
+                window.addEventListener('mousemove', onMove);
+                window.addEventListener('mouseup', onUp);
+            };
+            root.addEventListener('mousedown', onPointerDown);
+
+            // Touch
+            root.addEventListener('touchstart', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+            
+            root.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                setPct(toPctFromClientX(t.clientX));
+            }, { passive: true });
+
+            // Range input (keyboard + screen readers)
+            range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+
+            // Initialize
+            setPct(parseFloat(range.value) || 50);
+        });
+    </script>
+
+    <!-- Hide video controls on mobile until user taps -->
+<script>
+    (function() {
+        if (window.innerWidth <= 768) {
+            const videos = document.querySelectorAll('.full-image video');
+            
+            videos.forEach(video => {
+                video.removeAttribute('controls');
+                
+                video.addEventListener('click', function() {
+                    this.setAttribute('controls', '');
+                    this.classList.add('show-controls');
+                }, { once: true });
+            });
+        }
+    })();
+</script>
+
+    <!-- Inject shared navbar -->
+    <script>
+      (function() {
+        fetch('navbar.html')
+          .then(function(res){ return res.text(); })
+          .then(function(html){
+            var mount = document.getElementById('navbar-placeholder');
+            if (mount) mount.innerHTML = html;
+          })
+          .catch(function(e){ console.error('Navbar load failed:', e); });
+      })();
+    </script>
+</body>
+</html>
