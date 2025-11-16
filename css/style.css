@@ -505,6 +505,7 @@ footer {
   vertical-align: top;
   line-height: 0;
   font-size: 0;
+  background: #000;
 }
 
 /* Hide video controls on mobile until interaction */
@@ -845,22 +846,14 @@ footer {
     padding: 2rem 1.5rem;
   }
   
-  /* Parallax layers will still animate on mobile with reduced effect from JS */
+  /* Show full composition on mobile - no cropping */
   .parallax-layer {
     background-attachment: scroll;
-    background-size: cover;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-position: center center;
-    /* Prevent cropping on mobile */
     min-height: 100vh;
     min-width: 100vw;
-  }
-  
-  /* Adjust background size on very small screens */
-  @media (max-width: 480px) {
-    .parallax-layer {
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
   }
 }
 
