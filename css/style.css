@@ -777,6 +777,9 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Mask/clip any layers that extend beyond bounds */
+  -webkit-mask-image: -webkit-linear-gradient(white, white);
+  mask-image: linear-gradient(white, white);
 }
 
 .parallax-bg {
@@ -784,6 +787,8 @@ footer {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  /* Additional clipping for parallax container */
+  clip-path: inset(0);
 }
 
 .parallax-layer {
@@ -830,7 +835,7 @@ footer {
   z-index: 1;
 }
 
-/* Mobile adjustments - Full bleed */
+/* Mobile adjustments */
 @media (max-width: 768px) {
   .parallax-section {
     min-height: 100vh;
@@ -840,29 +845,14 @@ footer {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    overflow: hidden;
-  }
-  
-  .parallax-bg {
-    overflow: hidden;
   }
   
   .parallax-content {
     padding: 2rem 1.5rem;
   }
   
-  /* Show full composition on mobile - contained within viewport */
   .parallax-layer {
     background-attachment: scroll;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
   }
 }
 
