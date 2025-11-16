@@ -846,6 +846,10 @@ footer {
     margin-left: -50vw;
     margin-right: -50vw;
     overflow: hidden;
+    /* Force strict clipping */
+    -webkit-mask-image: -webkit-linear-gradient(white, white);
+    mask-image: linear-gradient(white, white);
+    isolation: isolate;
   }
   
   .parallax-bg {
@@ -854,6 +858,9 @@ footer {
     height: auto;
     min-height: 120vh;
     top: -10vh;
+    overflow: hidden;
+    /* Additional clipping layer */
+    clip-path: inset(10vh 0);
   }
   
   .parallax-content {
@@ -868,6 +875,8 @@ footer {
     /* Extend layers to accommodate movement */
     height: 120vh;
     top: -10vh;
+    /* Ensure layers stay contained */
+    overflow: hidden;
   }
 }
 
