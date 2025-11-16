@@ -4,7 +4,7 @@
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
    - Swipe gestures for slide slideshows
-   - Parallax scrolling effect
+   - Parallax scrolling effect (works on mobile with reduced intensity)
 */
 
 (function () {
@@ -21,7 +21,6 @@
 
   /*** LOADING BAR ***/
   (function initLoadingBar() {
-    // Create loading bar element
     const loadingBar = document.createElement('div');
     loadingBar.id = 'loading-bar';
     document.body.insertBefore(loadingBar, document.body.firstChild);
@@ -64,7 +63,6 @@
       }
 
       videos.forEach(video => {
-        // Check if video is already loaded
         if (video.readyState >= 3) {
           loadedVideos++;
           updateProgress();
@@ -113,7 +111,6 @@
       });
     }
 
-    // Start tracking when DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         trackVideos();
@@ -124,7 +121,6 @@
       trackImages();
     }
 
-    // Fallback: ensure bar completes even if something fails
     window.addEventListener('load', () => {
       setTimeout(() => {
         if (progress < 100) {
@@ -137,34 +133,33 @@
 
   /*** 1) Dynamic --nav-h CSS variable ***/
   function setNavHeightVar() {
-    var nav = document.querySelector('nav');
+    const nav = document.querySelector('nav');
     if (!nav) return;
-    var h = nav.offsetHeight || 0;
+    const h = nav.offsetHeight || 0;
     document.documentElement.style.setProperty('--nav-h', h + 'px');
   }
-  // Set once and on resize (debounced)
+  
   window.addEventListener('load', setNavHeightVar);
   window.addEventListener('resize', debounce(setNavHeightVar, 150));
 
   /*** 2) Base-path safeguard (home preserves hashes) ***/
   function basePathSafeguard() {
     try {
-      var parts = window.location.pathname.split('/').filter(Boolean);
-      var base = parts.length ? '/' + parts[0] : '';
-      var here = window.location.pathname || '/';
-      var isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const base = parts.length ? '/' + parts[0] : '';
+      const here = window.location.pathname || '/';
+      const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
 
       document.querySelectorAll('nav a').forEach(function (link) {
-        var href = link.getAttribute('href');
+        const href = link.getAttribute('href');
         if (!href) return;
 
-        var low = href.toLowerCase();
-        var isHashOnly  = href.charAt(0) === '#';
-        var isIndex     = low === 'index.html' || low === './index.html' || low === '/index.html';
-        var isIndexHash = low.indexOf('index.html#') === 0 || low.indexOf('./index.html#') === 0 || low.indexOf('/index.html#') === 0;
-        var isLogo = link.classList.contains('logo');
+        const low = href.toLowerCase();
+        const isHashOnly = href.charAt(0) === '#';
+        const isIndex = low === 'index.html' || low === './index.html' || low === '/index.html';
+        const isIndexHash = low.indexOf('index.html#') === 0 || low.indexOf('./index.html#') === 0 || low.indexOf('/index.html#') === 0;
+        const isLogo = link.classList.contains('logo');
 
-        // Logo: keep as-is on homepage (lets #hero smooth scroll); send to root from subpages
         if (isLogo) {
           if (!isHome && !isHashOnly) {
             link.setAttribute('href', base || '/');
@@ -172,20 +167,17 @@
           return;
         }
 
-        // Canonicalize explicit index.html
         if (isIndex) {
           link.setAttribute('href', base || '/');
           return;
         }
 
-        // On the homepage: leave hash links alone for native smooth scroll
         if (isHome && isHashOnly) {
           return;
         }
 
-        // On subpages: route hash-only or index.html#... back to homepage
         if (!isHome && (isHashOnly || isIndexHash)) {
-          var anchor = isHashOnly ? href.slice(1) : (href.split('#')[1] || '');
+          const anchor = isHashOnly ? href.slice(1) : (href.split('#')[1] || '');
           link.setAttribute('href', (base ? base : '') + '/index.html' + (anchor ? ('#' + anchor) : ''));
         }
       });
@@ -193,37 +185,37 @@
       if (window.console && console.warn) console.warn('Nav safeguard error:', e);
     }
   }
-  // Run once on load
+  
   window.addEventListener('DOMContentLoaded', basePathSafeguard);
 
   /*** 3) Smooth scroll with fixed-nav offset (homepage only) ***/
   function getNavHeight() {
-    var v = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
-    var n = parseInt(v, 10);
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
+    const n = parseInt(v, 10);
     return isNaN(n) ? 0 : n;
   }
 
   function smoothScrollToId(id) {
-    var el = document.getElementById(id);
+    const el = document.getElementById(id);
     if (!el) return;
-    var rect = el.getBoundingClientRect();
-    var navH = getNavHeight();
-    var target = window.scrollY + rect.top - (navH || 0);
+    const rect = el.getBoundingClientRect();
+    const navH = getNavHeight();
+    const target = window.scrollY + rect.top - (navH || 0);
     window.scrollTo({ top: target, behavior: 'smooth' });
   }
 
   function interceptHashClicks() {
-    var here = window.location.pathname || '/';
-    var parts = here.split('/').filter(Boolean);
-    var base = parts.length ? '/' + parts[0] : '';
-    var isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
-    if (!isHome) return; // Only intercept on homepage
+    const here = window.location.pathname || '/';
+    const parts = here.split('/').filter(Boolean);
+    const base = parts.length ? '/' + parts[0] : '';
+    const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
+    if (!isHome) return;
 
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function (e) {
-        var href = a.getAttribute('href');
+        const href = a.getAttribute('href');
         if (!href || href === '#') return;
-        var id = href.slice(1);
+        const id = href.slice(1);
         if (!id) return;
         e.preventDefault();
         smoothScrollToId(id);
@@ -231,241 +223,198 @@
       });
     });
   }
+  
   window.addEventListener('DOMContentLoaded', interceptHashClicks);
 
   /*** 4) Correct deep links on load/hashchange (fixed-nav offset) ***/
   function correctInitialHash() {
-    var hash = window.location.hash;
+    const hash = window.location.hash;
     if (!hash || hash.length < 2) return;
-    var id = hash.slice(1);
-    // Delay to allow layout to settle
+    const id = hash.slice(1);
     setTimeout(function () { smoothScrollToId(id); }, 0);
   }
+  
   window.addEventListener('load', correctInitialHash);
   window.addEventListener('hashchange', function () {
-    var id = (window.location.hash || '').replace(/^#/, '');
+    const id = (window.location.hash || '').replace(/^#/, '');
     if (!id) return;
     smoothScrollToId(id);
   });
 
-/*** 5) Global Slideshow Support (fade + slide variant) ***/
-function initSlideshows() {
-  document.querySelectorAll('.slideshow').forEach(function (root) {
-    var slides = Array.prototype.slice.call(
-      root.querySelectorAll('.slideshow__image')
-    );
-    var prevBtn = root.querySelector('.slideshow__arrow--prev');
-    var nextBtn = root.querySelector('.slideshow__arrow--next');
-    if (!slides.length) return;
+  /*** 5) Global Slideshow Support (fade + slide variant) ***/
+  function initSlideshows() {
+    document.querySelectorAll('.slideshow').forEach(function (root) {
+      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+      const prevBtn = root.querySelector('.slideshow__arrow--prev');
+      const nextBtn = root.querySelector('.slideshow__arrow--next');
+      if (!slides.length) return;
 
-    // Is this the side-to-side sliding version?
-    var isSlide = root.classList.contains('slideshow--slide');
+      const isSlide = root.classList.contains('slideshow--slide');
 
-    // Find initial active slide
-    var index = slides.findIndex(function (s) {
-      return s.classList.contains('active');
-    });
-    if (index < 0) {
-      index = 0;
-      slides[0].classList.add('active');
-    }
-
-    // For slide variant: arrange slides side-by-side as a track
-    function layout() {
-      if (!isSlide) return; // fade version doesn't use transform
-
-      slides.forEach(function (slide, idx) {
-        var offset = idx - index; // 0 = current, -1 = left, +1 = right
-        // Use translate3d for better rendering and to avoid subpixel gaps
-        slide.style.transform = 'translate3d(' + (offset * 100) + '%, 0, 0)';
-        slide.style.webkitTransform = 'translate3d(' + (offset * 100) + '%, 0, 0)';
-      });
-    }
-
-    // Enable/disable arrows at the ends for slide mode
-    function updateArrows() {
-      if (!isSlide) return;
-      if (prevBtn) prevBtn.disabled = (index === 0);
-      if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
-    }
-
-    function show(nextIndex) {
-      if (isSlide) {
-        // Clamp instead of wrap
-        if (nextIndex < 0 || nextIndex >= slides.length) return;
-      } else {
-        // Wrap-around behavior for non-slide (fade) slideshows
-        nextIndex = (nextIndex + slides.length) % slides.length;
+      let index = slides.findIndex(s => s.classList.contains('active'));
+      if (index < 0) {
+        index = 0;
+        slides[0].classList.add('active');
       }
 
-      if (nextIndex === index) return;
+      function layout() {
+        if (!isSlide) return;
 
-      slides[index].classList.remove('active');
-      index = nextIndex;
-      slides[index].classList.add('active');
+        slides.forEach(function (slide, idx) {
+          const offset = idx - index;
+          slide.style.transform = `translate3d(${offset * 100}%, 0, 0)`;
+          slide.style.webkitTransform = `translate3d(${offset * 100}%, 0, 0)`;
+        });
+      }
+
+      function updateArrows() {
+        if (!isSlide) return;
+        if (prevBtn) prevBtn.disabled = (index === 0);
+        if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
+      }
+
+      function show(nextIndex) {
+        if (isSlide) {
+          if (nextIndex < 0 || nextIndex >= slides.length) return;
+        } else {
+          nextIndex = (nextIndex + slides.length) % slides.length;
+        }
+
+        if (nextIndex === index) return;
+
+        slides[index].classList.remove('active');
+        index = nextIndex;
+        slides[index].classList.add('active');
+
+        layout();
+        updateArrows();
+      }
+
+      if (isSlide) {
+        let direction = 1;
+
+        let autoTimer = setInterval(function () {
+          if (index === slides.length - 1) direction = -1;
+          if (index === 0) direction = 1;
+          show(index + direction);
+        }, 4000);
+
+        root.addEventListener('mouseenter', function () {
+          clearInterval(autoTimer);
+        });
+
+        root.addEventListener('mouseleave', function () {
+          autoTimer = setInterval(function () {
+            if (index === slides.length - 1) direction = -1;
+            if (index === 0) direction = 1;
+            show(index + direction);
+          }, 4000);
+        });
+      }
 
       layout();
       updateArrows();
-    }
-     // AUTOPLAY – ONLY for slide variant (smooth bouncing)
-if (isSlide) {
-  var direction = 1; // 1 = forward, -1 = backward
 
-  var autoTimer = setInterval(function () {
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => show(index - 1));
+      }
 
-    // If at the last slide, reverse direction
-    if (index === slides.length - 1) {
-      direction = -1;
-    }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => show(index + 1));
+      }
 
-    // If at the first slide, reverse direction
-    if (index === 0) {
-      direction = 1;
-    }
-
-    show(index + direction);
-
-  }, 4000); // autoplay speed in ms
-
-  // Pause autoplay on hover
-  root.addEventListener('mouseenter', function () {
-    clearInterval(autoTimer);
-  });
-
-  // Resume on un-hover
-  root.addEventListener('mouseleave', function () {
-    autoTimer = setInterval(function () {
-      if (index === slides.length - 1) direction = -1;
-      if (index === 0) direction = 1;
-      show(index + direction);
-    }, 4000);
-  });
-}
-
-
-    // Initial setup
-    layout();
-    updateArrows();
-
-    // Prev/Next arrows
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
-        show(index - 1);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
-        show(index + 1);
-      });
-    }
-
-    // Keyboard control
-    root.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowLeft') show(index - 1);
-      if (e.key === 'ArrowRight') show(index + 1);
-    });
-
-    // Autoplay only for non-slide (fade) slideshows
-    if (!isSlide) {
-      var autoplayMs = 6000;
-      var timer = setInterval(function () {
-        show(index + 1);
-      }, autoplayMs);
-
-      root.addEventListener('mouseenter', function () {
-        clearInterval(timer);
+      root.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') show(index - 1);
+        if (e.key === 'ArrowRight') show(index + 1);
       });
 
-      root.addEventListener('mouseleave', function () {
-        timer = setInterval(function () {
-          show(index + 1);
-        }, autoplayMs);
-      });
-    }
+      if (!isSlide) {
+        const autoplayMs = 6000;
+        let timer = setInterval(() => show(index + 1), autoplayMs);
 
-    // Add swipe gesture support for slide variant
-    if (isSlide) {
-      let touchStartX = 0;
-      let touchEndX = 0;
-      
-      root.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-      
-      root.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, { passive: true });
-      
-      function handleSwipe() {
-        const swipeThreshold = 50; // Minimum distance for swipe
-        const diff = touchStartX - touchEndX;
+        root.addEventListener('mouseenter', () => clearInterval(timer));
+        root.addEventListener('mouseleave', () => {
+          timer = setInterval(() => show(index + 1), autoplayMs);
+        });
+      }
+
+      if (isSlide) {
+        let touchStartX = 0;
+        let touchEndX = 0;
         
-        if (Math.abs(diff) > swipeThreshold) {
-          if (diff > 0) {
-            // Swiped left - go to next
-            if (nextBtn && !nextBtn.disabled) {
-              show(index + 1);
-            }
-          } else {
-            // Swiped right - go to previous
-            if (prevBtn && !prevBtn.disabled) {
-              show(index - 1);
+        root.addEventListener('touchstart', function(e) {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        root.addEventListener('touchend', function(e) {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+          const swipeThreshold = 50;
+          const diff = touchStartX - touchEndX;
+          
+          if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+              if (nextBtn && !nextBtn.disabled) {
+                show(index + 1);
+              }
+            } else {
+              if (prevBtn && !prevBtn.disabled) {
+                show(index - 1);
+              }
             }
           }
         }
       }
-    }
-  });
-}
-
-window.addEventListener('DOMContentLoaded', initSlideshows);
-
-/*** 6) Parallax scrolling effect ***/
-(function initParallax() {
-  const parallaxSections = document.querySelectorAll('.parallax-section');
-  
-  if (parallaxSections.length === 0) return;
-  
-  // Disable on mobile for performance
-  if (window.innerWidth <= 768) return;
-  
-  function handleScroll() {
-    parallaxSections.forEach(section => {
-      const layers = section.querySelectorAll('.parallax-layer');
-      const rect = section.getBoundingClientRect();
-      const scrolled = rect.top;
-      
-      // Only apply effect when section is in viewport
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        layers.forEach((layer, index) => {
-          // Get speed from data attribute or use index-based default
-          const speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
-          const yPos = -(scrolled * speed);
-          
-          layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
-        });
-      }
     });
   }
-  
-  // Use requestAnimationFrame for smooth performance
-  let ticking = false;
-  
-  window.addEventListener('scroll', function() {
-    if (!ticking) {
-      window.requestAnimationFrame(function() {
-        handleScroll();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-  
-  // Initial call
-  handleScroll();
-})();
 
+  window.addEventListener('DOMContentLoaded', initSlideshows);
+
+  /*** 6) Parallax scrolling effect - Works on mobile with reduced intensity ***/
+  (function initParallax() {
+    const parallaxSections = document.querySelectorAll('.parallax-section');
+    
+    if (parallaxSections.length === 0) return;
+    
+    const isMobile = window.innerWidth <= 768;
+    const mobileMultiplier = 0.3;
+    
+    function handleScroll() {
+      parallaxSections.forEach(section => {
+        const layers = section.querySelectorAll('.parallax-layer');
+        const rect = section.getBoundingClientRect();
+        const scrolled = rect.top;
+        
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          layers.forEach((layer, index) => {
+            let speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
+            
+            if (isMobile) speed *= mobileMultiplier;
+            
+            const yPos = -(scrolled * speed);
+            
+            layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
+          });
+        }
+      });
+    }
+    
+    let ticking = false;
+    
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+    
+    handleScroll();
+  })();
 
 })();
