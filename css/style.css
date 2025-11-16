@@ -853,14 +853,11 @@ footer {
   }
   
   .parallax-bg {
-    /* Add extra padding to allow room for parallax movement while staying masked */
-    padding: 10vh 0;
-    height: auto;
-    min-height: 120vh;
-    top: -10vh;
     overflow: hidden;
-    /* Additional clipping layer */
-    clip-path: inset(10vh 0);
+    position: absolute;
+    inset: 0;
+    /* Clip to exact viewport bounds */
+    clip-path: inset(0);
   }
   
   .parallax-content {
@@ -872,10 +869,15 @@ footer {
     background-size: contain !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
-    /* Extend layers to accommodate movement */
-    height: 120vh;
-    top: -10vh;
-    /* Ensure layers stay contained */
+    /* Keep layers at exact viewport size */
+    position: absolute;
+    inset: 0;
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    /* Clip each individual layer */
+    clip-path: inset(0);
     overflow: hidden;
   }
 }
