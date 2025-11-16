@@ -853,6 +853,8 @@ footer {
   
   .parallax-layer {
     background-attachment: scroll;
+    background-size: contain;
+    background-position: center center;
   }
 }
 
