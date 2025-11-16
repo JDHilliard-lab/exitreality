@@ -847,13 +847,17 @@ footer {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    overflow: hidden;
+    overflow: hidden !important;
+    /* Hard clip boundary */
+    clip-path: inset(0);
+    isolation: isolate;
   }
   
   .parallax-bg {
     position: absolute;
     inset: 0;
-    overflow: hidden;
+    overflow: hidden !important;
+    clip-path: inset(0);
   }
   
   .parallax-content {
@@ -864,13 +868,16 @@ footer {
   
   .parallax-layer {
     background-attachment: scroll;
-    background-size: contain !important;
+    background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     /* Static positioning on mobile - no transforms */
-    position: absolute;
-    inset: 0;
+    position: absolute !important;
+    inset: 0 !important;
     transform: none !important;
+    /* Hard clip each layer */
+    clip-path: inset(0) !important;
+    overflow: hidden !important;
   }
 }
 
