@@ -849,8 +849,10 @@ footer {
   }
   
   .parallax-bg {
-    /* Add extra height to allow room for parallax movement */
-    height: 120vh;
+    /* Add extra padding to allow room for parallax movement while staying masked */
+    padding: 10vh 0;
+    height: auto;
+    min-height: 120vh;
     top: -10vh;
   }
   
@@ -860,9 +862,10 @@ footer {
   
   .parallax-layer {
     background-attachment: scroll;
-    background-size: cover;
-    background-position: center bottom;
-    /* Extend layers slightly to accommodate parallax movement */
+    background-size: contain !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    /* Extend layers to accommodate movement */
     height: 120vh;
     top: -10vh;
   }
