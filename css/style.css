@@ -768,7 +768,88 @@ footer {
   display: none;
 }
 
+/* ===== PARALLAX SECTION ===== */
+.parallax-section {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.parallax-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.parallax-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Content overlay */
+.parallax-content {
+  position: relative;
+  z-index: 10;
+  padding: 4rem;
+  text-align: center;
+  color: #fff;
+  max-width: 1200px;
+}
+
+.parallax-content h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  letter-spacing: -2px;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.parallax-content p {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  line-height: 1.8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Optional: Dark overlay for better text readability */
+.parallax-section.with-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+/* Mobile adjustments - Full bleed */
+@media (max-width: 768px) {
+  .parallax-section {
+    min-height: 70vh;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+  
+  .parallax-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  /* Parallax layers will still animate on mobile with reduced effect from JS */
+  .parallax-layer {
+    background-attachment: scroll;
+  }
+}
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
@@ -1044,100 +1125,3 @@ body.project-page .full-image:first-of-type {
   }
   
   body.project-page .full-image:first-of-type {
-    margin-top: -1px !important;
-    position: relative;
-    z-index: 1;
-  }
-  
-  /* Ensure video background is black to match header */
-  body.project-page .project-header.dark-theme + .full-image {
-    background: #000000;
-  }
-}
-
-/* ===== COLORED LOGO ===== */
-.logo .exit-text { 
-  color: #ff0000 !important; 
-  letter-spacing: 1px; 
-}
-
-.logo .reality-text { 
-  color: #000000 !important; 
-}
-
-/* ===== PARALLAX SECTION ===== */
-.parallax-section {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.parallax-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.parallax-layer {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  will-change: transform;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-/* Content overlay */
-.parallax-content {
-  position: relative;
-  z-index: 10;
-  padding: 4rem;
-  text-align: center;
-  color: #fff;
-  max-width: 1200px;
-}
-
-.parallax-content h2 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 300;
-  letter-spacing: -2px;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-}
-
-.parallax-content p {
-  font-size: clamp(1.1rem, 2vw, 1.5rem);
-  line-height: 1.8;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-/* Optional: Dark overlay for better text readability */
-.parallax-section.with-overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .parallax-section {
-    min-height: 70vh;
-  }
-  
-  .parallax-content {
-    padding: 2rem 1.5rem;
-  }
-  
-  /* Reduce parallax effect on mobile for better performance */
-  .parallax-layer {
-    background-attachment: scroll;
-  }
-}
