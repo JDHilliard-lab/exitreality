@@ -380,7 +380,7 @@
     if (parallaxSections.length === 0) return;
     
     const isMobile = window.innerWidth <= 768;
-    const mobileMultiplier = 0.3; // Reduced movement on mobile
+    const mobileMultiplier = 0.2; // Reduced movement on mobile
     
     function handleScroll() {
       parallaxSections.forEach(section => {
