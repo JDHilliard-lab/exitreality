@@ -838,7 +838,7 @@ footer {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .parallax-section {
-    /* Full-bleed 16:9 frame */
+    /* Full-bleed 16:9 frame matching your 1920x1080 images */
     min-height: auto;
     aspect-ratio: 16 / 9;
     width: 100vw;
@@ -866,22 +866,20 @@ footer {
   }
 
   .parallax-layer {
-    /* KEEP full-bleed background, but allow JS transforms */
+    /* Key part: same size as the section, no extra tall stretch */
+    position: absolute;
+    inset: 0;
+
     background-attachment: scroll;
-    background-size: cover;
-    background-position: center center;
+    background-size: cover;          /* full image width, slight vertical crop */
+    background-position: center;     /* keep image centered */
     background-repeat: no-repeat;
 
-    /* Make layers a bit taller so moving them won’t expose edges */
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: -10vh;
-    bottom: -10vh;
     clip-path: inset(0);
     overflow: hidden;
   }
 }
+
 
 
 /* ===== MOBILE RESPONSIVE ===== */
