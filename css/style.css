@@ -838,7 +838,7 @@ footer {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .parallax-section {
-    /* Match the 16:9 aspect ratio of your images instead of 100vh */
+    /* Full-bleed 16:9 frame */
     min-height: auto;
     aspect-ratio: 16 / 9;
     width: 100vw;
@@ -847,39 +847,42 @@ footer {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    overflow: hidden !important;
-    /* Hard clip boundary */
+    overflow: hidden;
     clip-path: inset(0);
     isolation: isolate;
   }
-  
+
   .parallax-bg {
     position: absolute;
     inset: 0;
-    overflow: hidden !important;
+    overflow: hidden;
     clip-path: inset(0);
   }
-  
+
   .parallax-content {
     padding: 2rem 1.5rem;
     position: relative;
     z-index: 100;
   }
-  
+
   .parallax-layer {
+    /* KEEP full-bleed background, but allow JS transforms */
     background-attachment: scroll;
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-    /* Static positioning on mobile - no transforms */
-    position: absolute !important;
-    inset: 0 !important;
-    transform: none !important;
-    /* Hard clip each layer */
-    clip-path: inset(0) !important;
-    overflow: hidden !important;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* Make layers a bit taller so moving them won’t expose edges */
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10vh;
+    bottom: -10vh;
+    clip-path: inset(0);
+    overflow: hidden;
   }
 }
+
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
