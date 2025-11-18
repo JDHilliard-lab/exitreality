@@ -421,61 +421,54 @@
 
   /*** 7) Scroll-Driven Video (360° rotation effect) ***/
   (function initScrollVideo() {
-   // Smooth scroll-scrub video with NO extra black space
-document.addEventListener("DOMContentLoaded", () => {
-  const section = document.querySelector(".scroll-video-section");
-  const video = document.querySelector(".scroll-video");
+    const section = document.querySelector('.scroll-video-section');
+    const video = document.querySelector('.scroll-video');
 
-  if (!section || !video) return;
+    if (!section || !video) return;
 
-  // Ensure browser knows video duration
-  video.addEventListener("loadedmetadata", () => {
-    const videoDuration = video.duration;      // total seconds
-    const viewportHeight = window.innerHeight; // pin height
+    // Wait for video metadata to load
+    video.addEventListener('loadedmetadata', function() {
+      const videoDuration = video.duration;
+      const viewportHeight = window.innerHeight;
 
-    // 🔥 Set perfect section height:
-    // video plays from start to end across a scroll distance equal to
-    // (videoDuration * viewportHeight)
-    const scrubDistance = videoDuration * viewportHeight;
-    section.style.height = scrubDistance + viewportHeight + "px";
+      // Set section height based on video duration
+      const scrubDistance = videoDuration * viewportHeight;
+      section.style.height = (scrubDistance + viewportHeight) + 'px';
 
-    let ticking = false;
+      let ticking = false;
 
-    function updateVideo() {
-      const rect = section.getBoundingClientRect();
-      const start = 0;                // when section top touches top of viewport
-      const end = scrubDistance;      // when scrub should be done
+      function updateVideo() {
+        const rect = section.getBoundingClientRect();
+        const start = 0;
+        const end = scrubDistance;
 
-      // How far we are into the scrub
-      let progress = (start - rect.top) / end;
-      progress = Math.max(0, Math.min(1, progress));
+        // Calculate progress
+        let progress = (start - rect.top) / end;
+        progress = Math.max(0, Math.min(1, progress));
 
-      // Map scroll progress → video time
-      video.currentTime = progress * videoDuration;
+        // Update video time
+        if (!isNaN(videoDuration)) {
+          video.currentTime = progress * videoDuration;
+        }
 
-      ticking = false;
-    }
-
-    function onScroll() {
-      if (!ticking) {
-        requestAnimationFrame(updateVideo);
-        ticking = true;
+        ticking = false;
       }
-    }
 
-    window.addEventListener("scroll", onScroll);
-  });
-});
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateVideo);
+          ticking = true;
+        }
+      }
 
+      window.addEventListener('scroll', onScroll);
 
-        
-        // Initial update
-        updateVideo();
-      });
-      
-      // Ensure video doesn't autoplay
-      video.pause();
+      // Initial update
+      updateVideo();
     });
+
+    // Ensure video doesn't autoplay
+    video.pause();
   })();
 
 })();
