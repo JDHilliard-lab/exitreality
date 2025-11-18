@@ -786,36 +786,47 @@ footer {
   display: none;
 }
 
-/* Scroll video section with NO extra space below */
+/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) ===== */
 .scroll-video-section {
   position: relative;
   width: 100vw;
+  height: 300vh; /* Extended height for scroll scrubbing */
   background: #000;
   overflow: hidden;
-  margin: 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
   padding: 0;
 }
 
-/* The container stays fixed while scrubbing happens */
 .scroll-video-container {
   position: sticky;
   top: 0;
+  left: 0;
   width: 100vw;
-  height: 100vh; /* video takes the full screen */
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background: #000;
+  padding: 0;
+  margin: 0;
 }
 
 .scroll-video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  position: absolute;
+  display: block;
+  background: #000;
+  margin: 0;
+  padding: 0;
 }
-
 
 /* Hide progress indicator completely */
 .scroll-progress {
@@ -824,7 +835,7 @@ footer {
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 140vh; /* was 250vh – much tighter on mobile */
+    height: 250vh; /* Adjusted scroll distance on mobile */
     margin-left: calc(-50vw + 50%);
   }
   
@@ -838,7 +849,6 @@ footer {
     height: 100vh;
   }
 }
-
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
