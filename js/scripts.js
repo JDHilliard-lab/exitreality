@@ -419,65 +419,69 @@
     handleScroll();
   })();
 
- /*** 7) Scroll-Driven Video (360° rotation effect) ***/
-(function initScrollVideo() {
-  const section = document.querySelector('.scroll-video-section');
-  const video = document.querySelector('.scroll-video');
+  /*** 7) Scroll-Driven Video (360° rotation effect) ***/
+  (function initScrollVideo() {
+    const section = document.querySelector('.scroll-video-section');
+    const video = document.querySelector('.scroll-video');
 
-  if (!section || !video) return;
+    if (!section || !video) return;
 
-  // Wait for video metadata to load
-  video.addEventListener('loadedmetadata', function() {
-    const videoDuration = video.duration;
-    const viewportHeight = window.innerHeight;
-    
-    // Set section height: 1 viewport + (video duration in seconds × 150px)
-    // This means ~150px of scrolling per second of video
-    // Adjust multiplier: lower = less scrolling, higher = more scrolling
-    const scrollPerSecond = 150;
-    const totalHeight = viewportHeight + (videoDuration * scrollPerSecond);
-    section.style.height = totalHeight + 'px';
-
-    console.log('Video duration:', videoDuration, 'Section height:', totalHeight);
-
-    let ticking = false;
-
-    function updateVideo() {
-      const rect = section.getBoundingClientRect();
-      const sectionTop = rect.top;
-      const sectionHeight = rect.height;
+    // Wait for video metadata to load
+    video.addEventListener('loadedmetadata', function() {
+      const videoDuration = video.duration;
+      const viewportHeight = window.innerHeight;
       
-      // Calculate scroll progress
-      // Start: when section top hits top of viewport (sectionTop = 0)
-      // End: when we've scrolled the full section height
-      let progress = -sectionTop / (sectionHeight - viewportHeight);
-      
-      // Clamp between 0 and 1
-      progress = Math.max(0, Math.min(1, progress));
+      // TIGHT calculation: Only enough space for the video to play + 1 viewport
+      // For 10-second video: viewport + 10vh extra = minimal black space
+      const extraScroll = viewportHeight * 0.5; // Only 50% extra viewport for scrolling
+      const totalHeight = viewportHeight + extraScroll;
+      section.style.height = totalHeight + 'px';
 
-      // Update video
-      if (video.duration && !isNaN(video.duration)) {
-        video.currentTime = progress * video.duration;
+      console.log('Video duration:', videoDuration, 'seconds | Section height:', totalHeight, 'px');
+
+      let ticking = false;
+
+      function updateVideo() {
+        const rect = section.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Progress starts when top of section reaches bottom of viewport
+        // Progress ends when bottom of section reaches top of viewport
+        const sectionTop = rect.top;
+        const sectionBottom = rect.bottom;
+        const sectionHeight = rect.height;
+        
+        // More intuitive calculation:
+        // When section top = viewport height (just entering), progress = 0
+        // When section top = -sectionHeight (fully scrolled past), progress = 1
+        let progress = (viewportHeight - sectionTop) / (sectionHeight + viewportHeight);
+        
+        // Clamp between 0 and 1
+        progress = Math.max(0, Math.min(1, progress));
+
+        // Update video
+        if (video.duration && !isNaN(video.duration)) {
+          video.currentTime = progress * video.duration;
+        }
+
+        ticking = false;
       }
 
-      ticking = false;
-    }
-
-    function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(updateVideo);
-        ticking = true;
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateVideo);
+          ticking = true;
+        }
       }
-    }
 
-    window.addEventListener('scroll', onScroll);
+      window.addEventListener('scroll', onScroll);
 
-    // Initial update
-    updateVideo();
-  });
+      // Initial update
+      updateVideo();
+    });
 
-  // Ensure video doesn't autoplay
-  video.pause();
-})();
+    // Ensure video doesn't autoplay
+    video.pause();
+  })();
 
 })();
