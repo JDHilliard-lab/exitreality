@@ -431,23 +431,27 @@
       const videoDuration = video.duration;
       const viewportHeight = window.innerHeight;
 
-      // Set section height based on video duration
-      const scrubDistance = videoDuration * viewportHeight;
-      section.style.height = (scrubDistance + viewportHeight) + 'px';
+      // Precise calculation: exactly enough height for the video to play through
+      // Section height = viewport height (for the sticky container)
+      const totalHeight = viewportHeight + (videoDuration * 100); // 100px scroll per second
+      section.style.height = totalHeight + 'px';
 
       let ticking = false;
 
       function updateVideo() {
         const rect = section.getBoundingClientRect();
-        const start = 0;
-        const end = scrubDistance;
-
-        // Calculate progress
-        let progress = (start - rect.top) / end;
+        
+        // When section top is at viewport top, progress = 0
+        // When section bottom is at viewport bottom, progress = 1
+        const scrolled = -rect.top;
+        const maxScroll = rect.height - viewportHeight;
+        let progress = scrolled / maxScroll;
+        
+        // Clamp between 0 and 1
         progress = Math.max(0, Math.min(1, progress));
 
-        // Update video time
-        if (!isNaN(videoDuration)) {
+        // Update video time based on scroll progress
+        if (!isNaN(videoDuration) && videoDuration > 0) {
           video.currentTime = progress * videoDuration;
         }
 
