@@ -5,6 +5,7 @@
    - Loading bar for page and video content
    - Swipe gestures for slide slideshows
    - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
+   - Scroll-driven video (360° rotation effect)
 */
 
 (function () {
@@ -380,8 +381,7 @@
     if (parallaxSections.length === 0) return;
     
     const isMobile = window.innerWidth <= 768;
-    const mobileMultiplier = 0.2
-       ; // Reduced movement on mobile
+    const mobileMultiplier = 0.2; // Reduced movement on mobile
     
     function handleScroll() {
       parallaxSections.forEach(section => {
@@ -417,6 +417,74 @@
     });
     
     handleScroll();
+  })();
+
+  /*** 7) Scroll-Driven Video (360° rotation effect) ***/
+  (function initScrollVideo() {
+    const scrollVideoSections = document.querySelectorAll('.scroll-video-section');
+    
+    if (scrollVideoSections.length === 0) return;
+    
+    scrollVideoSections.forEach(section => {
+      const video = section.querySelector('.scroll-video');
+      const progressIndicator = document.getElementById('progressIndicator');
+      const progressPercent = document.getElementById('progressPercent');
+      
+      if (!video) return;
+      
+      // Wait for video metadata to load
+      video.addEventListener('loadedmetadata', function() {
+        let ticking = false;
+        
+        function updateVideo() {
+          const rect = section.getBoundingClientRect();
+          const sectionHeight = section.offsetHeight;
+          const windowHeight = window.innerHeight;
+          
+          // Calculate scroll progress through the section
+          // When section top hits top of viewport, progress = 0
+          // When section bottom hits bottom of viewport, progress = 1
+          const scrollStart = rect.top + windowHeight;
+          const scrollRange = sectionHeight + windowHeight;
+          const scrollProgress = 1 - (scrollStart / scrollRange);
+          
+          // Clamp between 0 and 1
+          const progress = Math.max(0, Math.min(1, scrollProgress));
+          
+          // Update video time based on scroll progress
+          if (video.duration) {
+            const targetTime = progress * video.duration;
+            
+            // Only update if difference is significant (prevents jitter)
+            if (Math.abs(video.currentTime - targetTime) > 0.01) {
+              video.currentTime = targetTime;
+            }
+          }
+          
+          // Update progress indicator if it exists
+          if (progressPercent) {
+            progressPercent.textContent = Math.round(progress * 100);
+          }
+          
+          ticking = false;
+        }
+        
+        function onScroll() {
+          if (!ticking) {
+            window.requestAnimationFrame(updateVideo);
+            ticking = true;
+          }
+        }
+        
+        window.addEventListener('scroll', onScroll);
+        
+        // Initial update
+        updateVideo();
+      });
+      
+      // Ensure video doesn't autoplay
+      video.pause();
+    });
   })();
 
 })();
