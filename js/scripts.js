@@ -445,12 +445,10 @@ function updateVideo() {
           const sectionBottom = rect.bottom;
 
           // Map scroll so:
-          // - progress = 0 when the section top first hits the bottom of the viewport
-          // - progress = 1 after the section has fully scrolled past
-          const start = windowHeight;   // when we want the video scrub to begin
-          const end = -sectionHeight;   // when the section has fully scrolled past
-
-          let scrollProgress = (sectionTop - start) / (end - start);
+          // - progress = 0 when the top of the section first touches the bottom of the viewport
+          // - progress = 1 when the bottom of the section leaves the top of the viewport
+          const distance = windowHeight + sectionHeight;
+          let scrollProgress = (windowHeight - sectionTop) / distance;
           scrollProgress = Math.max(0, Math.min(1, scrollProgress));
 
           // Show/hide progress indicator only when section is in view
@@ -480,15 +478,15 @@ function updateVideo() {
           ticking = false;
         }
 
-        
         function onScroll() {
           if (!ticking) {
             window.requestAnimationFrame(updateVideo);
             ticking = true;
           }
         }
-        
+
         window.addEventListener('scroll', onScroll);
+
         
         // Initial update
         updateVideo();
