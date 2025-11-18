@@ -234,12 +234,13 @@
             </div>
         </div>
     </div>
- <!-- Process: Body parts -->
+
+    <!-- Process: Body parts -->
     <div class="content-section">
         <div class="section-label">Process</div>
         <div class="section-title">Image to 3D</div>
         <div class="section-description">
-            <p>Isolating the creature’s body parts allowed a focused generative pass that sharpened details 
+            <p>Isolating the creature's body parts allowed a focused generative pass that sharpened details 
                 ahead of 3D generation. </p>
         </div>
         
@@ -257,35 +258,27 @@
         </div>
     </div>
 
-
     <!-- Parallax BG -->
-         <section class="parallax-section">
-    <div class="parallax-bg">
-        <div class="parallax-layer" data-speed="0.0" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0005_APL6-Beast-Parallax_bg.png');"></div>
-        <div class="parallax-layer" data-speed="0.1" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0004_APL5-Beast-Parallax_treebg.png');"></div>
-        <div class="parallax-layer" data-speed="0.2" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0003_APL4-mid-creature.png');"></div>
-        <div class="parallax-layer" data-speed="0.3" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0002_APL3-Mid-dust.png');"></div>
-        <div class="parallax-layer" data-speed="0.15" style="background-image: url('BEAST/Parallax Layers/PL_0001_PL2.2-Beast-Parallax_shrub-treeRight-fg.png');"></div>
-        <div class="parallax-layer" data-speed="0.0" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0000_APL1.2-Beast-Parallax_shrub-tree-fg.png');"></div> 
-    </div>
-</section>
+    <section class="parallax-section">
+        <div class="parallax-bg">
+            <div class="parallax-layer" data-speed="0.0" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0005_APL6-Beast-Parallax_bg.png');"></div>
+            <div class="parallax-layer" data-speed="0.1" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0004_APL5-Beast-Parallax_treebg.png');"></div>
+            <div class="parallax-layer" data-speed="0.2" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0003_APL4-mid-creature.png');"></div>
+            <div class="parallax-layer" data-speed="0.3" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0002_APL3-Mid-dust.png');"></div>
+            <div class="parallax-layer" data-speed="0.15" style="background-image: url('BEAST/Parallax Layers/PL_0001_PL2.2-Beast-Parallax_shrub-treeRight-fg.png');"></div>
+            <div class="parallax-layer" data-speed="0.0" style="background-image: url('BEAST/Parallax Layers/Beast-Parallax_0000_APL1.2-Beast-Parallax_shrub-tree-fg.png');"></div> 
+        </div>
+    </section>
 
-    
-    <!-- 360 Scroll-Driven Showcase -->
-    
-<section class="scroll-video-section">
-    <div class="scroll-video-container">
-        <video class="scroll-video" muted playsinline preload="auto">
-            <source src="BEAST/beast-360W.mp4" type="video/mp4">
-        </video>
-    </div>
-</section>
+    <!-- 360 Scroll-Driven Showcase - REMOVED FROM CONTENT-SECTION -->
+    <section class="scroll-video-section">
+        <div class="scroll-video-container">
+            <video class="scroll-video" muted playsinline preload="auto">
+                <source src="BEAST/beast-360W.mp4" type="video/mp4">
+            </video>
+        </div>
+    </section>
 
-<!-- Optional Progress Indicator -->
-<div class="scroll-progress" id="progressIndicator">
-    Rotation: <span id="progressPercent">0</span>%
-</div>
- 
     <!-- Stage 2: Image to 3D -->
     <div class="content-section">
         <div class="section-label">Process</div>
@@ -385,22 +378,22 @@
     </script>
 
     <!-- Hide video controls on mobile until user taps -->
-<script>
-    (function() {
-        if (window.innerWidth <= 768) {
-            const videos = document.querySelectorAll('.full-image video');
-            
-            videos.forEach(video => {
-                video.removeAttribute('controls');
+    <script>
+        (function() {
+            if (window.innerWidth <= 768) {
+                const videos = document.querySelectorAll('.full-image video');
                 
-                video.addEventListener('click', function() {
-                    this.setAttribute('controls', '');
-                    this.classList.add('show-controls');
-                }, { once: true });
-            });
-        }
-    })();
-</script>
+                videos.forEach(video => {
+                    video.removeAttribute('controls');
+                    
+                    video.addEventListener('click', function() {
+                        this.setAttribute('controls', '');
+                        this.classList.add('show-controls');
+                    }, { once: true });
+                });
+            }
+        })();
+    </script>
 
     <!-- Inject shared navbar -->
     <script>
