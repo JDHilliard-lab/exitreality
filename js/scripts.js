@@ -441,19 +441,27 @@
           const sectionHeight = section.offsetHeight;
           const windowHeight = window.innerHeight;
           
-          // Calculate scroll progress through the section
-          // When section top hits top of viewport, progress = 0
-          // When section bottom hits bottom of viewport, progress = 1
-          const scrollStart = rect.top + windowHeight;
-          const scrollRange = sectionHeight + windowHeight;
-          const scrollProgress = 1 - (scrollStart / scrollRange);
+          // Start when section enters viewport, end when it leaves
+          const sectionTop = rect.top;
+          const sectionBottom = rect.bottom;
           
-          // Clamp between 0 and 1
-          const progress = Math.max(0, Math.min(1, scrollProgress));
+          // Progress starts when section top enters bottom of viewport
+          // Progress ends when section bottom exits top of viewport
+          const scrollRange = sectionHeight - windowHeight;
+          const scrollProgress = Math.max(0, Math.min(1, -sectionTop / scrollRange));
+          
+          // Show/hide progress indicator only when section is in view
+          if (progressIndicator) {
+            if (sectionTop < windowHeight && sectionBottom > 0) {
+              progressIndicator.classList.add('visible');
+            } else {
+              progressIndicator.classList.remove('visible');
+            }
+          }
           
           // Update video time based on scroll progress
-          if (video.duration) {
-            const targetTime = progress * video.duration;
+          if (video.duration && !isNaN(video.duration)) {
+            const targetTime = scrollProgress * video.duration;
             
             // Only update if difference is significant (prevents jitter)
             if (Math.abs(video.currentTime - targetTime) > 0.01) {
@@ -463,7 +471,7 @@
           
           // Update progress indicator if it exists
           if (progressPercent) {
-            progressPercent.textContent = Math.round(progress * 100);
+            progressPercent.textContent = Math.round(scrollProgress * 100);
           }
           
           ticking = false;
