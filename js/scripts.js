@@ -480,8 +480,4 @@
   video.pause();
 })();
 
-    // Ensure video doesn't autoplay
-    video.pause();
-  })();
-
 })();
