@@ -436,20 +436,23 @@
       video.addEventListener('loadedmetadata', function() {
         let ticking = false;
         
-        function updateVideo() {
+function updateVideo() {
           const rect = section.getBoundingClientRect();
           const sectionHeight = section.offsetHeight;
           const windowHeight = window.innerHeight;
-          
-          // Start when section enters viewport, end when it leaves
+
           const sectionTop = rect.top;
           const sectionBottom = rect.bottom;
-          
-          // Progress starts when section top enters bottom of viewport
-          // Progress ends when section bottom exits top of viewport
-          const scrollRange = sectionHeight - windowHeight;
-          const scrollProgress = Math.max(0, Math.min(1, -sectionTop / scrollRange));
-          
+
+          // Map scroll so:
+          // - progress = 0 when the section top first hits the bottom of the viewport
+          // - progress = 1 after the section has fully scrolled past
+          const start = windowHeight;   // when we want the video scrub to begin
+          const end = -sectionHeight;   // when the section has fully scrolled past
+
+          let scrollProgress = (sectionTop - start) / (end - start);
+          scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+
           // Show/hide progress indicator only when section is in view
           if (progressIndicator) {
             if (sectionTop < windowHeight && sectionBottom > 0) {
@@ -458,24 +461,25 @@
               progressIndicator.classList.remove('visible');
             }
           }
-          
+
           // Update video time based on scroll progress
           if (video.duration && !isNaN(video.duration)) {
             const targetTime = scrollProgress * video.duration;
-            
+
             // Only update if difference is significant (prevents jitter)
             if (Math.abs(video.currentTime - targetTime) > 0.01) {
               video.currentTime = targetTime;
             }
           }
-          
+
           // Update progress indicator if it exists
           if (progressPercent) {
             progressPercent.textContent = Math.round(scrollProgress * 100);
           }
-          
+
           ticking = false;
         }
+
         
         function onScroll() {
           if (!ticking) {
