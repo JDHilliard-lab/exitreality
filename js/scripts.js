@@ -421,71 +421,52 @@
 
   /*** 7) Scroll-Driven Video (360° rotation effect) ***/
   (function initScrollVideo() {
-    const scrollVideoSections = document.querySelectorAll('.scroll-video-section');
-    
-    if (scrollVideoSections.length === 0) return;
-    
-    scrollVideoSections.forEach(section => {
-      const video = section.querySelector('.scroll-video');
-      const progressIndicator = document.getElementById('progressIndicator');
-      const progressPercent = document.getElementById('progressPercent');
-      
-      if (!video) return;
-      
-      // Wait for video metadata to load
-      video.addEventListener('loadedmetadata', function() {
-        let ticking = false;
-        
-function updateVideo() {
-          const rect = section.getBoundingClientRect();
-          const sectionHeight = section.offsetHeight;
-          const windowHeight = window.innerHeight;
+   // Smooth scroll-scrub video with NO extra black space
+document.addEventListener("DOMContentLoaded", () => {
+  const section = document.querySelector(".scroll-video-section");
+  const video = document.querySelector(".scroll-video");
 
-          const sectionTop = rect.top;
-          const sectionBottom = rect.bottom;
+  if (!section || !video) return;
 
-          // Map scroll so:
-          // - progress = 0 when the top of the section first touches the bottom of the viewport
-          // - progress = 1 when the bottom of the section leaves the top of the viewport
-          const distance = windowHeight + sectionHeight;
-          let scrollProgress = (windowHeight - sectionTop) / distance;
-          scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+  // Ensure browser knows video duration
+  video.addEventListener("loadedmetadata", () => {
+    const videoDuration = video.duration;      // total seconds
+    const viewportHeight = window.innerHeight; // pin height
 
-          // Show/hide progress indicator only when section is in view
-          if (progressIndicator) {
-            if (sectionTop < windowHeight && sectionBottom > 0) {
-              progressIndicator.classList.add('visible');
-            } else {
-              progressIndicator.classList.remove('visible');
-            }
-          }
+    // 🔥 Set perfect section height:
+    // video plays from start to end across a scroll distance equal to
+    // (videoDuration * viewportHeight)
+    const scrubDistance = videoDuration * viewportHeight;
+    section.style.height = scrubDistance + viewportHeight + "px";
 
-          // Update video time based on scroll progress
-          if (video.duration && !isNaN(video.duration)) {
-            const targetTime = scrollProgress * video.duration;
+    let ticking = false;
 
-            // Only update if difference is significant (prevents jitter)
-            if (Math.abs(video.currentTime - targetTime) > 0.01) {
-              video.currentTime = targetTime;
-            }
-          }
+    function updateVideo() {
+      const rect = section.getBoundingClientRect();
+      const start = 0;                // when section top touches top of viewport
+      const end = scrubDistance;      // when scrub should be done
 
-          // Update progress indicator if it exists
-          if (progressPercent) {
-            progressPercent.textContent = Math.round(scrollProgress * 100);
-          }
+      // How far we are into the scrub
+      let progress = (start - rect.top) / end;
+      progress = Math.max(0, Math.min(1, progress));
 
-          ticking = false;
-        }
+      // Map scroll progress → video time
+      video.currentTime = progress * videoDuration;
 
-        function onScroll() {
-          if (!ticking) {
-            window.requestAnimationFrame(updateVideo);
-            ticking = true;
-          }
-        }
+      ticking = false;
+    }
 
-        window.addEventListener('scroll', onScroll);
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(updateVideo);
+        ticking = true;
+      }
+    }
+
+    window.addEventListener("scroll", onScroll);
+  });
+});
+
 
         
         // Initial update
