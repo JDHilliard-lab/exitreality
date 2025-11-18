@@ -273,12 +273,21 @@
       
     
    <!-- 360 Showcase -->
-      <div class="full-image">
-        <video autoplay muted loop playsinline controls>
+    <!-- 360 Scroll-Driven Showcase -->
+    <div class="full-image">
+<section class="scroll-video-section">
+    <div class="scroll-video-container">
+        <video class="scroll-video" muted playsinline preload="auto">
             <source src="BEAST/beast-360W.mp4" type="video/mp4">
-            Your browser does not support the video tag.
         </video>
     </div>
+</section>
+
+<!-- Optional Progress Indicator -->
+<div class="scroll-progress" id="progressIndicator">
+    Rotation: <span id="progressPercent">0</span>%
+</div>
+ 
     <!-- Stage 2: Image to 3D -->
     <div class="content-section">
         <div class="section-label">Process</div>
