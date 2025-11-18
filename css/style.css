@@ -793,17 +793,17 @@ footer {
   height: 300vh; /* Extended height for scroll scrubbing */
   background: #000;
   overflow: hidden;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: 0;
   margin-top: 0;
   margin-bottom: 0;
+  padding: 0;
 }
 
 .scroll-video-container {
   position: sticky;
   top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -811,52 +811,42 @@ footer {
   justify-content: center;
   overflow: hidden;
   background: #000;
+  padding: 0;
+  margin: 0;
 }
 
 .scroll-video {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
   display: block;
   background: #000;
+  margin: 0;
+  padding: 0;
 }
 
+/* Hide progress indicator completely */
 .scroll-progress {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.scroll-progress.visible {
-  opacity: 1;
-}
-
-.scroll-progress #progressPercent {
-  font-weight: 600;
-  color: #ff0000;
+  display: none !important;
 }
 
 @media (max-width: 768px) {
   .scroll-video-section {
     height: 250vh; /* Adjusted scroll distance on mobile */
+    margin-left: calc(-50vw + 50%);
   }
   
-  .scroll-progress {
-    bottom: 1rem;
-    right: 1rem;
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
+  .scroll-video-container {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .scroll-video {
+    width: 100vw;
+    height: 100vh;
   }
 }
 
