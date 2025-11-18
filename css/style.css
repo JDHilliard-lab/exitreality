@@ -790,7 +790,7 @@ footer {
 .scroll-video-section {
   position: relative;
   width: 100vw;
-  height: 220vh; /* was 300vh – less black space, still enough scroll to scrub */
+  height: 160vh; /* was 300vh – much less black space */
   background: #000;
   overflow: hidden;
   margin-left: calc(-50vw + 50%);
@@ -835,11 +835,10 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .scroll-video-section {
-    height: 200vh; /* was 250vh – tighter on mobile */
+  .scroll-video-section {
+    height: 140vh; /* was 250vh – much tighter on mobile */
     margin-left: calc(-50vw + 50%);
   }
-
   
   .scroll-video-container {
     width: 100vw;
@@ -851,6 +850,7 @@ footer {
     height: 100vh;
   }
 }
+
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
