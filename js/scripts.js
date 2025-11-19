@@ -330,14 +330,28 @@
       });
 
       if (!isSlide) {
-        const autoplayMs = 6000;
-        let timer = setInterval(() => show(index + 1), autoplayMs);
+  const autoplayMs = 6000;
+  let timer = setInterval(() => show(index + 1), autoplayMs);
 
-        root.addEventListener('mouseenter', () => clearInterval(timer));
-        root.addEventListener('mouseleave', () => {
-          timer = setInterval(() => show(index + 1), autoplayMs);
-        });
-      }
+  function stopAutoplay() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  // Stop autoplay when the user interacts
+  root.addEventListener('mouseenter', stopAutoplay);
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', stopAutoplay);
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', stopAutoplay);
+  }
+}
+
 
       if (isSlide) {
         // ===== MOBILE TOUCH SWIPE =====
