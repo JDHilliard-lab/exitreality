@@ -439,7 +439,7 @@
     // stickyEnd = 0.75 means video releases at 75% of scroll
     //
     // For immediate play when centered, try: stickyStart = 0.5, stickyEnd = 0.5
-    const stickyStart = 0.3;  // When video reaches center (0-1)
+    const stickyStart = 0.5;  // When video reaches center (0-1)
     const stickyEnd = 0.8;    // When video releases from center (0-1)
     // =========================
 
