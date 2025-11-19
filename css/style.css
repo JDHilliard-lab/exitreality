@@ -790,7 +790,7 @@ footer {
 .scroll-video-section {
   position: relative;
   width: 100vw;
-  height: 200vh;              /* just enough scroll to scrub, not a huge tunnel */
+  height: 180vh;              /* just enough scroll to scrub, not a huge tunnel */
   background: transparent;    /* no big black block behind the video */
   overflow: hidden;
   margin-left: calc(-50vw + 50%);
@@ -836,7 +836,7 @@ footer {
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 200vh; /* match desktop – enough to scrub, not huge */
+    height: 180vh; /* match desktop – enough to scrub, not huge */
     margin-left: calc(-50vw + 50%);
   }
   
