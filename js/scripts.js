@@ -374,7 +374,7 @@
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
-   /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
+  /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
     const parallaxSections = document.querySelectorAll('.parallax-section');
     
@@ -419,83 +419,75 @@
     handleScroll();
   })();
 
-  /*** 7) Scroll-Driven Video (360° rotation effect) ***/
-  (function initScrollVideo() {
-    const scrollVideoSections = document.querySelectorAll('.scroll-video-section');
-    if (!scrollVideoSections.length) return;
+/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
+(function initScrollVideo() {
+  const section = document.querySelector('.scroll-video-section');
+  const video = document.querySelector('.scroll-video');
 
-    scrollVideoSections.forEach(section => {
-      const video = section.querySelector('.scroll-video');
-      const progressIndicator = document.getElementById('progressIndicator');
-      const progressPercent = document.getElementById('progressPercent');
+  if (!section || !video) return;
 
-      if (!video) return;
+  video.addEventListener('loadedmetadata', function() {
+    let ticking = false;
 
-      // Wait for video metadata so we know the duration
-      video.addEventListener('loadedmetadata', function () {
-        let ticking = false;
+    function updateVideo() {
+      const rect = section.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const sectionHeight = rect.height;
+      
+      // Start when top of video enters viewport
+      const startScroll = windowHeight;
+      // End when bottom of video exits viewport
+      const endScroll = -sectionHeight;
+      const scrollRange = startScroll - endScroll;
+      
+      // Current position of section top
+      const currentPos = rect.top;
+      
+      // Calculate progress (0 = just entering, 1 = just exiting)
+      let progress = (startScroll - currentPos) / scrollRange;
+      progress = Math.max(0, Math.min(1, progress));
 
-        function updateVideo() {
-        const rect = section.getBoundingClientRect();
-const sectionHeight = section.offsetHeight;
-const windowHeight = window.innerHeight;
+      // Sticky phase: when video is centered (progress 0.25 to 0.75)
+      const stickyStart = 0.25;
+      const stickyEnd = 0.75;
+      const stickyRange = stickyEnd - stickyStart;
+      
+      let videoProgress = 0;
+      
+      if (progress < stickyStart) {
+        // Entering phase: video moves into center (0% to 25% of scroll)
+        videoProgress = (progress / stickyStart) * 0.3; // First 30% of video
+      } else if (progress <= stickyEnd) {
+        // Sticky phase: video plays while stuck in center (25% to 75% of scroll)
+        const stickyProgress = (progress - stickyStart) / stickyRange;
+        videoProgress = 0.3 + (stickyProgress * 0.4); // Middle 40% of video (30% to 70%)
+      } else {
+        // Exiting phase: video moves out as it finishes (75% to 100% of scroll)
+        const exitProgress = (progress - stickyEnd) / (1 - stickyEnd);
+        videoProgress = 0.7 + (exitProgress * 0.3); // Last 30% of video
+      }
 
-// Start when section enters viewport, end when it leaves
-const sectionTop = rect.top;
-const sectionBottom = rect.bottom;
+      if (video.duration && !isNaN(video.duration)) {
+        video.currentTime = videoProgress * video.duration;
+      }
 
-// Use the full life of the section for progress:
-// 0 when top first touches bottom of viewport,
-// 1 when bottom leaves top of viewport
-const totalDistance = windowHeight + sectionHeight;
-let scrollProgress = (windowHeight - sectionTop) / totalDistance;
-scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+      ticking = false;
+    }
 
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateVideo);
+        ticking = true;
+      }
+    }
 
-          // Optional progress indicator (you've hidden this in CSS)
-          if (progressIndicator) {
-            if (sectionTop < windowHeight && sectionBottom > 0) {
-              progressIndicator.classList.add('visible');
-            } else {
-              progressIndicator.classList.remove('visible');
-            }
-          }
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
 
-          // Drive video time from scroll progress
-          if (video.duration && !isNaN(video.duration)) {
-            const targetTime = scrollProgress * video.duration;
+    updateVideo();
+  });
 
-            // Avoid jitter
-            if (Math.abs(video.currentTime - targetTime) > 0.01) {
-              video.currentTime = targetTime;
-            }
-          }
+  video.pause();
+})();
 
-          if (progressPercent) {
-            progressPercent.textContent = Math.round(scrollProgress * 100);
-          }
-
-          ticking = false;
-        }
-
-        function onScroll() {
-          if (!ticking) {
-            window.requestAnimationFrame(updateVideo);
-            ticking = true;
-          }
-        }
-
-        window.addEventListener('scroll', onScroll);
-        window.addEventListener('resize', onScroll);
-
-        // Initial sync
-        updateVideo();
-      });
-
-      // Ensure the scroll video doesn’t autoplay
-      video.pause();
-    });
-  })();
-
-})(); // closes the big top-level IIFE
-
+})();
