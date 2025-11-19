@@ -420,26 +420,16 @@
   })();
 
 /*** 7) Scroll-Driven Video (360° rotation effect) ***/
-(function initScrollVideo() {
-  const section = document.querySelector('.scroll-video-section');
-  const video = document.querySelector('.scroll-video');
-
-  if (!section || !video) return;
-
-  video.addEventListener('loadedmetadata', function() {
-    let ticking = false;
-
     function updateVideo() {
       const rect = section.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const sectionHeight = rect.height;
-      
-      const enterPoint = windowHeight;
-      const exitPoint = -sectionHeight;
-      const totalScrollRange = enterPoint - exitPoint;
-      const currentPosition = rect.top;
-      
-      let progress = (enterPoint - currentPosition) / totalScrollRange;
+      const sectionHeight = section.offsetHeight || rect.height;
+
+      // We want:
+      // - progress = 0 when the top of the section first touches the bottom of the viewport
+      // - progress = 1 when the bottom of the section leaves the top of the viewport
+      const distance = windowHeight + sectionHeight;
+      let progress = (windowHeight - rect.top) / distance;
       progress = Math.max(0, Math.min(1, progress));
 
       if (video.duration && !isNaN(video.duration)) {
@@ -448,6 +438,7 @@
 
       ticking = false;
     }
+
 
     function onScroll() {
       if (!ticking) {
