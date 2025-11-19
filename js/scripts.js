@@ -491,13 +491,45 @@
       }
     }
 
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('resize', onScroll);
+    // Use passive listeners for better mobile performance
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', debounce(updateVideo, 100));
 
+    // Initial update
     updateVideo();
-  });
+  }
 
+  // Wait for video metadata to load
+  if (video.readyState >= 2) {
+    // Video already loaded
+    initScrollBehavior();
+  } else {
+    video.addEventListener('loadedmetadata', initScrollBehavior, { once: true });
+    
+    // Fallback if loadedmetadata doesn't fire
+    setTimeout(() => {
+      if (video.readyState < 2) {
+        console.log('Video loading slowly, initializing anyway...');
+        initScrollBehavior();
+      }
+    }, 2000);
+  }
+
+  // Ensure video stays paused (no autoplay)
   video.pause();
+
+  // Mobile-specific: Try to load video when it comes into view
+  if (isMobile) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          video.load();
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(section);
+  }
 })();
 
 })();
