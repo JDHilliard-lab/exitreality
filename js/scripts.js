@@ -242,7 +242,7 @@
     smoothScrollToId(id);
   });
 
-  /*** 5) Global Slideshow Support (fade + slide variant) ***/
+  /*** 5) Global Slideshow Support (fade + slide variant) with Desktop Drag ***/
   function initSlideshows() {
     document.querySelectorAll('.slideshow').forEach(function (root) {
       const slides = Array.from(root.querySelectorAll('.slideshow__image'));
@@ -340,6 +340,7 @@
       }
 
       if (isSlide) {
+        // ===== MOBILE TOUCH SWIPE =====
         let touchStartX = 0;
         let touchEndX = 0;
         
@@ -368,6 +369,66 @@
             }
           }
         }
+
+        // ===== DESKTOP MOUSE DRAG =====
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragCurrentX = 0;
+        let dragThreshold = 50; // pixels to drag before triggering slide change
+
+        root.addEventListener('mousedown', function(e) {
+          // Don't interfere with arrow button clicks
+          if (e.target.classList.contains('slideshow__arrow') || 
+              e.target.classList.contains('slideshow__arrow--prev') ||
+              e.target.classList.contains('slideshow__arrow--next')) {
+            return;
+          }
+
+          isDragging = true;
+          dragStartX = e.clientX;
+          dragCurrentX = e.clientX;
+          root.style.cursor = 'grabbing';
+          e.preventDefault(); // Prevent image dragging
+        });
+
+        window.addEventListener('mousemove', function(e) {
+          if (!isDragging) return;
+          dragCurrentX = e.clientX;
+        });
+
+        window.addEventListener('mouseup', function(e) {
+          if (!isDragging) return;
+
+          const dragDistance = dragCurrentX - dragStartX;
+
+          if (Math.abs(dragDistance) > dragThreshold) {
+            if (dragDistance > 0) {
+              // Dragged right = show previous
+              if (prevBtn && !prevBtn.disabled) {
+                show(index - 1);
+              }
+            } else {
+              // Dragged left = show next
+              if (nextBtn && !nextBtn.disabled) {
+                show(index + 1);
+              }
+            }
+          }
+
+          isDragging = false;
+          root.style.cursor = 'grab';
+        });
+
+        // Set initial cursor
+        root.style.cursor = 'grab';
+
+        // Reset cursor when mouse leaves
+        root.addEventListener('mouseleave', function() {
+          if (isDragging) {
+            isDragging = false;
+            root.style.cursor = 'grab';
+          }
+        });
       }
     });
   }
@@ -419,14 +480,27 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE COMPATIBLE ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
 
   if (!section || !video) return;
 
-  video.addEventListener('loadedmetadata', function() {
+  // Mobile detection
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+  // Force video to load on mobile
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.muted = true;
+  video.playsInline = true;
+
+  // Preload video
+  video.preload = 'auto';
+  video.load();
+
+  function initScrollBehavior() {
     let ticking = false;
 
     // ===== CONFIGURATION =====
@@ -478,7 +552,11 @@
       }
 
       if (video.duration && !isNaN(video.duration)) {
-        video.currentTime = videoProgress * video.duration;
+        const newTime = videoProgress * video.duration;
+        // Only update if difference is significant (reduces jank on mobile)
+        if (Math.abs(video.currentTime - newTime) > 0.05) {
+          video.currentTime = newTime;
+        }
       }
 
       ticking = false;
@@ -491,13 +569,45 @@
       }
     }
 
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('resize', onScroll);
+    // Use passive listeners for better mobile performance
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', debounce(updateVideo, 100));
 
+    // Initial update
     updateVideo();
-  });
+  }
 
+  // Wait for video metadata to load
+  if (video.readyState >= 2) {
+    // Video already loaded
+    initScrollBehavior();
+  } else {
+    video.addEventListener('loadedmetadata', initScrollBehavior, { once: true });
+    
+    // Fallback if loadedmetadata doesn't fire
+    setTimeout(() => {
+      if (video.readyState < 2) {
+        console.log('Video loading slowly, initializing anyway...');
+        initScrollBehavior();
+      }
+    }, 2000);
+  }
+
+  // Ensure video stays paused (no autoplay)
   video.pause();
+
+  // Mobile-specific: Try to load video when it comes into view
+  if (isMobile) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          video.load();
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(section);
+  }
 })();
 
 })();
