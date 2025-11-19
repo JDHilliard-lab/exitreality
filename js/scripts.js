@@ -374,7 +374,7 @@
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
-  /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
+   /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
     const parallaxSections = document.querySelectorAll('.parallax-section');
     
@@ -419,8 +419,23 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) ***/
-              function updateVideo() {
+  /*** 7) Scroll-Driven Video (360° rotation effect) ***/
+  (function initScrollVideo() {
+    const scrollVideoSections = document.querySelectorAll('.scroll-video-section');
+    if (!scrollVideoSections.length) return;
+
+    scrollVideoSections.forEach(section => {
+      const video = section.querySelector('.scroll-video');
+      const progressIndicator = document.getElementById('progressIndicator');
+      const progressPercent = document.getElementById('progressPercent');
+
+      if (!video) return;
+
+      // Wait for video metadata so we know the duration
+      video.addEventListener('loadedmetadata', function () {
+        let ticking = false;
+
+        function updateVideo() {
           const rect = section.getBoundingClientRect();
           const windowHeight = window.innerHeight;
           const sectionHeight = section.offsetHeight;
@@ -428,14 +443,14 @@
           const sectionTop = rect.top;
           const sectionBottom = rect.bottom;
 
-          // We want:
-          // - progress = 0 when the top of the section first touches the bottom of the viewport
-          // - progress = 1 when the bottom of the section leaves the top of the viewport
+          // Map scroll so:
+          // - progress = 0 when top of section first touches bottom of viewport
+          // - progress = 1 when bottom of section leaves top of viewport
           const totalDistance = windowHeight + sectionHeight;
           let scrollProgress = (windowHeight - sectionTop) / totalDistance;
           scrollProgress = Math.max(0, Math.min(1, scrollProgress));
 
-          // Show/hide progress indicator only when section is in view (optional)
+          // Optional progress indicator (you've hidden this in CSS)
           if (progressIndicator) {
             if (sectionTop < windowHeight && sectionBottom > 0) {
               progressIndicator.classList.add('visible');
@@ -444,17 +459,16 @@
             }
           }
 
-          // Update video time based on scroll progress
+          // Drive video time from scroll progress
           if (video.duration && !isNaN(video.duration)) {
             const targetTime = scrollProgress * video.duration;
 
-            // Only update if difference is significant (prevents jitter)
+            // Avoid jitter
             if (Math.abs(video.currentTime - targetTime) > 0.01) {
               video.currentTime = targetTime;
             }
           }
 
-          // Update progress indicator if it exists
           if (progressPercent) {
             progressPercent.textContent = Math.round(scrollProgress * 100);
           }
@@ -462,23 +476,24 @@
           ticking = false;
         }
 
+        function onScroll() {
+          if (!ticking) {
+            window.requestAnimationFrame(updateVideo);
+            ticking = true;
+          }
+        }
 
+        window.addEventListener('scroll', onScroll);
+        window.addEventListener('resize', onScroll);
 
+        // Initial sync
+        updateVideo();
+      });
 
-    function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(updateVideo);
-        ticking = true;
-      }
-    }
+      // Ensure the scroll video doesn’t autoplay
+      video.pause();
+    });
+  })();
 
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('resize', onScroll);
+})(); // closes the big top-level IIFE
 
-    updateVideo();
-  });
-
-  video.pause();
-})();
-
-})();
