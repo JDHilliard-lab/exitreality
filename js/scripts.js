@@ -420,47 +420,48 @@
   })();
 
 /*** 7) Scroll-Driven Video (360° rotation effect) ***/
-        function updateVideo() {
-        const rect = section.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const sectionHeight = section.offsetHeight;
+              function updateVideo() {
+          const rect = section.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
+          const sectionHeight = section.offsetHeight;
 
-        const sectionTop = rect.top;
-        const sectionBottom = rect.bottom;
+          const sectionTop = rect.top;
+          const sectionBottom = rect.bottom;
 
-        // We want:
-        // - progress = 0 when the top of the section first touches the bottom of the viewport
-        // - progress = 1 when the bottom of the section leaves the top of the viewport
-        const totalDistance = windowHeight + sectionHeight;
-        let scrollProgress = (windowHeight - sectionTop) / totalDistance;
-        scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+          // We want:
+          // - progress = 0 when the top of the section first touches the bottom of the viewport
+          // - progress = 1 when the bottom of the section leaves the top of the viewport
+          const totalDistance = windowHeight + sectionHeight;
+          let scrollProgress = (windowHeight - sectionTop) / totalDistance;
+          scrollProgress = Math.max(0, Math.min(1, scrollProgress));
 
-        // Show/hide progress indicator only when section is in view (optional)
-        if (progressIndicator) {
-          if (sectionTop < windowHeight && sectionBottom > 0) {
-            progressIndicator.classList.add('visible');
-          } else {
-            progressIndicator.classList.remove('visible');
+          // Show/hide progress indicator only when section is in view (optional)
+          if (progressIndicator) {
+            if (sectionTop < windowHeight && sectionBottom > 0) {
+              progressIndicator.classList.add('visible');
+            } else {
+              progressIndicator.classList.remove('visible');
+            }
           }
-        }
 
-        // Update video time based on scroll progress
-        if (video.duration && !isNaN(video.duration)) {
-          const targetTime = scrollProgress * video.duration;
+          // Update video time based on scroll progress
+          if (video.duration && !isNaN(video.duration)) {
+            const targetTime = scrollProgress * video.duration;
 
-          // Prevent jitter by only changing when necessary
-          if (Math.abs(video.currentTime - targetTime) > 0.01) {
-            video.currentTime = targetTime;
+            // Only update if difference is significant (prevents jitter)
+            if (Math.abs(video.currentTime - targetTime) > 0.01) {
+              video.currentTime = targetTime;
+            }
           }
+
+          // Update progress indicator if it exists
+          if (progressPercent) {
+            progressPercent.textContent = Math.round(scrollProgress * 100);
+          }
+
+          ticking = false;
         }
 
-        // Update progress indicator if it exists
-        if (progressPercent) {
-          progressPercent.textContent = Math.round(scrollProgress * 100);
-        }
-
-        ticking = false;
-      }
 
 
 
