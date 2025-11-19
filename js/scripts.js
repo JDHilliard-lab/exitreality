@@ -494,134 +494,76 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE COMPATIBLE ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
 (function initScrollVideo() {
-  const section = document.querySelector('.scroll-video-section');
-  const video = document.querySelector('.scroll-video');
+  const sections = document.querySelectorAll('.scroll-video-section');
+  if (!sections.length) return;
 
-  if (!section || !video) return;
+  sections.forEach(section => {
+    const video = section.querySelector('.scroll-video');
+    if (!video) return;
 
-  // Mobile detection
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    video.addEventListener('loadedmetadata', function () {
+      let ticking = false;
 
-  // Force video to load on mobile
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');
-  video.muted = true;
-  video.playsInline = true;
+      // ===== CONFIGURATION =====
+      const stickyStart = 0.4; // when video is reaching center
+      const stickyEnd   = 0.6; // when video starts to release
+      // =========================
 
-  // Preload video
-  video.preload = 'auto';
-  video.load();
+      function updateVideo() {
+        const rect = section.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const sectionHeight = rect.height;
 
-  function initScrollBehavior() {
-    let ticking = false;
+        // Start when top of section enters viewport,
+        // end when bottom leaves viewport
+        const startScroll = windowHeight;
+        const endScroll = -sectionHeight;
+        const scrollRange = startScroll - endScroll;
+        const currentPos = rect.top;
 
-    // ===== CONFIGURATION =====
-    // Adjust these values to control when video starts playing:
-    // - stickyStart: When video becomes centered and starts playing (0 to 1)
-    // - stickyEnd: When video finishes and starts scrolling out (0 to 1)
-    // 
-    // Example values:
-    // stickyStart = 0.25 means video centers at 25% of scroll
-    // stickyEnd = 0.75 means video releases at 75% of scroll
-    //
-    // For immediate play when centered, try: stickyStart = 0.5, stickyEnd = 0.5
-    const stickyStart = 0.4;  // When video reaches center (0-1)
-    const stickyEnd = 0.6;    // When video releases from center (0-1)
-    // =========================
+        let progress = (startScroll - currentPos) / scrollRange;
+        progress = Math.max(0, Math.min(1, progress));
 
-    function updateVideo() {
-      const rect = section.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const sectionHeight = rect.height;
-      
-      // Start when top of video enters viewport
-      const startScroll = windowHeight;
-      // End when bottom of video exits viewport
-      const endScroll = -sectionHeight;
-      const scrollRange = startScroll - endScroll;
-      
-      // Current position of section top
-      const currentPos = rect.top;
-      
-      // Calculate progress (0 = just entering, 1 = just exiting)
-      let progress = (startScroll - currentPos) / scrollRange;
-      progress = Math.max(0, Math.min(1, progress));
+        const stickyRange = stickyEnd - stickyStart;
+        let videoProgress = 0;
 
-      const stickyRange = stickyEnd - stickyStart;
-      
-      let videoProgress = 0;
-      
-      if (progress < stickyStart) {
-        // Entering phase: video moves into center, stays at start frame
-        videoProgress = 0; // Video doesn't play yet
-      } else if (progress <= stickyEnd) {
-        // Sticky phase: video plays while centered
-        const stickyProgress = (progress - stickyStart) / stickyRange;
-        videoProgress = stickyProgress; // Plays from 0% to 100% during sticky phase
-      } else {
-        // Exiting phase: video is at end, scrolls away
-        videoProgress = 1; // Video stays at final frame
+        if (progress < stickyStart) {
+          // entering – hold first frame
+          videoProgress = 0;
+        } else if (progress <= stickyEnd) {
+          // sticky phase – play through
+          const stickyProgress = (progress - stickyStart) / stickyRange;
+          videoProgress = stickyProgress;
+        } else {
+          // exiting – hold last frame
+          videoProgress = 1;
+        }
+
+        if (video.duration && !isNaN(video.duration)) {
+          video.currentTime = videoProgress * video.duration;
+        }
+
+        ticking = false;
       }
 
-      if (video.duration && !isNaN(video.duration)) {
-        const newTime = videoProgress * video.duration;
-        // Only update if difference is significant (reduces jank on mobile)
-        if (Math.abs(video.currentTime - newTime) > 0.05) {
-          video.currentTime = newTime;
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateVideo);
+          ticking = true;
         }
       }
 
-      ticking = false;
-    }
+      window.addEventListener('scroll', onScroll);
+      window.addEventListener('resize', onScroll);
 
-    function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(updateVideo);
-        ticking = true;
-      }
-    }
+      // Initial sync
+      updateVideo();
+    });
 
-    // Use passive listeners for better mobile performance
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', debounce(updateVideo, 100));
-
-    // Initial update
-    updateVideo();
-  }
-
-  // Wait for video metadata to load
-  if (video.readyState >= 2) {
-    // Video already loaded
-    initScrollBehavior();
-  } else {
-    video.addEventListener('loadedmetadata', initScrollBehavior, { once: true });
-    
-    // Fallback if loadedmetadata doesn't fire
-    setTimeout(() => {
-      if (video.readyState < 2) {
-        console.log('Video loading slowly, initializing anyway...');
-        initScrollBehavior();
-      }
-    }, 2000);
-  }
-
-  // Ensure video stays paused (no autoplay)
-  video.pause();
-
-  // Mobile-specific: Try to load video when it comes into view
-  if (isMobile) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          video.load();
-        }
-      });
-    }, { threshold: 0.1 });
-    
-    observer.observe(section);
-  }
+    // make sure it doesn’t autoplay on its own
+    video.pause();
+  });
 })();
 
-})();
