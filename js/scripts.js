@@ -419,14 +419,27 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE COMPATIBLE ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
 
   if (!section || !video) return;
 
-  video.addEventListener('loadedmetadata', function() {
+  // Mobile detection
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+  // Force video to load on mobile
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.muted = true;
+  video.playsInline = true;
+
+  // Preload video
+  video.preload = 'auto';
+  video.load();
+
+  function initScrollBehavior() {
     let ticking = false;
 
     // ===== CONFIGURATION =====
@@ -439,8 +452,8 @@
     // stickyEnd = 0.75 means video releases at 75% of scroll
     //
     // For immediate play when centered, try: stickyStart = 0.5, stickyEnd = 0.5
-    const stickyStart = 0.55;  // When video reaches center (0-1)
-    const stickyEnd = 0.55;    // When video releases from center (0-1)
+    const stickyStart = 0.25;  // When video reaches center (0-1)
+    const stickyEnd = 0.75;    // When video releases from center (0-1)
     // =========================
 
     function updateVideo() {
@@ -478,7 +491,11 @@
       }
 
       if (video.duration && !isNaN(video.duration)) {
-        video.currentTime = videoProgress * video.duration;
+        const newTime = videoProgress * video.duration;
+        // Only update if difference is significant (reduces jank on mobile)
+        if (Math.abs(video.currentTime - newTime) > 0.05) {
+          video.currentTime = newTime;
+        }
       }
 
       ticking = false;
