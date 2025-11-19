@@ -702,7 +702,8 @@ linear - Constant speed (robotic feel)
 Recommendation slideshow:
 For a modern, snappy feel: 0.3s ease-out
 For a smooth, elegant feel: 0.5s ease-in-out (current)
-For a cinematic feel: 0.8s ease-in-out*/
+For a cinematic feel: 0.8s ease-in-out
+transition: opacity 0.05s linear; */
 
 .slideshow__image {
   position: absolute;
@@ -711,7 +712,7 @@ For a cinematic feel: 0.8s ease-in-out*/
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.1s ease-out;
+  transition: opacity 0.05s linear;
   display: block;
   vertical-align: top;
   line-height: 0;
