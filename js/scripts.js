@@ -436,19 +436,21 @@
         let ticking = false;
 
         function updateVideo() {
-          const rect = section.getBoundingClientRect();
-          const windowHeight = window.innerHeight;
-          const sectionHeight = section.offsetHeight;
+        const rect = section.getBoundingClientRect();
+const sectionHeight = section.offsetHeight;
+const windowHeight = window.innerHeight;
 
-          const sectionTop = rect.top;
-          const sectionBottom = rect.bottom;
+// Start when section enters viewport, end when it leaves
+const sectionTop = rect.top;
+const sectionBottom = rect.bottom;
 
-          // Map scroll so:
-          // - progress = 0 when top of section first touches bottom of viewport
-          // - progress = 1 when bottom of section leaves top of viewport
-          const totalDistance = windowHeight + sectionHeight;
-          let scrollProgress = (windowHeight - sectionTop) / totalDistance;
-          scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+// Use the full life of the section for progress:
+// 0 when top first touches bottom of viewport,
+// 1 when bottom leaves top of viewport
+const totalDistance = windowHeight + sectionHeight;
+let scrollProgress = (windowHeight - sectionTop) / totalDistance;
+scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+
 
           // Optional progress indicator (you've hidden this in CSS)
           if (progressIndicator) {
