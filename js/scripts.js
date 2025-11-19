@@ -419,27 +419,14 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE COMPATIBLE ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
 
   if (!section || !video) return;
 
-  // Mobile detection
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
-  // Force video to load on mobile
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');
-  video.muted = true;
-  video.playsInline = true;
-
-  // Preload video
-  video.preload = 'auto';
-  video.load();
-
-  function initScrollBehavior() {
+  video.addEventListener('loadedmetadata', function() {
     let ticking = false;
 
     // ===== CONFIGURATION =====
@@ -452,8 +439,8 @@
     // stickyEnd = 0.75 means video releases at 75% of scroll
     //
     // For immediate play when centered, try: stickyStart = 0.5, stickyEnd = 0.5
-    const stickyStart = 0.5;  // When video reaches center (0-1)
-    const stickyEnd = 0.5;    // When video releases from center (0-1)
+    const stickyStart = 0.55;  // When video reaches center (0-1)
+    const stickyEnd = 0.55;    // When video releases from center (0-1)
     // =========================
 
     function updateVideo() {
@@ -491,11 +478,7 @@
       }
 
       if (video.duration && !isNaN(video.duration)) {
-        const newTime = videoProgress * video.duration;
-        // Only update if difference is significant (reduces jank on mobile)
-        if (Math.abs(video.currentTime - newTime) > 0.05) {
-          video.currentTime = newTime;
-        }
+        video.currentTime = videoProgress * video.duration;
       }
 
       ticking = false;
@@ -508,45 +491,13 @@
       }
     }
 
-    // Use passive listeners for better mobile performance
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', debounce(updateVideo, 100));
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
 
-    // Initial update
     updateVideo();
-  }
+  });
 
-  // Wait for video metadata to load
-  if (video.readyState >= 2) {
-    // Video already loaded
-    initScrollBehavior();
-  } else {
-    video.addEventListener('loadedmetadata', initScrollBehavior, { once: true });
-    
-    // Fallback if loadedmetadata doesn't fire
-    setTimeout(() => {
-      if (video.readyState < 2) {
-        console.log('Video loading slowly, initializing anyway...');
-        initScrollBehavior();
-      }
-    }, 2000);
-  }
-
-  // Ensure video stays paused (no autoplay)
   video.pause();
-
-  // Mobile-specific: Try to load video when it comes into view
-  if (isMobile) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          video.load();
-        }
-      });
-    }, { threshold: 0.1 });
-    
-    observer.observe(section);
-  }
 })();
 
 })();
