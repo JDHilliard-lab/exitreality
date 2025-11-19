@@ -790,8 +790,8 @@ footer {
 .scroll-video-section {
   position: relative;
   width: 100vw;
-  height: 300vh; /* Extended height for scroll scrubbing */
-  background: #000;
+  height: 180vh;              /* shorter scroll section */
+  background: transparent;    /* no solid black background */
   overflow: hidden;
   margin-left: calc(-50vw + 50%);
   margin-right: 0;
@@ -805,12 +805,12 @@ footer {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100vh;              /* video fills the viewport */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #000;
+  background: transparent;    /* no extra black, just the video itself */
   padding: 0;
   margin: 0;
 }
@@ -821,12 +821,13 @@ footer {
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;
+  object-fit: cover;          /* full-bleed, edge-to-edge, no letterboxing */
   display: block;
-  background: #000;
+  background: #000;           /* black only inside the video frame */
   margin: 0;
   padding: 0;
 }
+
 
 /* Hide progress indicator completely */
 .scroll-progress {
@@ -835,7 +836,7 @@ footer {
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 250vh; /* Adjusted scroll distance on mobile */
+    height: 160vh; /* shorter scroll on mobile too */
     margin-left: calc(-50vw + 50%);
   }
   
