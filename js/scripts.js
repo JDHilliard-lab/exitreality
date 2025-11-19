@@ -429,6 +429,20 @@
   video.addEventListener('loadedmetadata', function() {
     let ticking = false;
 
+    // ===== CONFIGURATION =====
+    // Adjust these values to control when video starts playing:
+    // - stickyStart: When video becomes centered and starts playing (0 to 1)
+    // - stickyEnd: When video finishes and starts scrolling out (0 to 1)
+    // 
+    // Example values:
+    // stickyStart = 0.25 means video centers at 25% of scroll
+    // stickyEnd = 0.75 means video releases at 75% of scroll
+    //
+    // For immediate play when centered, try: stickyStart = 0.5, stickyEnd = 0.5
+    const stickyStart = 0.25;  // When video reaches center (0-1)
+    const stickyEnd = 0.75;    // When video releases from center (0-1)
+    // =========================
+
     function updateVideo() {
       const rect = section.getBoundingClientRect();
       const windowHeight = window.innerHeight;
@@ -447,24 +461,20 @@
       let progress = (startScroll - currentPos) / scrollRange;
       progress = Math.max(0, Math.min(1, progress));
 
-      // Sticky phase: when video is centered (progress 0.25 to 0.75)
-      const stickyStart = 0.25;
-      const stickyEnd = 0.75;
       const stickyRange = stickyEnd - stickyStart;
       
       let videoProgress = 0;
       
       if (progress < stickyStart) {
-        // Entering phase: video moves into center (0% to 25% of scroll)
-        videoProgress = (progress / stickyStart) * 0.3; // First 30% of video
+        // Entering phase: video moves into center, stays at start frame
+        videoProgress = 0; // Video doesn't play yet
       } else if (progress <= stickyEnd) {
-        // Sticky phase: video plays while stuck in center (25% to 75% of scroll)
+        // Sticky phase: video plays while centered
         const stickyProgress = (progress - stickyStart) / stickyRange;
-        videoProgress = 0.3 + (stickyProgress * 0.4); // Middle 40% of video (30% to 70%)
+        videoProgress = stickyProgress; // Plays from 0% to 100% during sticky phase
       } else {
-        // Exiting phase: video moves out as it finishes (75% to 100% of scroll)
-        const exitProgress = (progress - stickyEnd) / (1 - stickyEnd);
-        videoProgress = 0.7 + (exitProgress * 0.3); // Last 30% of video
+        // Exiting phase: video is at end, scrolls away
+        videoProgress = 1; // Video stays at final frame
       }
 
       if (video.duration && !isNaN(video.duration)) {
