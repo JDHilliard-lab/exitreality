@@ -270,14 +270,21 @@
         </div>
     </section>
 
-    <!-- 360 Scroll-Driven Showcase - REMOVED FROM CONTENT-SECTION -->
-    <section class="scroll-video-section">
-        <div class="scroll-video-container">
-            <video class="scroll-video" muted playsinline preload="auto">
-                <source src="BEAST/beast-360W.mp4" type="video/mp4">
-            </video>
-        </div>
-    </section>
+    <!-- 360 Scroll-Driven Showcase - MOBILE COMPATIBLE -->
+<section class="scroll-video-section">
+    <div class="scroll-video-container">
+        <video 
+            class="scroll-video" 
+            muted 
+            playsinline 
+            webkit-playsinline 
+            preload="auto"
+            disablePictureInPicture
+        >
+            <source src="BEAST/beast-360W.mp4" type="video/mp4">
+        </video>
+    </div>
+</section>
 
     <!-- Stage 2: Image to 3D -->
     <div class="content-section">
