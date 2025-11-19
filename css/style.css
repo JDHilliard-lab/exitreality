@@ -790,8 +790,8 @@ footer {
 .scroll-video-section {
   position: relative;
   width: 100vw;
-  height: 180vh;              /* shorter scroll section */
-  background: transparent;    /* no solid black background */
+  height: 200vh;              /* just enough scroll to scrub, not a huge tunnel */
+  background: transparent;    /* no big black block behind the video */
   overflow: hidden;
   margin-left: calc(-50vw + 50%);
   margin-right: 0;
@@ -810,7 +810,7 @@ footer {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: transparent;    /* no extra black, just the video itself */
+  background: transparent;    /* no extra black outside the video */
   padding: 0;
   margin: 0;
 }
@@ -821,9 +821,9 @@ footer {
   left: 0;
   width: 100vw;
   height: 100vh;
-  object-fit: cover;          /* full-bleed, edge-to-edge, no letterboxing */
+  object-fit: cover;          /* full bleed edge-to-edge */
   display: block;
-  background: #000;           /* black only inside the video frame */
+  background: #000;           /* only inside the video area if needed */
   margin: 0;
   padding: 0;
 }
@@ -836,7 +836,7 @@ footer {
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 160vh; /* shorter scroll on mobile too */
+    height: 200vh; /* match desktop – enough to scrub, not huge */
     margin-left: calc(-50vw + 50%);
   }
   
