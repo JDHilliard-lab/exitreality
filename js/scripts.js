@@ -419,69 +419,50 @@
     handleScroll();
   })();
 
-  /*** 7) Scroll-Driven Video (360° rotation effect) ***/
-  (function initScrollVideo() {
-    const section = document.querySelector('.scroll-video-section');
-    const video = document.querySelector('.scroll-video');
+/*** 7) Scroll-Driven Video (360° rotation effect) ***/
+(function initScrollVideo() {
+  const section = document.querySelector('.scroll-video-section');
+  const video = document.querySelector('.scroll-video');
 
-    if (!section || !video) return;
+  if (!section || !video) return;
 
-    // Wait for video metadata to load
-    video.addEventListener('loadedmetadata', function() {
-      const videoDuration = video.duration;
-      const viewportHeight = window.innerHeight;
+  video.addEventListener('loadedmetadata', function() {
+    let ticking = false;
+
+    function updateVideo() {
+      const rect = section.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const sectionHeight = rect.height;
       
-      // TIGHT calculation: Only enough space for the video to play + 1 viewport
-      // For 10-second video: viewport + 10vh extra = minimal black space
-      const extraScroll = viewportHeight * 0.5; // Only 50% extra viewport for scrolling
-      const totalHeight = viewportHeight + extraScroll;
-      section.style.height = totalHeight + 'px';
+      const enterPoint = windowHeight;
+      const exitPoint = -sectionHeight;
+      const totalScrollRange = enterPoint - exitPoint;
+      const currentPosition = rect.top;
+      
+      let progress = (enterPoint - currentPosition) / totalScrollRange;
+      progress = Math.max(0, Math.min(1, progress));
 
-      console.log('Video duration:', videoDuration, 'seconds | Section height:', totalHeight, 'px');
-
-      let ticking = false;
-
-      function updateVideo() {
-        const rect = section.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        
-        // Progress starts when top of section reaches bottom of viewport
-        // Progress ends when bottom of section reaches top of viewport
-        const sectionTop = rect.top;
-        const sectionBottom = rect.bottom;
-        const sectionHeight = rect.height;
-        
-        // More intuitive calculation:
-        // When section top = viewport height (just entering), progress = 0
-        // When section top = -sectionHeight (fully scrolled past), progress = 1
-        let progress = (viewportHeight - sectionTop) / (sectionHeight + viewportHeight);
-        
-        // Clamp between 0 and 1
-        progress = Math.max(0, Math.min(1, progress));
-
-        // Update video
-        if (video.duration && !isNaN(video.duration)) {
-          video.currentTime = progress * video.duration;
-        }
-
-        ticking = false;
+      if (video.duration && !isNaN(video.duration)) {
+        video.currentTime = progress * video.duration;
       }
 
-      function onScroll() {
-        if (!ticking) {
-          window.requestAnimationFrame(updateVideo);
-          ticking = true;
-        }
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateVideo);
+        ticking = true;
       }
+    }
 
-      window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
 
-      // Initial update
-      updateVideo();
-    });
+    updateVideo();
+  });
 
-    // Ensure video doesn't autoplay
-    video.pause();
-  })();
+  video.pause();
+})();
 
 })();
