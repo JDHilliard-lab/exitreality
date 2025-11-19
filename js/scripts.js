@@ -562,8 +562,10 @@
       updateVideo();
     });
 
-    // make sure it doesn’t autoplay on its own
+     // make sure it doesn’t autoplay on its own
     video.pause();
   });
 })();
+
+})(); // closes the big top-level IIFE
 
