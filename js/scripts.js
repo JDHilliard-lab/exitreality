@@ -64,6 +64,13 @@
       }
 
       videos.forEach(video => {
+        // Skip scroll-video from loading bar (loads separately)
+        if (video.classList.contains('scroll-video')) {
+          totalVideos--;
+          if (totalVideos === 0) updateProgress();
+          return;
+        }
+
         if (video.readyState >= 3) {
           loadedVideos++;
           updateProgress();
