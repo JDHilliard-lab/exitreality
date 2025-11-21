@@ -475,7 +475,7 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE DEBUG VERSION ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - iOS SAFARI FIX ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
@@ -499,7 +499,11 @@
   video.setAttribute('webkit-playsinline', '');
   video.muted = true;
   video.playsInline = true;
-  video.preload = 'auto';
+  video.preload = 'metadata'; // Changed from 'auto' for iOS
+
+  // iOS-specific: Force load and enable seeking
+  let videoReady = false;
+  let userInteracted = false;
 
   video.addEventListener('loadstart', () => {
     console.log('⏳ 6. Video loading started');
@@ -507,14 +511,17 @@
 
   video.addEventListener('loadedmetadata', () => {
     console.log('✅ 7. Metadata loaded - Duration:', video.duration);
+    videoReady = true;
   });
 
   video.addEventListener('loadeddata', () => {
     console.log('✅ 8. Video data loaded - Ready state:', video.readyState);
+    videoReady = true;
   });
 
   video.addEventListener('canplay', () => {
     console.log('✅ 9. Video can play');
+    videoReady = true;
   });
 
   video.addEventListener('error', (e) => {
@@ -523,35 +530,29 @@
     console.error('Error message:', video.error?.message);
   });
 
-  function forceLoad() {
-    console.log('🔄 11. Forcing video load...');
+  // iOS Safari requires user interaction to enable seeking
+  function enableIOSVideo() {
+    if (userInteracted) return;
     
-    video.load();
+    console.log('🍎 iOS: Enabling video on user interaction...');
     
-    if (isIOS) {
-      setTimeout(() => {
-        video.play()
-          .then(() => {
-            console.log('▶️ 12. Play succeeded, pausing...');
-            video.pause();
-            video.currentTime = 0;
-          })
-          .catch(err => {
-            console.log('⏸️ 13. Play failed (needs user interaction):', err.message);
-            
-            document.addEventListener('touchstart', function enableVideo() {
-              console.log('👆 14. User touched, trying play again...');
-              video.play()
-                .then(() => {
-                  video.pause();
-                  video.currentTime = 0;
-                  console.log('✅ 15. Video enabled via touch');
-                })
-                .catch(e => console.log('❌ Touch play failed:', e));
-            }, { once: true, passive: true });
-          });
-      }, 500);
-    }
+    video.play().then(() => {
+      video.pause();
+      video.currentTime = 0;
+      userInteracted = true;
+      console.log('✅ iOS video enabled for seeking');
+      updateVideo(); // Update immediately after enabling
+    }).catch(err => {
+      console.log('⚠️ iOS play failed:', err.message);
+    });
+  }
+
+  // Listen for ANY user interaction to enable video
+  if (isIOS) {
+    const enableEvents = ['touchstart', 'touchend', 'scroll'];
+    enableEvents.forEach(eventType => {
+      document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
+    });
   }
 
   const stickyStart = 0.25;
@@ -559,8 +560,24 @@
 
   let ticking = false;
   let scrollUpdateCount = 0;
+  let lastTime = -1;
 
   function updateVideo() {
+    // Don't update if video not ready
+    if (!videoReady) {
+      if (scrollUpdateCount === 0) {
+        console.warn('⚠️ Video not ready yet');
+      }
+      ticking = false;
+      return;
+    }
+
+    // iOS: Don't update until user has interacted
+    if (isIOS && !userInteracted) {
+      ticking = false;
+      return;
+    }
+
     const rect = section.getBoundingClientRect();
     const windowHeight = window.innerHeight;
     const sectionHeight = rect.height;
@@ -588,19 +605,19 @@
     if (video.duration && !isNaN(video.duration)) {
       const newTime = videoProgress * video.duration;
       
-      try {
-        video.currentTime = newTime;
-        
-        scrollUpdateCount++;
-        if (scrollUpdateCount <= 5) {
-          console.log(`📊 Scroll update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
+      // Only update if time changed significantly (helps iOS performance)
+      if (Math.abs(newTime - lastTime) > 0.03) {
+        try {
+          video.currentTime = newTime;
+          lastTime = newTime;
+          
+          scrollUpdateCount++;
+          if (scrollUpdateCount <= 5) {
+            console.log(`📊 Update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
+          }
+        } catch (e) {
+          console.error('❌ Error setting currentTime:', e);
         }
-      } catch (e) {
-        console.error('❌ Error setting currentTime:', e);
-      }
-    } else {
-      if (scrollUpdateCount === 0) {
-        console.warn('⚠️ Video duration not available yet');
       }
     }
 
@@ -614,45 +631,55 @@
     }
   }
 
-  if (video.readyState >= 2) {
-    console.log('✅ 16. Video already loaded, starting scroll handler');
+  // Load the video
+  video.load();
+
+  // Wait for video to be ready
+  const startScroll = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
+    console.log('🎬 Scroll handler attached');
     updateVideo();
+  };
+
+  if (video.readyState >= 1) {
+    console.log('✅ Video metadata ready');
+    videoReady = true;
+    startScroll();
   } else {
-    console.log('⏳ 17. Waiting for video to load...');
-    
-    video.addEventListener('loadeddata', function() {
-      console.log('✅ 18. Video loaded, starting scroll handler');
-      window.addEventListener('scroll', onScroll, { passive: true });
-      updateVideo();
+    video.addEventListener('loadedmetadata', () => {
+      videoReady = true;
+      startScroll();
     }, { once: true });
 
+    // Fallback
     setTimeout(() => {
-      if (video.readyState < 2) {
-        console.warn('⚠️ 19. Video still not loaded after 3s, starting anyway');
-        window.addEventListener('scroll', onScroll, { passive: true });
+      if (!videoReady) {
+        console.warn('⚠️ Video still loading, starting anyway');
+        videoReady = true;
+        startScroll();
       }
-    }, 3000);
+    }, 2000);
   }
 
-  forceLoad();
-
+  // Lazy load when section is near
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          console.log('👀 20. Video section in view, loading...');
-          forceLoad();
+          console.log('👀 Video section in view');
+          video.load();
+          if (isIOS && !userInteracted) {
+            console.log('💡 Tip: Tap or scroll to enable video on iOS');
+          }
         }
       });
-    }, { threshold: 0.01, rootMargin: '500px' });
+    }, { threshold: 0.01, rootMargin: '200px' });
     
     observer.observe(section);
   }
 
   video.pause();
-  
-  console.log('🎬 21. Setup complete. Scroll to the video section and watch console.');
+  console.log('🎬 Setup complete. On iOS, touch the screen to enable video.');
 })();
 
 })();
