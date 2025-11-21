@@ -800,12 +800,12 @@ transition: opacity 0.05s linear; */
   display: none;
 }
 
-/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - FIXED VERSION ===== */
+/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - MOBILE FIXED ===== */
 .scroll-video-section {
   position: relative;
   width: 100%;
-  height: 200vh; /* Reduced from 300vh - controls scroll distance */
-  overflow: visible; /* Changed from hidden to allow proper flow */
+  height: 200vh;
+  overflow: visible;
   margin: 0;
   padding: 0;
 }
@@ -820,10 +820,10 @@ transition: opacity 0.05s linear; */
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: transparent; /* Changed from #000 to prevent black bars */
+  background: transparent;
   padding: 0;
   margin: 0;
-  margin-left: calc(-50vw + 50%); /* Full bleed alignment */
+  margin-left: calc(-50vw + 50%);
 }
 
 .scroll-video {
@@ -846,27 +846,56 @@ transition: opacity 0.05s linear; */
     height: 180vh;
     min-height: 180vh;
     overflow: visible;
+    /* Critical: Remove any inherited padding/margin */
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   .scroll-video-container {
-    width: 100vw;
-    height: 100vh;
-    margin-left: calc(-50vw + 50%);
     position: sticky;
     top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    /* Force full bleed */
+    margin: 0 !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding: 0 !important;
     background: #000;
+    overflow: hidden;
   }
   
   .scroll-video {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
     object-fit: cover;
+    /* GPU acceleration for smoother playback */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    /* Remove any borders/padding */
+    margin: 0;
+    padding: 0;
+    border: none;
   }
+}
+
+/* Ensure sections before and after have no extra spacing */
+.parallax-section + .scroll-video-section {
+  margin-top: 0 !important;
+}
+
+.scroll-video-section + .content-section {
+  margin-top: 0 !important;
+  padding-top: 6rem;
 }
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
