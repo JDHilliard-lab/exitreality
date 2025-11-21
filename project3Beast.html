@@ -268,44 +268,7 @@
         </div>
     </section>
 
-    <!-- DEBUG TEST VIDEO - Check if video file loads at all -->
-    <div style="width: 100%; padding: 2rem; background: #ffeb3b; border: 3px solid #f00;">
-        <h2 style="color: #000; margin-bottom: 1rem;">🔍 DEBUG: Video File Test</h2>
-        <p style="color: #000; margin-bottom: 1rem;">If you can see and play this video, the file path is correct:</p>
-        <video 
-            controls 
-            autoplay 
-            muted 
-            playsinline
-            style="width: 100%; max-width: 600px; display: block; margin: 1rem 0; background: #000;"
-        >
-            <source src="BEAST/beast-360W-mobile.mp4" type="video/mp4">
-            <source src="BEAST/beast-360W_mobile.mp4" type="video/mp4">
-            Video not loading - check filename!
-        </video>
-        <p id="debug-status" style="font-weight: bold; color: red; font-size: 18px;">Testing...</p>
-        
-        <script>
-            const testVid = document.querySelector('video[controls]');
-            const status = document.getElementById('debug-status');
-            
-            testVid.addEventListener('loadeddata', () => {
-                status.textContent = '✅ SUCCESS! Video loads. File path is correct.';
-                status.style.color = 'green';
-                console.log('✅ Test video loaded successfully');
-                console.log('Video src:', testVid.currentSrc);
-            });
-            
-            testVid.addEventListener('error', (e) => {
-                status.textContent = '❌ FAILED! Video not loading. Check filename: beast-360W-mobile.mp4 or beast-360W_mobile.mp4';
-                status.style.color = 'red';
-                console.error('❌ Test video failed to load');
-                console.error('Error:', testVid.error);
-            });
-        </script>
-    </div>
-
-    <!-- 360 Scroll-Driven Showcase - WITH DEBUG -->
+    <!-- 360 Scroll-Driven Showcase -->
     <section class="scroll-video-section">
         <div class="scroll-video-container">
             <video 
@@ -314,13 +277,11 @@
                 playsinline 
                 webkit-playsinline
                 x-webkit-airplay="deny"
-                preload="auto"
+                preload="metadata"
                 disablePictureInPicture
                 disableRemotePlayback
             >
-                <!-- Try both possible filenames -->
                 <source src="BEAST/beast-360W-mobile.mp4" type="video/mp4">
-                <source src="BEAST/beast-360W_mobile.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
