@@ -5,7 +5,7 @@
    - Loading bar for page and video content
    - Swipe gestures for slide slideshows
    - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
-   - Scroll-driven video (360° rotation effect)
+   - Scroll-driven video (360° rotation effect) with mobile debugging
 */
 
 (function () {
@@ -330,28 +330,14 @@
       });
 
       if (!isSlide) {
-  const autoplayMs = 6000;
-  let timer = setInterval(() => show(index + 1), autoplayMs);
+        const autoplayMs = 6000;
+        let timer = setInterval(() => show(index + 1), autoplayMs);
 
-  function stopAutoplay() {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-  }
-
-  // Stop autoplay when the user interacts
-  root.addEventListener('mouseenter', stopAutoplay);
-
-  if (prevBtn) {
-    prevBtn.addEventListener('click', stopAutoplay);
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', stopAutoplay);
-  }
-}
-
+        root.addEventListener('mouseenter', () => clearInterval(timer));
+        root.addEventListener('mouseleave', () => {
+          timer = setInterval(() => show(index + 1), autoplayMs);
+        });
+      }
 
       if (isSlide) {
         // ===== MOBILE TOUCH SWIPE =====
@@ -388,10 +374,9 @@
         let isDragging = false;
         let dragStartX = 0;
         let dragCurrentX = 0;
-        let dragThreshold = 50; // pixels to drag before triggering slide change
+        let dragThreshold = 50;
 
         root.addEventListener('mousedown', function(e) {
-          // Don't interfere with arrow button clicks
           if (e.target.classList.contains('slideshow__arrow') || 
               e.target.classList.contains('slideshow__arrow--prev') ||
               e.target.classList.contains('slideshow__arrow--next')) {
@@ -402,7 +387,7 @@
           dragStartX = e.clientX;
           dragCurrentX = e.clientX;
           root.style.cursor = 'grabbing';
-          e.preventDefault(); // Prevent image dragging
+          e.preventDefault();
         });
 
         window.addEventListener('mousemove', function(e) {
@@ -417,12 +402,10 @@
 
           if (Math.abs(dragDistance) > dragThreshold) {
             if (dragDistance > 0) {
-              // Dragged right = show previous
               if (prevBtn && !prevBtn.disabled) {
                 show(index - 1);
               }
             } else {
-              // Dragged left = show next
               if (nextBtn && !nextBtn.disabled) {
                 show(index + 1);
               }
@@ -433,10 +416,8 @@
           root.style.cursor = 'grab';
         });
 
-        // Set initial cursor
         root.style.cursor = 'grab';
 
-        // Reset cursor when mouse leaves
         root.addEventListener('mouseleave', function() {
           if (isDragging) {
             isDragging = false;
@@ -456,7 +437,7 @@
     if (parallaxSections.length === 0) return;
     
     const isMobile = window.innerWidth <= 768;
-    const mobileMultiplier = 0.2; // Reduced movement on mobile
+    const mobileMultiplier = 0.2;
     
     function handleScroll() {
       parallaxSections.forEach(section => {
@@ -494,78 +475,184 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - FIXED VERSION ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - MOBILE DEBUG VERSION ***/
 (function initScrollVideo() {
-  const sections = document.querySelectorAll('.scroll-video-section');
-  if (!sections.length) return;
+  const section = document.querySelector('.scroll-video-section');
+  const video = document.querySelector('.scroll-video');
 
-  sections.forEach(section => {
-    const video = section.querySelector('.scroll-video');
-    if (!video) return;
+  console.log('🎬 1. Section found:', !!section);
+  console.log('🎬 2. Video found:', !!video);
 
-    video.addEventListener('loadedmetadata', function () {
-      let ticking = false;
+  if (!section || !video) {
+    console.error('❌ ERROR: Video or section not found!');
+    return;
+  }
 
-      // ===== CONFIGURATION =====
-      const stickyStart = 0.4; // when video is reaching center
-      const stickyEnd   = 0.6; // when video starts to release
-      // =========================
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  
+  console.log('📱 3. Is Mobile:', isMobile);
+  console.log('🍎 4. Is iOS:', isIOS);
+  console.log('📁 5. Video src:', video.querySelector('source')?.src || 'NO SOURCE');
 
-      function updateVideo() {
-        const rect = section.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const sectionHeight = rect.height;
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'auto';
 
-        // Start when top of section enters viewport,
-        // end when bottom leaves viewport
-        const startScroll = windowHeight;
-        const endScroll = -sectionHeight;
-        const scrollRange = startScroll - endScroll;
-        const currentPos = rect.top;
-
-        let progress = (startScroll - currentPos) / scrollRange;
-        progress = Math.max(0, Math.min(1, progress));
-
-        const stickyRange = stickyEnd - stickyStart;
-        let videoProgress = 0;
-
-        if (progress < stickyStart) {
-          // entering – hold first frame
-          videoProgress = 0;
-        } else if (progress <= stickyEnd) {
-          // sticky phase – play through
-          const stickyProgress = (progress - stickyStart) / stickyRange;
-          videoProgress = stickyProgress;
-        } else {
-          // exiting – hold last frame
-          videoProgress = 1;
-        }
-
-        if (video.duration && !isNaN(video.duration)) {
-          video.currentTime = videoProgress * video.duration;
-        }
-
-        ticking = false;
-      }
-
-      function onScroll() {
-        if (!ticking) {
-          window.requestAnimationFrame(updateVideo);
-          ticking = true;
-        }
-      }
-
-      window.addEventListener('scroll', onScroll);
-      window.addEventListener('resize', onScroll);
-
-      // Initial sync
-      updateVideo();
-    });
-
-     // make sure it doesn’t autoplay on its own
-    video.pause();
+  video.addEventListener('loadstart', () => {
+    console.log('⏳ 6. Video loading started');
   });
+
+  video.addEventListener('loadedmetadata', () => {
+    console.log('✅ 7. Metadata loaded - Duration:', video.duration);
+  });
+
+  video.addEventListener('loadeddata', () => {
+    console.log('✅ 8. Video data loaded - Ready state:', video.readyState);
+  });
+
+  video.addEventListener('canplay', () => {
+    console.log('✅ 9. Video can play');
+  });
+
+  video.addEventListener('error', (e) => {
+    console.error('❌ 10. VIDEO ERROR:', e);
+    console.error('Error code:', video.error?.code);
+    console.error('Error message:', video.error?.message);
+  });
+
+  function forceLoad() {
+    console.log('🔄 11. Forcing video load...');
+    
+    video.load();
+    
+    if (isIOS) {
+      setTimeout(() => {
+        video.play()
+          .then(() => {
+            console.log('▶️ 12. Play succeeded, pausing...');
+            video.pause();
+            video.currentTime = 0;
+          })
+          .catch(err => {
+            console.log('⏸️ 13. Play failed (needs user interaction):', err.message);
+            
+            document.addEventListener('touchstart', function enableVideo() {
+              console.log('👆 14. User touched, trying play again...');
+              video.play()
+                .then(() => {
+                  video.pause();
+                  video.currentTime = 0;
+                  console.log('✅ 15. Video enabled via touch');
+                })
+                .catch(e => console.log('❌ Touch play failed:', e));
+            }, { once: true, passive: true });
+          });
+      }, 500);
+    }
+  }
+
+  const stickyStart = 0.25;
+  const stickyEnd = 0.75;
+
+  let ticking = false;
+  let scrollUpdateCount = 0;
+
+  function updateVideo() {
+    const rect = section.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const sectionHeight = rect.height;
+    
+    const startScroll = windowHeight;
+    const endScroll = -sectionHeight;
+    const scrollRange = startScroll - endScroll;
+    const currentPos = rect.top;
+    
+    let progress = (startScroll - currentPos) / scrollRange;
+    progress = Math.max(0, Math.min(1, progress));
+
+    const stickyRange = stickyEnd - stickyStart;
+    let videoProgress = 0;
+    
+    if (progress < stickyStart) {
+      videoProgress = 0;
+    } else if (progress <= stickyEnd) {
+      const stickyProgress = (progress - stickyStart) / stickyRange;
+      videoProgress = stickyProgress;
+    } else {
+      videoProgress = 1;
+    }
+
+    if (video.duration && !isNaN(video.duration)) {
+      const newTime = videoProgress * video.duration;
+      
+      try {
+        video.currentTime = newTime;
+        
+        scrollUpdateCount++;
+        if (scrollUpdateCount <= 5) {
+          console.log(`📊 Scroll update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
+        }
+      } catch (e) {
+        console.error('❌ Error setting currentTime:', e);
+      }
+    } else {
+      if (scrollUpdateCount === 0) {
+        console.warn('⚠️ Video duration not available yet');
+      }
+    }
+
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(updateVideo);
+      ticking = true;
+    }
+  }
+
+  if (video.readyState >= 2) {
+    console.log('✅ 16. Video already loaded, starting scroll handler');
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateVideo();
+  } else {
+    console.log('⏳ 17. Waiting for video to load...');
+    
+    video.addEventListener('loadeddata', function() {
+      console.log('✅ 18. Video loaded, starting scroll handler');
+      window.addEventListener('scroll', onScroll, { passive: true });
+      updateVideo();
+    }, { once: true });
+
+    setTimeout(() => {
+      if (video.readyState < 2) {
+        console.warn('⚠️ 19. Video still not loaded after 3s, starting anyway');
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }
+    }, 3000);
+  }
+
+  forceLoad();
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          console.log('👀 20. Video section in view, loading...');
+          forceLoad();
+        }
+      });
+    }, { threshold: 0.01, rootMargin: '500px' });
+    
+    observer.observe(section);
+  }
+
+  video.pause();
+  
+  console.log('🎬 21. Setup complete. Scroll to the video section and watch console.');
 })();
 
-})(); // closes the big top-level IIFE
-
+})();
