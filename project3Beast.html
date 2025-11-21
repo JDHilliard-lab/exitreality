@@ -270,14 +270,24 @@
         </div>
     </section>
 
-    <!-- 360 Scroll-Driven Showcase - MOBILE COMPATIBLE -->
- <section class="scroll-video-section">
-        <div class="scroll-video-container">
-            <video class="scroll-video" muted playsinline preload="auto">
-                <source src="BEAST/beast-360W.mp4" type="video/mp4">
-            </video>
-        </div>
-    </section>
+<!-- 360 Scroll-Driven Showcase - MOBILE OPTIMIZED -->
+<section class="scroll-video-section">
+    <div class="scroll-video-container">
+        <video 
+            class="scroll-video" 
+            muted 
+            playsinline 
+            webkit-playsinline
+            x-webkit-airplay="deny"
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+        >
+            <source src="BEAST/beast-360W_mobile.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</section>
 
 
     <!-- Stage 2: Image to 3D -->
