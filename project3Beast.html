@@ -220,7 +220,6 @@
 
         <!-- Before/After Sliders -->
         <div class="full-image">
-            <!-- Slider 1 -->
             <div class="ba" tabindex="0" role="region" aria-label="Before and after comparison 1">
                 <div class="ba__layer ba__before">
                     <img class="ba__img" src="BEAST/sketch-tigerLizard001-GPT001-16x9.jpg" alt="Watercolor creature painting">
@@ -251,7 +250,6 @@
                 <img class="slideshow__image" src="BEAST/Beast_BodyARMS.webp" alt="Creature 3D view 3">
                 <img class="slideshow__image" src="BEAST/Beast_Body_FullBodySide.webp" alt="Creature 3D view 4">
                 
-                
                 <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
                 <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
              </div>
@@ -270,25 +268,63 @@
         </div>
     </section>
 
-<!-- 360 Scroll-Driven Showcase - MOBILE OPTIMIZED -->
-<section class="scroll-video-section">
-    <div class="scroll-video-container">
+    <!-- DEBUG TEST VIDEO - Check if video file loads at all -->
+    <div style="width: 100%; padding: 2rem; background: #ffeb3b; border: 3px solid #f00;">
+        <h2 style="color: #000; margin-bottom: 1rem;">🔍 DEBUG: Video File Test</h2>
+        <p style="color: #000; margin-bottom: 1rem;">If you can see and play this video, the file path is correct:</p>
         <video 
-            class="scroll-video" 
+            controls 
+            autoplay 
             muted 
-            playsinline 
-            webkit-playsinline
-            x-webkit-airplay="deny"
-            preload="auto"
-            disablePictureInPicture
-            disableRemotePlayback
+            playsinline
+            style="width: 100%; max-width: 600px; display: block; margin: 1rem 0; background: #000;"
         >
+            <source src="BEAST/beast-360W-mobile.mp4" type="video/mp4">
             <source src="BEAST/beast-360W_mobile.mp4" type="video/mp4">
-            Your browser does not support the video tag.
+            Video not loading - check filename!
         </video>
+        <p id="debug-status" style="font-weight: bold; color: red; font-size: 18px;">Testing...</p>
+        
+        <script>
+            const testVid = document.querySelector('video[controls]');
+            const status = document.getElementById('debug-status');
+            
+            testVid.addEventListener('loadeddata', () => {
+                status.textContent = '✅ SUCCESS! Video loads. File path is correct.';
+                status.style.color = 'green';
+                console.log('✅ Test video loaded successfully');
+                console.log('Video src:', testVid.currentSrc);
+            });
+            
+            testVid.addEventListener('error', (e) => {
+                status.textContent = '❌ FAILED! Video not loading. Check filename: beast-360W-mobile.mp4 or beast-360W_mobile.mp4';
+                status.style.color = 'red';
+                console.error('❌ Test video failed to load');
+                console.error('Error:', testVid.error);
+            });
+        </script>
     </div>
-</section>
 
+    <!-- 360 Scroll-Driven Showcase - WITH DEBUG -->
+    <section class="scroll-video-section">
+        <div class="scroll-video-container">
+            <video 
+                class="scroll-video" 
+                muted 
+                playsinline 
+                webkit-playsinline
+                x-webkit-airplay="deny"
+                preload="auto"
+                disablePictureInPicture
+                disableRemotePlayback
+            >
+                <!-- Try both possible filenames -->
+                <source src="BEAST/beast-360W-mobile.mp4" type="video/mp4">
+                <source src="BEAST/beast-360W_mobile.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </section>
 
     <!-- Stage 2: Image to 3D -->
     <div class="content-section">
@@ -356,7 +392,6 @@
                 return ((clientX - rect.left) / rect.width) * 100;
             };
 
-            // Mouse/pointer
             const onPointerDown = (e) => {
                 setPct(toPctFromClientX(e.clientX));
                 const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
@@ -369,7 +404,6 @@
             };
             root.addEventListener('mousedown', onPointerDown);
 
-            // Touch
             root.addEventListener('touchstart', (e) => {
                 const t = e.touches[0];
                 setPct(toPctFromClientX(t.clientX));
@@ -380,10 +414,8 @@
                 setPct(toPctFromClientX(t.clientX));
             }, { passive: true });
 
-            // Range input (keyboard + screen readers)
             range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
 
-            // Initialize
             setPct(parseFloat(range.value) || 50);
         });
     </script>
