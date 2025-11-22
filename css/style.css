@@ -495,9 +495,10 @@ footer {
 /* Custom project header themes */
 .project-header.dark-theme {
   background: #000000;
-  border-bottom: none;
-  margin-top: var(--nav-h); /* ← CHANGE THIS */
-  padding-top: 0.75rem;
+  border-bottom: 1px solid #333333;
+  /* Extend the black background up behind the navbar */
+  padding-top: calc(var(--nav-h) + 0.75rem);
+  margin-top: calc(-1 * var(--nav-h));
 }
 
 /* Remove border on mobile */
