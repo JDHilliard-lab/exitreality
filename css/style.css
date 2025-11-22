@@ -494,11 +494,19 @@ footer {
 
 /* Custom project header themes */
 .project-header.dark-theme {
+  position: relative;
   background: #000000;
   border-bottom: 1px solid #333333;
-  /* Extend the black background up behind the navbar */
-  padding-top: calc(var(--nav-h) + 0.75rem);
-  margin-top: calc(-1 * var(--nav-h));
+}
+
+.project-header.dark-theme::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: #000000;
 }
 
 /* Remove border on mobile */
@@ -1240,11 +1248,6 @@ transition: opacity 0.05s linear; */
   body.project-page .credits-list {
     text-align: left !important;
   }
-  /* Force black background in the navbar area on project pages */
-body.project-page {
-  padding-top: 0;
-  background: linear-gradient(to bottom, #000000 0%, #000000 var(--nav-h), #ffffff var(--nav-h));
-}
 
   /* Image grid */
   .image-grid {
