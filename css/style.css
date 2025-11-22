@@ -489,13 +489,14 @@ footer {
   padding: 0.75rem 4rem;
   border-bottom: 1px solid #e0e0e0;
   background: #ffffff; /* Default white background */
+  margin-top: var(--nav-h); /* ← ADD THIS LINE */
 }
 
 /* Custom project header themes */
 .project-header.dark-theme {
   background: #000000;
   border-bottom: 1px solid #333333;
-  margin-top: 0;
+  margin-top: var(--nav-h); /* ← CHANGE THIS */
   padding-top: 0.75rem;
 }
 
