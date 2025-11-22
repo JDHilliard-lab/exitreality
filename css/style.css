@@ -154,6 +154,20 @@ nav.dark-nav {
   border-bottom: none; 
 }
 
+/* ... other dark navbar styles ... */
+
+/* Black strip behind navbar on project pages */
+body.project-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  background: #000000;
+  z-index: 999; /* Just below navbar (which is z-index: 1000) */
+}
+
 /* Dark theme logo - EXIT stays red, REALITY turns white */
 nav.dark-nav .logo .exit-text {
   color: #ff0000; /* Keep red */
