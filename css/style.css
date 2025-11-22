@@ -133,13 +133,24 @@ nav {
 /* ===== DARK NAVBAR THEME =====
    Add the class "dark-nav" to your <nav> element to enable dark theme
    Example: <nav class="dark-nav">
-*/
+
+/*Translucency control:
+
+rgba(0, 0, 0, 0.75) - the last number (0.75) controls opacity
+0.0 = completely transparent
+1.0 = completely opaque
+Try: 0.5 for more see-through, 0.9 for more solid
+
+Blur control:
+
+blur(10px) - adjust the pixel value
+Try: blur(20px) for more blur, blur(5px) for less blur
 
 /* Dark theme navbar */
 nav.dark-nav {
-  background: rgba(0, 0, 0, 0.75);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
