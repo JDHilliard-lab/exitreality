@@ -194,6 +194,8 @@ Add this anywhere in your page:
   min-height: 520px;
   overflow: hidden;
   padding: 0;
+  margin-top: calc(-1 * var(--nav-h)); /* Pull hero up behind navbar */
+  padding-top: var(--nav-h); /* Add padding back for content */
 }
 
 .hero-video {
