@@ -130,7 +130,63 @@ nav {
 .nav-links a:focus {
   outline: none;
 }
+/* ===== DARK NAVBAR THEME =====
+   Add the class "dark-nav" to your <nav> element to enable dark theme
+   Example: <nav class="dark-nav">
+*/
 
+/* Dark theme navbar */
+nav.dark-nav {
+  background: rgba(0, 0, 0, 0.75);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dark theme logo - EXIT stays red, REALITY turns white */
+nav.dark-nav .logo .exit-text {
+  color: #ff0000; /* Keep red */
+}
+
+nav.dark-nav .logo .reality-text {
+  color: #ffffff; /* Change to white */
+}
+
+/* Dark theme navigation links - white text */
+nav.dark-nav .nav-links a {
+  color: #ffffff;
+}
+
+/* Hover states for dark theme */
+nav.dark-nav .logo:hover,
+nav.dark-nav .nav-links a:hover {
+  opacity: 0.6;
+}
+
+/* ===== HOW TO USE =====
+
+OPTION 1: Enable dark navbar site-wide
+Add this to your navbar.html:
+<nav class="dark-nav">
+
+OPTION 2: Enable dark navbar on specific pages only
+Add this script to any page where you want dark navbar:
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const nav = document.querySelector('nav');
+    if (nav) nav.classList.add('dark-nav');
+  });
+</script>
+
+OPTION 3: Toggle between themes with a button
+Add this anywhere in your page:
+
+<button onclick="document.querySelector('nav').classList.toggle('dark-nav')">
+  Toggle Navbar Theme
+</button>
+
+*/
 /* ===== HERO SECTION ===== */
 .hero {
   position: relative;
