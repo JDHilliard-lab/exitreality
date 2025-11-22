@@ -1240,6 +1240,11 @@ transition: opacity 0.05s linear; */
   body.project-page .credits-list {
     text-align: left !important;
   }
+  /* Force black background in the navbar area on project pages */
+body.project-page {
+  padding-top: 0;
+  background: linear-gradient(to bottom, #000000 0%, #000000 var(--nav-h), #ffffff var(--nav-h));
+}
 
   /* Image grid */
   .image-grid {
