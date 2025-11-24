@@ -881,7 +881,7 @@ transition: opacity 0.05s linear; */
   display: none;
 }
 
-/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - MOBILE FIXED ===== */
+/* ===== SCROLL-DRIVEN VIDEO - MOBILE OPTIMIZED ===== */
 .scroll-video-section {
   position: relative;
   width: 100%;
@@ -917,7 +917,6 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
-/* Hide progress indicator completely */
 .scroll-progress {
   display: none !important;
 }
@@ -927,7 +926,6 @@ transition: opacity 0.05s linear; */
     height: 180vh;
     min-height: 180vh;
     overflow: visible;
-    /* Critical: Remove any inherited padding/margin */
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -939,7 +937,6 @@ transition: opacity 0.05s linear; */
     right: 0;
     width: 100vw;
     height: 100vh;
-    /* Force full bleed */
     margin: 0 !important;
     margin-left: calc(-50vw + 50%) !important;
     margin-right: calc(-50vw + 50%) !important;
@@ -950,26 +947,26 @@ transition: opacity 0.05s linear; */
   
   .scroll-video {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100vw !important;
-    height: 100vh !important;
+    height: 100vw !important;
     max-width: none !important;
+    max-height: 100vh;
     object-fit: cover;
-    /* GPU acceleration for smoother playback */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    object-position: center;
+    transform: translate(-50%, -50%) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    /* Remove any borders/padding */
     margin: 0;
     padding: 0;
     border: none;
   }
 }
 
-/* Ensure sections before and after have no extra spacing */
 .parallax-section + .scroll-video-section {
   margin-top: 0 !important;
 }
@@ -978,6 +975,7 @@ transition: opacity 0.05s linear; */
   margin-top: 0 !important;
   padding-top: 6rem;
 }
+
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
   position: relative;
