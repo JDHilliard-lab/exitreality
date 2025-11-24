@@ -923,9 +923,9 @@ transition: opacity 0.05s linear; */
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 100vh; /* Changed from 180vh */
-    min-height: 100vh;
-    overflow: hidden; /* Changed from visible */
+    height: 100vw; /* Make section square to match 1:1 video */
+    min-height: auto;
+    overflow: hidden;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -936,7 +936,7 @@ transition: opacity 0.05s linear; */
     left: 0;
     right: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100vw; /* Square container */
     margin: 0 !important;
     padding: 0 !important;
     background: #000;
@@ -948,12 +948,12 @@ transition: opacity 0.05s linear; */
     top: 0;
     left: 0;
     width: 100vw !important;
-    height: 100vh !important;
+    height: 100vw !important; /* Square video matches square container */
     max-width: none !important;
     max-height: none !important;
-    object-fit: cover; /* This fills the screen edge-to-edge */
+    object-fit: contain; /* Shows full video without cropping */
     object-position: center;
-    transform: none; /* Remove transforms */
+    transform: none;
     -webkit-transform: none;
     margin: 0;
     padding: 0;
