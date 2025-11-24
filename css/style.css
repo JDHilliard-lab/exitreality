@@ -923,9 +923,9 @@ transition: opacity 0.05s linear; */
 
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: 180vh;
-    min-height: 180vh;
-    overflow: visible;
+    height: 100vh; /* Changed from 180vh */
+    min-height: 100vh;
+    overflow: hidden; /* Changed from visible */
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -938,8 +938,6 @@ transition: opacity 0.05s linear; */
     width: 100vw;
     height: 100vh;
     margin: 0 !important;
-    margin-left: calc(-50vw + 50%) !important;
-    margin-right: calc(-50vw + 50%) !important;
     padding: 0 !important;
     background: #000;
     overflow: hidden;
@@ -947,20 +945,16 @@ transition: opacity 0.05s linear; */
   
   .scroll-video {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
     width: 100vw !important;
-    height: 100vw !important;
+    height: 100vh !important;
     max-width: none !important;
-    max-height: 100vh;
-    object-fit: cover;
+    max-height: none !important;
+    object-fit: cover; /* This fills the screen edge-to-edge */
     object-position: center;
-    transform: translate(-50%, -50%) translateZ(0);
-    -webkit-transform: translate(-50%, -50%) translateZ(0);
-    will-change: transform;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    transform: none; /* Remove transforms */
+    -webkit-transform: none;
     margin: 0;
     padding: 0;
     border: none;
