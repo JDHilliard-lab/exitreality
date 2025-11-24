@@ -687,7 +687,8 @@
 
   video.pause();
   console.log('🎬 Setup complete. On iOS, touch the screen to enable video.');
-   
+   })(); // <--- ADD THIS to close (function initScrollVideo() { ... })
+
 /*** 8) Auto-load correct scroll video based on screen size ***/
 (function initScrollVideoSource() {
   const scrollVideo = document.querySelector('.scroll-video');
@@ -740,4 +741,6 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(loadCorrectVideo, 250);
   });
-})();
+})(); // closes initScrollVideoSource()
+
+})(); // <--- ADD THIS: closes the outer (function () { ... }) at the top
