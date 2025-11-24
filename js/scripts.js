@@ -687,6 +687,57 @@
 
   video.pause();
   console.log('🎬 Setup complete. On iOS, touch the screen to enable video.');
-})();
-
+   
+/*** 8) Auto-load correct scroll video based on screen size ***/
+(function initScrollVideoSource() {
+  const scrollVideo = document.querySelector('.scroll-video');
+  if (!scrollVideo) return;
+  
+  function loadCorrectVideo() {
+    const isMobile = window.innerWidth <= 768;
+    
+    // Get the base path from the first source tag
+    const firstSource = scrollVideo.querySelector('source');
+    if (!firstSource) return;
+    
+    const originalSrc = firstSource.getAttribute('src');
+    
+    // Extract directory and base filename
+    // Example: "BEAST/beast-360-desktop.mp4" or "BEAST/beast-360W_mobile.mp4"
+    const lastSlash = originalSrc.lastIndexOf('/');
+    const directory = originalSrc.substring(0, lastSlash + 1);
+    const filename = originalSrc.substring(lastSlash + 1);
+    
+    // Construct mobile and desktop filenames
+    // Convention: filename-mobile-square.mp4 for mobile, original for desktop
+    const baseFilename = filename.replace('-desktop', '').replace('_mobile', '').replace('-mobile-square', '').replace('.mp4', '');
+    
+    const desktopSrc = directory + baseFilename + '-desktop.mp4';
+    const mobileSrc = directory + baseFilename + '-mobile-square.mp4';
+    
+    const correctSrc = isMobile ? mobileSrc : desktopSrc;
+    const currentSrc = firstSource.getAttribute('src');
+    
+    // Only reload if source needs to change
+    if (currentSrc !== correctSrc) {
+      const currentTime = scrollVideo.currentTime || 0;
+      scrollVideo.innerHTML = `<source src="${correctSrc}" type="video/mp4">`;
+      scrollVideo.load();
+      scrollVideo.currentTime = currentTime;
+    }
+  }
+  
+  // Load on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadCorrectVideo);
+  } else {
+    loadCorrectVideo();
+  }
+  
+  // Reload if window is resized
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(loadCorrectVideo, 250);
+  });
 })();
