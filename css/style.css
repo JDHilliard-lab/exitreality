@@ -884,7 +884,7 @@ transition: opacity 0.05s linear; */
 /* ===== SCROLL-DRIVEN VIDEO - MOBILE OPTIMIZED ===== */
 .scroll-video-section {
   position: relative;
-  height: 280vh;
+  height: 180vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
