@@ -586,7 +586,7 @@
   }
 
   // Only scrub through the middle of the scroll
-  const stickyStart = 0.5;
+  const stickyStart = 0.3;
   const stickyEnd   = 0.9;
 
   let ticking          = false;
