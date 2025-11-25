@@ -918,13 +918,12 @@ transition: opacity 0.05s linear; */
 }
 
 /* ===== MOBILE SCROLL VIDEO ===== */
-/* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
   /* Section just a bit taller than the square video so sticky has room,
      but not a giant empty canyon */
   .scroll-video-section {
-    height: 120vw;          /* was 160vw – tweak 130–150vw if needed */
+    height: 100vw;          /* was 160vw – tweak 130–150vw if needed */
     margin: 0;
     padding: 0;
     overflow: visible;
