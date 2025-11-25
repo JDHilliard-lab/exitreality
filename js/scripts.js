@@ -485,45 +485,46 @@
 /*** 7) Scroll-Driven Video (360° rotation effect) - iOS SAFARI FIX ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
-  const video = document.querySelector('.scroll-video');
-
-   const defaultPoster = video.getAttribute('poster') || '';
-const mobilePoster  = video.dataset.mobilePoster || defaultPoster;
-
+  const video   = document.querySelector('.scroll-video');
 
   console.log('🎬 1. Section found:', !!section);
   console.log('🎬 2. Video found:', !!video);
 
+  // Bail out cleanly on pages that don't have the scroll video
   if (!section || !video) {
-    console.error('❌ ERROR: Video or section not found!');
+    console.warn('ℹ️ Scroll-video section not found on this page – skipping scroll video init.');
     return;
   }
 
+  // Only access poster/data-* after we know video exists
+  const defaultPoster = video.getAttribute('poster') || '';
+  const mobilePoster  = video.dataset.mobilePoster || defaultPoster;
+
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isIOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-   // Update poster when screen size changes (mobile ↔ desktop)
-window.addEventListener('resize', () => {
-  const nowMobile = window.innerWidth <= 768;
-  video.setAttribute('poster', nowMobile ? mobilePoster : defaultPoster);
-});
+  // Set poster based on device
+  video.setAttribute('poster', isMobile ? mobilePoster : defaultPoster);
 
-   // Set poster based on device
-video.setAttribute('poster', isMobile ? mobilePoster : defaultPoster);
-  
+  // Update poster when screen size changes (mobile ↔ desktop)
+  window.addEventListener('resize', () => {
+    const nowMobile = window.innerWidth <= 768;
+    video.setAttribute('poster', nowMobile ? mobilePoster : defaultPoster);
+  });
+
   console.log('📱 3. Is Mobile:', isMobile);
   console.log('🍎 4. Is iOS:', isIOS);
-  console.log('📁 5. Video src:', video.querySelector('source')?.src || 'NO SOURCE');
+  console.log('📁 5. Video src:', (video.querySelector('source') && video.querySelector('source').src) || 'NO SOURCE');
 
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
-  video.muted = true;
+  video.muted       = true;
   video.playsInline = true;
-  video.preload = 'metadata'; // Changed from 'auto' for iOS
+  video.preload     = 'metadata'; // better for iOS
 
   // iOS-specific: Force load and enable seeking
-  let videoReady = false;
-  let userInteracted = false;
+  let videoReady      = false;
+  let userInteracted  = false;
 
   video.addEventListener('loadstart', () => {
     console.log('⏳ 6. Video loading started');
@@ -550,49 +551,47 @@ video.setAttribute('poster', isMobile ? mobilePoster : defaultPoster);
     console.error('Error message:', video.error?.message);
   });
 
-  // iOS Safari requires user interaction to enable seeking
-function enableIOSVideo() {
-  if (userInteracted) return;
+  function enableIOSVideo() {
+    if (userInteracted) return;
 
-  console.log('🍎 iOS: Enabling video on user interaction...');
+    console.log('🍎 iOS: Enabling video on user interaction...');
 
-  // Mark as interacted *immediately* so scroll updates are allowed
-  userInteracted = true;
+    // Mark as interacted *immediately* so scroll updates are allowed
+    userInteracted = true;
 
-  const playPromise = video.play && video.play();
-  if (playPromise && typeof playPromise.then === 'function') {
-    playPromise.then(() => {
-      video.pause();
-      video.currentTime = 0;
-      console.log('✅ iOS video enabled for seeking');
-      updateVideo(); // Update immediately after enabling
-    }).catch(err => {
-      console.log('⚠️ iOS play failed:', err.message);
-      // Even if play fails, we still allow scrolling to scrub frames
+    const playPromise = video.play && video.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.then(() => {
+        video.pause();
+        video.currentTime = 0;
+        console.log('✅ iOS video enabled for seeking');
+        updateVideo(); // Update immediately after enabling
+      }).catch(err => {
+        console.log('⚠️ iOS play failed:', err.message);
+        // Even if play fails, we still allow scrolling to scrub frames
+        updateVideo();
+      });
+    } else {
+      // Older browsers or no promise – just try to update
       updateVideo();
-    });
-  } else {
-    // Older browsers or no promise – just try to update
-    updateVideo();
+    }
   }
-}
-
 
   // Listen for ANY user interaction to enable video
-if (isIOS) {
-  const enableEvents = ['touchstart', 'touchend', 'scroll', 'click'];
-  enableEvents.forEach(eventType => {
-    document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
-  });
-}
+  if (isIOS) {
+    const enableEvents = ['touchstart', 'touchend', 'scroll', 'click'];
+    enableEvents.forEach(eventType => {
+      document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
+    });
+  }
 
-
+  // Only scrub through the middle of the scroll
   const stickyStart = 0.5;
-  const stickyEnd = 0.9;
+  const stickyEnd   = 0.9;
 
-  let ticking = false;
+  let ticking          = false;
   let scrollUpdateCount = 0;
-  let lastTime = -1;
+  let lastTime         = -1;
 
   function updateVideo() {
     // Don't update if video not ready
@@ -610,21 +609,21 @@ if (isIOS) {
       return;
     }
 
-    const rect = section.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+    const rect          = section.getBoundingClientRect();
+    const windowHeight  = window.innerHeight;
     const sectionHeight = rect.height;
-    
+
     const startScroll = windowHeight;
-    const endScroll = -sectionHeight;
+    const endScroll   = -sectionHeight;
     const scrollRange = startScroll - endScroll;
-    const currentPos = rect.top;
-    
+    const currentPos  = rect.top;
+
     let progress = (startScroll - currentPos) / scrollRange;
     progress = Math.max(0, Math.min(1, progress));
 
-    const stickyRange = stickyEnd - stickyStart;
-    let videoProgress = 0;
-    
+    const stickyRange  = stickyEnd - stickyStart;
+    let videoProgress  = 0;
+
     if (progress < stickyStart) {
       videoProgress = 0;
     } else if (progress <= stickyEnd) {
@@ -636,13 +635,13 @@ if (isIOS) {
 
     if (video.duration && !isNaN(video.duration)) {
       const newTime = videoProgress * video.duration;
-      
+
       // Only update if time changed significantly (helps iOS performance)
       if (Math.abs(newTime - lastTime) > 0.03) {
         try {
           video.currentTime = newTime;
-          lastTime = newTime;
-          
+          lastTime          = newTime;
+
           scrollUpdateCount++;
           if (scrollUpdateCount <= 5) {
             console.log(`📊 Update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
@@ -666,8 +665,8 @@ if (isIOS) {
   // Load the video
   video.load();
 
-  // Wait for video to be ready
-  const startScroll = () => {
+  // Attach scroll when video is ready
+  const startScrollHandler = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     console.log('🎬 Scroll handler attached');
     updateVideo();
@@ -676,11 +675,11 @@ if (isIOS) {
   if (video.readyState >= 1) {
     console.log('✅ Video metadata ready');
     videoReady = true;
-    startScroll();
+    startScrollHandler();
   } else {
     video.addEventListener('loadedmetadata', () => {
       videoReady = true;
-      startScroll();
+      startScrollHandler();
     }, { once: true });
 
     // Fallback
@@ -688,7 +687,7 @@ if (isIOS) {
       if (!videoReady) {
         console.warn('⚠️ Video still loading, starting anyway');
         videoReady = true;
-        startScroll();
+        startScrollHandler();
       }
     }, 2000);
   }
@@ -706,13 +705,13 @@ if (isIOS) {
         }
       });
     }, { threshold: 0.01, rootMargin: '200px' });
-    
+
     observer.observe(section);
   }
 
   video.pause();
   console.log('🎬 Setup complete. On iOS, touch the screen to enable video.');
-   })(); // <--- ADD THIS to close (function initScrollVideo() { ... })
+ })(); // <--- ADD THIS to close (function initScrollVideo() { ... })
 
 /*** 8) Auto-load correct scroll video based on screen size ***/
 (function initScrollVideoSource() {
