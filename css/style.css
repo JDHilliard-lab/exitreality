@@ -881,13 +881,14 @@ transition: opacity 0.05s linear; */
   display: none;
 }
 
-/* ===== SCROLL-DRIVEN VIDEO - MOBILE OPTIMIZED ===== */
+/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - MOBILE FIXED ===== */
 .scroll-video-section {
   position: relative;
-  height: 100vh;
+  width: 100%;
+  height: 200vh;      /* ⬅ desktop: tall section so sticky has room */
+  overflow: visible;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .scroll-video-container {
@@ -895,12 +896,12 @@ transition: opacity 0.05s linear; */
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100vh;      /* ⬅ sticky element = viewport height */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: transparent; /*transparent or #000*/
+  background: transparent;
   padding: 0;
   margin: 0;
   margin-left: calc(-50vw + 50%);
@@ -909,52 +910,45 @@ transition: opacity 0.05s linear; */
 .scroll-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;  /* For a 1:1 video in a 1:1 box, no crop, no bars */
+  object-fit: cover;
   display: block;
+  background: #000;
+  margin: 0;
+  padding: 0;
 }
 
-/* keep the next content from jumping down too far */
-.scroll-video-section + .content-section {
-  margin-top: 0 !important;
-  padding-top: 6rem;
-}
-
-.scroll-progress {
-  display: none !important;
-}
-
+/* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
-    .scroll-video-section {
-    height: 100vh;   /* height = screen width → square area */
+
+  /* Make the section tall enough for sticky to pin */
+  .scroll-video-section {
+    height: 180vh;      /* Sticky works because 180vh > 100vh */
+    overflow: visible;
+    margin: 0;
+    padding: 0;
   }
-  
+
+  /* Sticky container stays pinned while scrolling */
   .scroll-video-container {
     position: sticky;
     top: 0;
     left: 0;
-    right: 0;
     width: 100vw;
-    height: 100vw; /* Square container */
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #000;
+    height: 100vh;      /* Always fills screen */
     overflow: hidden;
+    background: #000;
+    margin: 0;
+    margin-left: calc(-50vw + 50%);
   }
-  
+
+  /* Video fills the screen */
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;  /* Since video is 1:1 and box is 1:1, it won’t crop */
+    object-fit: cover;
+    display: block;
+    background: #000;
   }
-}
-
-.parallax-section + .scroll-video-section {
-  margin-top: 0 !important;
-}
-
-.scroll-video-section + .content-section {
-  margin-top: 0 !important;
-  padding-top: 6rem;
 }
 
 /* ===== PARALLAX SECTION ===== */
