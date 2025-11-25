@@ -918,28 +918,31 @@ transition: opacity 0.05s linear; */
 }
 
 /* ===== MOBILE SCROLL VIDEO ===== */
+/* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
-  /* Section must be taller than the square video so sticky can work */
+  /* Section just a bit taller than the square video so sticky has room,
+     but not a giant empty canyon */
   .scroll-video-section {
-    height: 160vw;     /* ~1.6× square gives scroll space */
+    height: 120vw;          /* was 160vw – tweak 130–150vw if needed */
     margin: 0;
     padding: 0;
     overflow: visible;
   }
 
-  /* Sticky container is EXACTLY the video size (square) */
+  /* Sticky square, centered vertically in the viewport while pinned */
   .scroll-video-container {
     position: sticky;
-    top: 0;
+    /* Center a 100vw-tall square in the viewport */
+    top: calc(50vh - 50vw);
     left: 0;
-    width: 100vw;      /* square */
-    height: 100vw;     /* square */
+    width: 100vw;
+    height: 100vw;          /* square = same as video */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: none;  /* no black */
+    background: none;
     margin: 0;
     padding: 0;
   }
@@ -948,11 +951,12 @@ transition: opacity 0.05s linear; */
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* since box is square and video is square = ZERO cropping */
+    object-fit: cover;      /* 1:1 video in 1:1 box → no cropping/bars */
     display: block;
     background: none;
   }
 }
+
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
