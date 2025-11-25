@@ -920,34 +920,37 @@ transition: opacity 0.05s linear; */
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
-  /* Make the section tall enough for sticky to pin */
+  /* Section must be taller than the square video so sticky can work */
   .scroll-video-section {
-    height: 180vh;      /* Sticky works because 180vh > 100vh */
-    overflow: visible;
+    height: 160vw;     /* ~1.6× square gives scroll space */
     margin: 0;
     padding: 0;
+    overflow: visible;
   }
 
-  /* Sticky container stays pinned while scrolling */
+  /* Sticky container is EXACTLY the video size (square) */
   .scroll-video-container {
     position: sticky;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;      /* Always fills screen */
+    width: 100vw;      /* square */
+    height: 100vw;     /* square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
-    background: #000;
+    background: none;  /* no black */
     margin: 0;
-    margin-left: calc(-50vw + 50%);
+    padding: 0;
   }
 
-  /* Video fills the screen */
+  /* Video fills the square perfectly */
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* since box is square and video is square = ZERO cropping */
     display: block;
-    background: #000;
+    background: none;
   }
 }
 
