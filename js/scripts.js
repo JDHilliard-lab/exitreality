@@ -574,8 +574,8 @@ if (isIOS) {
 }
 
 
-  const stickyStart = 0.55;
-  const stickyEnd = 0.55;
+  const stickyStart = 0.25;
+  const stickyEnd = 0.75;
 
   let ticking = false;
   let scrollUpdateCount = 0;
