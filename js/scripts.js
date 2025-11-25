@@ -538,32 +538,44 @@
   });
 
   // iOS Safari requires user interaction to enable seeking
-  function enableIOSVideo() {
-    if (userInteracted) return;
-    
-    console.log('🍎 iOS: Enabling video on user interaction...');
-    
-    video.play().then(() => {
+function enableIOSVideo() {
+  if (userInteracted) return;
+
+  console.log('🍎 iOS: Enabling video on user interaction...');
+
+  // Mark as interacted *immediately* so scroll updates are allowed
+  userInteracted = true;
+
+  const playPromise = video.play && video.play();
+  if (playPromise && typeof playPromise.then === 'function') {
+    playPromise.then(() => {
       video.pause();
       video.currentTime = 0;
-      userInteracted = true;
       console.log('✅ iOS video enabled for seeking');
       updateVideo(); // Update immediately after enabling
     }).catch(err => {
       console.log('⚠️ iOS play failed:', err.message);
+      // Even if play fails, we still allow scrolling to scrub frames
+      updateVideo();
     });
+  } else {
+    // Older browsers or no promise – just try to update
+    updateVideo();
   }
+}
+
 
   // Listen for ANY user interaction to enable video
-  if (isIOS) {
-    const enableEvents = ['touchstart', 'touchend', 'scroll'];
-    enableEvents.forEach(eventType => {
-      document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
-    });
-  }
+if (isIOS) {
+  const enableEvents = ['touchstart', 'touchend', 'scroll', 'click'];
+  enableEvents.forEach(eventType => {
+    document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
+  });
+}
 
-  const stickyStart = 0.25;
-  const stickyEnd = 0.75;
+
+  const stickyStart = 0.6;
+  const stickyEnd = 0.4;
 
   let ticking = false;
   let scrollUpdateCount = 0;
