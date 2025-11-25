@@ -487,6 +487,10 @@
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
 
+   const defaultPoster = video.getAttribute('poster') || '';
+const mobilePoster  = video.dataset.mobilePoster || defaultPoster;
+
+
   console.log('🎬 1. Section found:', !!section);
   console.log('🎬 2. Video found:', !!video);
 
@@ -497,6 +501,15 @@
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+   // Update poster when screen size changes (mobile ↔ desktop)
+window.addEventListener('resize', () => {
+  const nowMobile = window.innerWidth <= 768;
+  video.setAttribute('poster', nowMobile ? mobilePoster : defaultPoster);
+});
+
+   // Set poster based on device
+video.setAttribute('poster', isMobile ? mobilePoster : defaultPoster);
   
   console.log('📱 3. Is Mobile:', isMobile);
   console.log('🍎 4. Is iOS:', isIOS);
@@ -574,8 +587,8 @@ if (isIOS) {
 }
 
 
-  const stickyStart = 0.25;
-  const stickyEnd = 0.75;
+  const stickyStart = 0.5;
+  const stickyEnd = 0.9;
 
   let ticking = false;
   let scrollUpdateCount = 0;
