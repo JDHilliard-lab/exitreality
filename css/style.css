@@ -922,8 +922,8 @@ transition: opacity 0.05s linear; */
 
   .scroll-video-section {
     height: auto;          /* let JS control height on mobile */
-    margin-top: -10vw;
-    margin-bottom: -10vw;
+    margin-top: 0vw;
+    margin-bottom: 0vw;
     padding: 0;
     overflow: visible;
   }
