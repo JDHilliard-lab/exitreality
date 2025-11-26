@@ -931,7 +931,7 @@ transition: opacity 0.05s linear; */
 
   /* Sticky square, centered visually while pinned */
   .scroll-video-container {
-    position: fixed; /* sticky; */
+    position: sticky; /* sticky; */
     top: calc(50vh - 50vw); /* center a 100vw-tall square in the viewport */
     left: 0;
     width: 100vw;
@@ -943,7 +943,7 @@ transition: opacity 0.05s linear; */
     padding: 0;
     overflow: hidden;
     background: none;
-    z-index: 2;
+    z-index: 1;  /* optional: lower from 2 to 1 */
   }
 
   .scroll-video {
