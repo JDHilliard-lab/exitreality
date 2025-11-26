@@ -919,40 +919,53 @@ transition: opacity 0.05s linear; */
 
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
-
   .scroll-video-section {
-    height: auto;          /* let JS control height on mobile */
-    margin-top: 0vw;
-    margin-bottom: 0vw;
+    /* Height will be set by JavaScript based on video duration */
+    height: auto;
+    min-height: 200vh;
+    position: relative;
+    margin: 0;
     padding: 0;
     overflow: visible;
   }
 
-
-  /* Sticky square, centered visually while pinned */
   .scroll-video-container {
-    position: sticky; /* sticky; */
-    top: calc(50vh - 50vw); /* center a 100vw-tall square in the viewport */
+    position: sticky;
+    /* Center the square video vertically in viewport */
+    top: calc(50vh - 50vw);
     left: 0;
     width: 100vw;
-    height: 100vw;          /* square = same as your 1:1 video */
+    height: 100vw; /* Square: same as width */
+    margin: 0 !important;
+    margin-left: calc(-50vw + 50%) !important;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background: none;
-    z-index: 1;  /* optional: lower from 2 to 1 */
   }
 
   .scroll-video {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* 1:1 video in 1:1 box → no bars */
+    object-fit: cover; /* 1:1 video fills 1:1 container perfectly */
     display: block;
-    background: none;
+    margin: 0;
+    padding: 0;
+    background: #000;
   }
+}
+
+/* Ensure no extra spacing between sections */
+.parallax-section + .scroll-video-section {
+  margin-top: 0 !important;
+}
+
+.scroll-video-section + .content-section {
+  margin-top: 0 !important;
+  padding-top: 6rem;
 }
 
 /* ===== PARALLAX SECTION ===== */
