@@ -512,9 +512,37 @@
     video.setAttribute('poster', nowMobile ? mobilePoster : defaultPoster);
   });
 
+  // 🔹 MOBILE: use video length to control sticky scroll height
+  function updateMobileSectionHeight() {
+    if (!isMobile) return;
+
+    const duration = video.duration || 10;  // fallback if metadata is slow
+
+    // Tunable scroll-feel settings for mobile
+    const perSecondVw = 12;   // how much scroll (vw) per second of video
+    const squareVw    = 100;  // the square video itself (100vw)
+    const minFactor   = 1.5;  // minimum height = 1.5 × square height
+
+    const extraVw  = duration * perSecondVw;    // extra scroll room
+    const totalVw  = squareVw + extraVw;        // video + extra area
+    const heightVw = Math.max(totalVw, squareVw * minFactor);
+
+    section.style.height = `${heightVw}vw`;
+    console.log(
+      '📏 Mobile sticky height set to',
+      heightVw + 'vw',
+      'for duration',
+      duration,
+      's'
+    );
+  }
+
   console.log('📱 3. Is Mobile:', isMobile);
   console.log('🍎 4. Is iOS:', isIOS);
-  console.log('📁 5. Video src:', (video.querySelector('source') && video.querySelector('source').src) || 'NO SOURCE');
+  console.log(
+    '📁 5. Video src:',
+    (video.querySelector('source') && video.querySelector('source').src) || 'NO SOURCE'
+  );
 
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
@@ -533,6 +561,9 @@
   video.addEventListener('loadedmetadata', () => {
     console.log('✅ 7. Metadata loaded - Duration:', video.duration);
     videoReady = true;
+
+    // 👉 set mobile height based on video length
+    updateMobileSectionHeight();
   });
 
   video.addEventListener('loadeddata', () => {
@@ -589,9 +620,9 @@
   const stickyStart = 0.25;
   const stickyEnd   = 0.75;
 
-  let ticking          = false;
+  let ticking           = false;
   let scrollUpdateCount = 0;
-  let lastTime         = -1;
+  let lastTime          = -1;
 
   function updateVideo() {
     // Don't update if video not ready
@@ -644,7 +675,9 @@
 
           scrollUpdateCount++;
           if (scrollUpdateCount <= 5) {
-            console.log(`📊 Update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
+            console.log(
+              `📊 Update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`
+            );
           }
         } catch (e) {
           console.error('❌ Error setting currentTime:', e);
@@ -679,6 +712,9 @@
   } else {
     video.addEventListener('loadedmetadata', () => {
       videoReady = true;
+
+      // ensure mobile height is set before we start scrolling
+      updateMobileSectionHeight();
       startScrollHandler();
     }, { once: true });
 
@@ -687,6 +723,9 @@
       if (!videoReady) {
         console.warn('⚠️ Video still loading, starting anyway');
         videoReady = true;
+
+        // best effort: set height even if duration was late
+        updateMobileSectionHeight();
         startScrollHandler();
       }
     }, 2000);
@@ -711,7 +750,8 @@
 
   video.pause();
   console.log('🎬 Setup complete. On iOS, touch the screen to enable video.');
- })(); // <--- ADD THIS to close (function initScrollVideo() { ... })
+})(); // closes initScrollVideo
+
 
 /*** 8) Auto-load correct scroll video based on screen size ***/
 (function initScrollVideoSource() {
