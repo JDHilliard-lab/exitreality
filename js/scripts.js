@@ -519,9 +519,9 @@
     const duration = video.duration || 10;  // fallback if metadata is slow
 
     // Tunable scroll-feel settings for mobile
-    const perSecondVw = 12;   // how much scroll (vw) per second of video
+    const perSecondVw = 8;   // how much scroll (vw) per second of video
     const squareVw    = 100;  // the square video itself (100vw)
-    const minFactor   = 1.5;  // minimum height = 1.5 × square height
+    const minFactor   = 1.2;  // minimum height = 1.5 × square height
 
     const extraVw  = duration * perSecondVw;    // extra scroll room
     const totalVw  = squareVw + extraVw;        // video + extra area
