@@ -920,23 +920,22 @@ transition: opacity 0.05s linear; */
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
-  /* Section slightly taller than the square so sticky has room,
-     and overlap above/below so it feels integrated, not like a big extra block */
+  /* JS will set the actual height based on video length */
   .scroll-video-section {
-    height: 100vw;          /* 100vw for the square + ~40vw of scroll room */
-    margin-top: -10vw;      /* overlap into the parallax above */
-    margin-bottom: -10vw;   /* overlap into the "Image to 3D" section below */
+    height: auto;         /* let JS decide */
+    margin-top: 0;
+    margin-bottom: 0;
     padding: 0;
     overflow: visible;
   }
 
-  /* Sticky square, centered in the viewport while pinned */
+  /* Sticky square, centered visually while pinned */
   .scroll-video-container {
     position: sticky;
     top: calc(50vh - 50vw); /* center a 100vw-tall square in the viewport */
     left: 0;
     width: 100vw;
-    height: 100vw;          /* square same as video */
+    height: 100vw;          /* square = same as your 1:1 video */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -944,19 +943,17 @@ transition: opacity 0.05s linear; */
     padding: 0;
     overflow: hidden;
     background: none;
-    z-index: 2;             /* sit above neighbors slightly */
+    z-index: 2;
   }
 
-  /* Video fills the square perfectly */
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* 1:1 video in 1:1 box → no crop/bars */
+    object-fit: cover;      /* 1:1 video in 1:1 box → no bars */
     display: block;
     background: none;
   }
 }
-
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
