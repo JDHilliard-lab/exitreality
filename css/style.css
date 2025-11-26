@@ -920,14 +920,14 @@ transition: opacity 0.05s linear; */
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
-  /* JS will set the actual height based on video length */
   .scroll-video-section {
-    height: auto;         /* let JS decide */
-    margin-top: 0;
-    margin-bottom: 0;
+    height: auto;          /* let JS control height on mobile */
+    margin-top: -10vw;
+    margin-bottom: -10vw;
     padding: 0;
     overflow: visible;
   }
+
 
   /* Sticky square, centered visually while pinned */
   .scroll-video-container {
