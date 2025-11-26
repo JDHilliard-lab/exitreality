@@ -923,7 +923,7 @@ transition: opacity 0.05s linear; */
   /* Section slightly taller than the square so sticky has room,
      and overlap above/below so it feels integrated, not like a big extra block */
   .scroll-video-section {
-    height: 140vw;          /* 100vw for the square + ~40vw of scroll room */
+    height: 100vw;          /* 100vw for the square + ~40vw of scroll room */
     margin-top: -10vw;      /* overlap into the parallax above */
     margin-bottom: -10vw;   /* overlap into the "Image to 3D" section below */
     padding: 0;
