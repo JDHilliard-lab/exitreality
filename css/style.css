@@ -923,7 +923,7 @@ transition: opacity 0.05s linear; */
     position: relative;
     width: 100%;
     /* Tall section to give scroll room - video stays centered */
-    height: 250vh;
+    height: 100vh;
     margin: 0;
     padding: 0;
     overflow: visible;
