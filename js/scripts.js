@@ -482,20 +482,16 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video - SIMPLIFIED & FIXED ***/
+/*** 7) Scroll-Driven Video - CLEAN VERSION (NO FALL) ***/
 (function initScrollVideo() {
   const section = document.querySelector('.scroll-video-section');
   const video = document.querySelector('.scroll-video');
 
-  if (!section || !video) {
-    console.warn('ℹ️ Scroll-video section not found');
-    return;
-  }
+  if (!section || !video) return;
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // Setup video attributes
   video.setAttribute('playsinline', '');
   video.setAttribute('webkit-playsinline', '');
   video.muted = true;
@@ -505,62 +501,35 @@
   let videoReady = false;
   let userInteracted = false;
 
-  // Set mobile section height based on video duration
-  function setMobileHeight() {
-    if (!isMobile || !video.duration) return;
-    
-    const duration = video.duration;
-    const scrollPerSecond = 15; // vw units of scroll per second of video
-    const videoHeight = 100; // 100vw (square video)
-    const scrollHeight = duration * scrollPerSecond;
-    const totalHeight = videoHeight + scrollHeight;
-    
-    section.style.height = `${totalHeight}vw`;
-    console.log(`📐 Mobile height: ${totalHeight}vw for ${duration}s video`);
-  }
-
-  // iOS requires user interaction to enable seeking
+  // iOS enabler
   function enableIOSVideo() {
     if (userInteracted) return;
     userInteracted = true;
-
     video.play().then(() => {
       video.pause();
       video.currentTime = 0;
-      console.log('✅ iOS video enabled');
-      updateVideo();
-    }).catch(() => {
-      updateVideo();
-    });
+    }).catch(() => {});
   }
 
   if (isIOS) {
-    ['touchstart', 'touchend', 'scroll'].forEach(evt => {
+    ['touchstart', 'scroll'].forEach(evt => {
       document.addEventListener(evt, enableIOSVideo, { once: true, passive: true });
     });
   }
 
   video.addEventListener('loadedmetadata', () => {
     videoReady = true;
-    setMobileHeight();
-    console.log('✅ Video ready:', video.duration + 's');
   });
 
-  // Scroll behavior configuration
-  const config = {
-    startPlay: 0.3,   // Start playing at 30% scroll through section
-    endPlay: 0.8      // Finish playing at 80% scroll through section
-  };
+  video.addEventListener('loadeddata', () => {
+    videoReady = true;
+  });
 
+  // Simple scroll progress
   let ticking = false;
 
   function updateVideo() {
-    if (!videoReady) {
-      ticking = false;
-      return;
-    }
-
-    if (isIOS && !userInteracted) {
+    if (!videoReady || (isIOS && !userInteracted)) {
       ticking = false;
       return;
     }
@@ -569,36 +538,30 @@
     const windowHeight = window.innerHeight;
     const sectionHeight = rect.height;
 
-    // Calculate scroll progress through section (0 = top entering, 1 = bottom exiting)
-    const enterPoint = windowHeight;
-    const exitPoint = -sectionHeight;
-    const scrollRange = enterPoint - exitPoint;
-    let progress = (enterPoint - rect.top) / scrollRange;
+    // Progress: 0 when section top enters viewport, 1 when section bottom exits
+    const start = windowHeight;
+    const end = -sectionHeight;
+    const range = start - end;
+    let progress = (start - rect.top) / range;
     progress = Math.max(0, Math.min(1, progress));
 
-    // Map scroll progress to video progress
+    // Video only plays in middle portion of scroll
+    const playStart = 0.25; // Start playing at 25%
+    const playEnd = 0.75;   // Stop playing at 75%
+    const playRange = playEnd - playStart;
+
     let videoProgress = 0;
     
-    if (progress < config.startPlay) {
-      // Before start: video at beginning
-      videoProgress = 0;
-    } else if (progress <= config.endPlay) {
-      // During play: scrub through video
-      const playRange = config.endPlay - config.startPlay;
-      videoProgress = (progress - config.startPlay) / playRange;
+    if (progress < playStart) {
+      videoProgress = 0; // Before: stay at start
+    } else if (progress <= playEnd) {
+      videoProgress = (progress - playStart) / playRange; // During: scrub
     } else {
-      // After end: video at end
-      videoProgress = 1;
+      videoProgress = 1; // After: stay at end
     }
 
     if (video.duration && !isNaN(video.duration)) {
-      const newTime = videoProgress * video.duration;
-      
-      try {
-        video.currentTime = newTime;
-      } catch (e) {
-        console.warn('Seek error:', e);
-      }
+      video.currentTime = videoProgress * video.duration;
     }
 
     ticking = false;
@@ -613,36 +576,15 @@
 
   // Initialize
   video.load();
-
-  if (video.readyState >= 1) {
+  
+  video.addEventListener('canplay', () => {
     videoReady = true;
-    setMobileHeight();
-  }
-
-  video.addEventListener('loadedmetadata', () => {
-    videoReady = true;
-    setMobileHeight();
   }, { once: true });
 
-  // Start scroll handler
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // Lazy load when near
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          video.load();
-        }
-      });
-    }, { rootMargin: '200px' });
-    observer.observe(section);
-  }
-
   video.pause();
-  console.log('🎬 Scroll video initialized');
 })();
-
 
 /*** 8) Auto-load correct scroll video based on screen size ***/
 (function initScrollVideoSource() {
