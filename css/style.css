@@ -920,37 +920,38 @@ transition: opacity 0.05s linear; */
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
 
-  /* Section just a bit taller than the square video so sticky has room,
-     but not a giant empty canyon */
+  /* Section slightly taller than the square so sticky has room,
+     and overlap above/below so it feels integrated, not like a big extra block */
   .scroll-video-section {
-    height: 110vw;          /* was 160vw – tweak 130–150vw if needed */
-    margin: 0;
+    height: 140vw;          /* 100vw for the square + ~40vw of scroll room */
+    margin-top: -10vw;      /* overlap into the parallax above */
+    margin-bottom: -10vw;   /* overlap into the "Image to 3D" section below */
     padding: 0;
     overflow: visible;
   }
 
-  /* Sticky square, centered vertically in the viewport while pinned */
+  /* Sticky square, centered in the viewport while pinned */
   .scroll-video-container {
     position: sticky;
-    /* Center a 100vw-tall square in the viewport */
-    top: calc(50vh - 50vw);
+    top: calc(50vh - 50vw); /* center a 100vw-tall square in the viewport */
     left: 0;
     width: 100vw;
-    height: 100vw;          /* square = same as video */
+    height: 100vw;          /* square same as video */
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    background: none;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+    background: none;
+    z-index: 2;             /* sit above neighbors slightly */
   }
 
   /* Video fills the square perfectly */
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* 1:1 video in 1:1 box → no cropping/bars */
+    object-fit: cover;      /* 1:1 video in 1:1 box → no crop/bars */
     display: block;
     background: none;
   }
