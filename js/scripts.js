@@ -249,304 +249,325 @@
     smoothScrollToId(id);
   });
 
- /*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
-  function initSlideshows() {
-    document.querySelectorAll('.slideshow').forEach(function (root) {
-      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-      const prevBtn = root.querySelector('.slideshow__arrow--prev');
-      const nextBtn = root.querySelector('.slideshow__arrow--next');
-      if (!slides.length) return;
+/*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
+function initSlideshows() {
+  document.querySelectorAll('.slideshow').forEach(function (root) {
+    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+    const prevBtn = root.querySelector('.slideshow__arrow--prev');
+    const nextBtn = root.querySelector('.slideshow__arrow--next');
+    if (!slides.length) return;
 
-      const isSlide = root.classList.contains('slideshow--slide');
+    const isSlide = root.classList.contains('slideshow--slide');
 
-      if (isSlide) {
-        initPhysicsDrag(root, slides, prevBtn, nextBtn);
-        return;
-      }
+    // For slideshow--slide variant, use physics drag
+    if (isSlide) {
+      initPhysicsDrag(root, slides, prevBtn, nextBtn);
+      return; // Exit early - physics drag handles everything
+    }
 
-      // Regular fade slideshow
-      let index = slides.findIndex(s => s.classList.contains('active'));
-      if (index < 0) {
-        index = 0;
-        slides[0].classList.add('active');
-      }
+    // Regular fade slideshow (non-slide variant)
+    let index = slides.findIndex(s => s.classList.contains('active'));
+    if (index < 0) {
+      index = 0;
+      slides[0].classList.add('active');
+    }
 
-      function show(nextIndex) {
-        nextIndex = (nextIndex + slides.length) % slides.length;
-        if (nextIndex === index) return;
+    function show(nextIndex) {
+      nextIndex = (nextIndex + slides.length) % slides.length;
+      if (nextIndex === index) return;
 
-        slides[index].classList.remove('active');
-        index = nextIndex;
-        slides[index].classList.add('active');
-      }
+      slides[index].classList.remove('active');
+      index = nextIndex;
+      slides[index].classList.add('active');
+    }
 
-      if (prevBtn) prevBtn.addEventListener('click', () => show(index - 1));
-      if (nextBtn) nextBtn.addEventListener('click', () => show(index + 1));
+    if (prevBtn) prevBtn.addEventListener('click', () => show(index - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => show(index + 1));
 
-      root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(index - 1);
-        if (e.key === 'ArrowRight') show(index + 1);
-      });
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
 
-      const autoplayMs = 6000;
-      let timer = setInterval(() => show(index + 1), autoplayMs);
-      root.addEventListener('mouseenter', () => clearInterval(timer));
-      root.addEventListener('mouseleave', () => {
-        timer = setInterval(() => show(index + 1), autoplayMs);
-      });
+    // Autoplay
+    const autoplayMs = 6000;
+    let timer = setInterval(() => show(index + 1), autoplayMs);
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', () => {
+      timer = setInterval(() => show(index + 1), autoplayMs);
+    });
+  });
+}
+
+/*** Physics-Based Slideshow Drag ***/
+function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+  let currentIndex = slides.findIndex(s => s.classList.contains('active'));
+  if (currentIndex < 0) currentIndex = 0;
+
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let dragOffset = 0;
+  let velocity = 0;
+  let lastX = 0;
+  let lastTime = 0;
+  let animationFrame = null;
+  let autoplayTimer = null;
+
+  // Position slides
+  function updatePositions(animated = true) {
+    slides.forEach((slide, idx) => {
+      const offset = (idx - currentIndex) * 100 + dragOffset;
+      slide.style.transition = animated ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+      slide.style.transform = `translate3d(${offset}%, 0, 0)`;
+      slide.style.webkitTransform = `translate3d(${offset}%, 0, 0)`;
     });
   }
 
-  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
-    let currentIndex = slides.findIndex(s => s.classList.contains('active'));
-    if (currentIndex < 0) currentIndex = 0;
+  // Physics animation with friction
+  function animate() {
+    if (!isDragging && Math.abs(velocity) > 0.1) {
+      dragOffset += velocity;
+      velocity *= 0.92; // Friction
 
-    let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
-    let dragOffset = 0;
-    let velocity = 0;
-    let lastX = 0;
-    let lastTime = 0;
-    let animationFrame = null;
-    let autoplayTimer = null;
-    let isInteracting = false;
-
-    function updatePositions(animated = true) {
-      slides.forEach((slide, idx) => {
-        const offset = (idx - currentIndex) * 100 + dragOffset;
-        slide.style.transition = animated ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
-        slide.style.transform = `translate3d(${offset}%, 0, 0)`;
-        slide.style.webkitTransform = `translate3d(${offset}%, 0, 0)`;
-      });
-    }
-
-    function animate() {
-      if (!isDragging && Math.abs(velocity) > 0.1) {
-        dragOffset += velocity;
-        velocity *= 0.92;
-
-        const threshold = 30;
-        
-        if (Math.abs(dragOffset) > threshold) {
-          if (dragOffset > 0 && currentIndex > 0) {
-            goToSlide(currentIndex - 1);
-            return;
-          } else if (dragOffset < 0 && currentIndex < slides.length - 1) {
-            goToSlide(currentIndex + 1);
-            return;
-          }
+      const threshold = 30;
+      
+      if (Math.abs(dragOffset) > threshold) {
+        if (dragOffset > 0 && currentIndex > 0) {
+          goToSlide(currentIndex - 1);
+          return;
+        } else if (dragOffset < 0 && currentIndex < slides.length - 1) {
+          goToSlide(currentIndex + 1);
+          return;
         }
-
-        updatePositions(false);
-        animationFrame = requestAnimationFrame(animate);
-      } else if (!isDragging && dragOffset !== 0) {
-        dragOffset = 0;
-        velocity = 0;
-        updatePositions(true);
-      }
-    }
-
-    function goToSlide(newIndex) {
-      if (newIndex < 0 || newIndex >= slides.length) {
-        dragOffset = 0;
-        velocity = 0;
-        updatePositions(true);
-        return;
       }
 
-      slides[currentIndex].classList.remove('active');
-      currentIndex = newIndex;
-      slides[currentIndex].classList.add('active');
+      updatePositions(false);
+      animationFrame = requestAnimationFrame(animate);
+    } else if (!isDragging && dragOffset !== 0) {
       dragOffset = 0;
       velocity = 0;
       updatePositions(true);
-
-      if (prevBtn) prevBtn.disabled = (currentIndex === 0);
-      if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
     }
-
-    function startAutoplay() {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      
-      let direction = 1;
-      autoplayTimer = setInterval(() => {
-        if (isInteracting) return;
-        
-        if (currentIndex === slides.length - 1) direction = -1;
-        if (currentIndex === 0) direction = 1;
-        goToSlide(currentIndex + direction);
-      }, 4000);
-    }
-
-    function pauseAutoplay() {
-      isInteracting = true;
-    }
-
-    function resumeAutoplay() {
-      isInteracting = false;
-    }
-
-    function onMouseDown(e) {
-      if (e.target.classList.contains('slideshow__arrow')) return;
-
-      pauseAutoplay();
-      isDragging = true;
-      startX = e.clientX;
-      currentX = e.clientX;
-      lastX = e.clientX;
-      lastTime = Date.now();
-      velocity = 0;
-      
-      root.style.cursor = 'grabbing';
-      
-      if (animationFrame) cancelAnimationFrame(animationFrame);
-
-      e.preventDefault();
-    }
-
-    function onMouseMove(e) {
-      if (!isDragging) return;
-
-      currentX = e.clientX;
-      const deltaX = currentX - startX;
-      const now = Date.now();
-      const deltaTime = now - lastTime;
-
-      if (deltaTime > 0) {
-        const deltaMove = currentX - lastX;
-        velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
-      }
-
-      lastX = currentX;
-      lastTime = now;
-
-      dragOffset = (deltaX / root.offsetWidth) * 100;
-      
-      if (currentIndex === 0 && dragOffset > 0) {
-        dragOffset *= 0.3;
-      } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
-        dragOffset *= 0.3;
-      }
-
-      updatePositions(false);
-    }
-
-    function onMouseUp(e) {
-      if (!isDragging) return;
-
-      isDragging = false;
-      root.style.cursor = 'grab';
-      animationFrame = requestAnimationFrame(animate);
-      
-      setTimeout(() => {
-        resumeAutoplay();
-      }, 700);
-    }
-
-    function onTouchStart(e) {
-      pauseAutoplay();
-      isDragging = true;
-      const touch = e.touches[0];
-      startX = touch.clientX;
-      currentX = touch.clientX;
-      lastX = touch.clientX;
-      lastTime = Date.now();
-      velocity = 0;
-
-      if (animationFrame) cancelAnimationFrame(animationFrame);
-    }
-
-    function onTouchMove(e) {
-      if (!isDragging) return;
-
-      const touch = e.touches[0];
-      currentX = touch.clientX;
-      const deltaX = currentX - startX;
-      const now = Date.now();
-      const deltaTime = now - lastTime;
-
-      if (deltaTime > 0) {
-        const deltaMove = currentX - lastX;
-        velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
-      }
-
-      lastX = currentX;
-      lastTime = now;
-
-      dragOffset = (deltaX / root.offsetWidth) * 100;
-
-      if (currentIndex === 0 && dragOffset > 0) {
-        dragOffset *= 0.3;
-      } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
-        dragOffset *= 0.3;
-      }
-
-      updatePositions(false);
-    }
-
-    function onTouchEnd(e) {
-      if (!isDragging) return;
-
-      isDragging = false;
-      animationFrame = requestAnimationFrame(animate);
-      
-      setTimeout(() => {
-        resumeAutoplay();
-      }, 700);
-    }
-
-    root.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    
-    root.addEventListener('touchstart', onTouchStart, { passive: true });
-    root.addEventListener('touchmove', onTouchMove, { passive: true });
-    root.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    root.addEventListener('mouseenter', pauseAutoplay);
-    root.addEventListener('mouseleave', resumeAutoplay);
-
-    if (prevBtn) {
-      prevBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        pauseAutoplay();
-        goToSlide(currentIndex - 1);
-        setTimeout(resumeAutoplay, 1000);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        pauseAutoplay();
-        goToSlide(currentIndex + 1);
-        setTimeout(resumeAutoplay, 1000);
-      });
-    }
-
-    root.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        pauseAutoplay();
-        goToSlide(currentIndex - 1);
-        setTimeout(resumeAutoplay, 1000);
-      }
-      if (e.key === 'ArrowRight') {
-        pauseAutoplay();
-        goToSlide(currentIndex + 1);
-        setTimeout(resumeAutoplay, 1000);
-      }
-    });
-
-    root.style.cursor = 'grab';
-    updatePositions(false);
-    
-    if (prevBtn) prevBtn.disabled = (currentIndex === 0);
-    if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
-    
-    startAutoplay();
   }
 
+  function goToSlide(newIndex) {
+    if (newIndex < 0 || newIndex >= slides.length) {
+      dragOffset = 0;
+      velocity = 0;
+      updatePositions(true);
+      return;
+    }
+
+    slides[currentIndex].classList.remove('active');
+    currentIndex = newIndex;
+    slides[currentIndex].classList.add('active');
+    dragOffset = 0;
+    velocity = 0;
+    updatePositions(true);
+
+    if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+    if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
+  }
+
+  // DESKTOP: Mouse drag
+  function onMouseDown(e) {
+    if (e.target.classList.contains('slideshow__arrow')) return;
+
+    pauseAutoplay(); // Pause autoplay while dragging
+    isDragging = true;
+    startX = e.clientX;
+    currentX = e.clientX;
+    lastX = e.clientX;
+    lastTime = Date.now();
+    velocity = 0;
+    
+    root.style.cursor = 'grabbing';
+    
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+
+    e.preventDefault();
+  }
+
+  function onMouseMove(e) {
+    if (!isDragging) return;
+
+    currentX = e.clientX;
+    const deltaX = currentX - startX;
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+
+    if (deltaTime > 0) {
+      const deltaMove = currentX - lastX;
+      velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+    }
+
+    lastX = currentX;
+    lastTime = now;
+
+    dragOffset = (deltaX / root.offsetWidth) * 100;
+    
+    // Edge resistance
+    if (currentIndex === 0 && dragOffset > 0) {
+      dragOffset *= 0.3;
+    } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+      dragOffset *= 0.3;
+    }
+
+    updatePositions(false);
+  }
+
+  function onMouseUp(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    root.style.cursor = 'grab';
+    animationFrame = requestAnimationFrame(animate);
+    
+    // Resume autoplay after a short delay (after throw animation settles)
+    setTimeout(() => {
+      resumeAutoplay();
+    }, 700);
+  }
+
+  // MOBILE: Touch drag
+  function onTouchStart(e) {
+    pauseAutoplay(); // Pause autoplay while touching
+    isDragging = true;
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    currentX = touch.clientX;
+    lastX = touch.clientX;
+    lastTime = Date.now();
+    velocity = 0;
+
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+  }
+
+  function onTouchMove(e) {
+    if (!isDragging) return;
+
+    const touch = e.touches[0];
+    currentX = touch.clientX;
+    const deltaX = currentX - startX;
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+
+    if (deltaTime > 0) {
+      const deltaMove = currentX - lastX;
+      velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+    }
+
+    lastX = currentX;
+    lastTime = now;
+
+    dragOffset = (deltaX / root.offsetWidth) * 100;
+
+    if (currentIndex === 0 && dragOffset > 0) {
+      dragOffset *= 0.3;
+    } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+      dragOffset *= 0.3;
+    }
+
+    updatePositions(false);
+  }
+
+  function onTouchEnd(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    animationFrame = requestAnimationFrame(animate);
+    
+    // Resume autoplay after throw animation settles
+    setTimeout(() => {
+      resumeAutoplay();
+    }, 700);
+  }
+
+  // Autoplay - runs constantly but pauses during interaction
+  let autoplayTimer = null;
+  let isInteracting = false;
+
+  function startAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+    
+    let direction = 1;
+    autoplayTimer = setInterval(() => {
+      // Don't autoplay if user is actively interacting
+      if (isInteracting) return;
+      
+      if (currentIndex === slides.length - 1) direction = -1;
+      if (currentIndex === 0) direction = 1;
+      goToSlide(currentIndex + direction);
+    }, 4000);
+  }
+
+  function pauseAutoplay() {
+    isInteracting = true;
+  }
+
+  function resumeAutoplay() {
+    isInteracting = false;
+  }
+
+  // Event listeners
+  root.addEventListener('mousedown', onMouseDown);
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+  
+  root.addEventListener('touchstart', onTouchStart, { passive: true });
+  root.addEventListener('touchmove', onTouchMove, { passive: true });
+  root.addEventListener('touchend', onTouchEnd, { passive: true });
+
+  // Pause autoplay on hover, resume on leave
+  root.addEventListener('mouseenter', pauseAutoplay);
+  root.addEventListener('mouseleave', resumeAutoplay);
+
+  // Arrow buttons
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAutoplay();
+      goToSlide(currentIndex - 1);
+      // Resume after a moment
+      setTimeout(resumeAutoplay, 1000);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pauseAutoplay();
+      goToSlide(currentIndex + 1);
+      // Resume after a moment
+      setTimeout(resumeAutoplay, 1000);
+    });
+  }
+
+  // Keyboard
+  root.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      pauseAutoplay();
+      goToSlide(currentIndex - 1);
+      setTimeout(resumeAutoplay, 1000);
+    }
+    if (e.key === 'ArrowRight') {
+      pauseAutoplay();
+      goToSlide(currentIndex + 1);
+      setTimeout(resumeAutoplay, 1000);
+    }
+  });
+
+  // Initial setup
+  root.style.cursor = 'grab';
+  updatePositions(false);
+  
+  if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+  if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
+  
+  // Start autoplay immediately
+  startAutoplay();
+}
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
   /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
