@@ -249,193 +249,292 @@
     smoothScrollToId(id);
   });
 
-  /*** 5) Global Slideshow Support (fade + slide variant) with Desktop Drag ***/
-  function initSlideshows() {
-    document.querySelectorAll('.slideshow').forEach(function (root) {
-      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-      const prevBtn = root.querySelector('.slideshow__arrow--prev');
-      const nextBtn = root.querySelector('.slideshow__arrow--next');
-      if (!slides.length) return;
+ /*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
+function initSlideshows() {
+  document.querySelectorAll('.slideshow').forEach(function (root) {
+    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+    const prevBtn = root.querySelector('.slideshow__arrow--prev');
+    const nextBtn = root.querySelector('.slideshow__arrow--next');
+    if (!slides.length) return;
 
-      const isSlide = root.classList.contains('slideshow--slide');
+    const isSlide = root.classList.contains('slideshow--slide');
 
-      let index = slides.findIndex(s => s.classList.contains('active'));
-      if (index < 0) {
-        index = 0;
-        slides[0].classList.add('active');
-      }
+    // For slideshow--slide variant, use physics drag
+    if (isSlide) {
+      initPhysicsDrag(root, slides, prevBtn, nextBtn);
+      return; // Exit early - physics drag handles everything
+    }
 
-      function layout() {
-        if (!isSlide) return;
+    // Regular fade slideshow (non-slide variant)
+    let index = slides.findIndex(s => s.classList.contains('active'));
+    if (index < 0) {
+      index = 0;
+      slides[0].classList.add('active');
+    }
 
-        slides.forEach(function (slide, idx) {
-          const offset = idx - index;
-          slide.style.transform = `translate3d(${offset * 100}%, 0, 0)`;
-          slide.style.webkitTransform = `translate3d(${offset * 100}%, 0, 0)`;
-        });
-      }
+    function show(nextIndex) {
+      nextIndex = (nextIndex + slides.length) % slides.length;
+      if (nextIndex === index) return;
 
-      function updateArrows() {
-        if (!isSlide) return;
-        if (prevBtn) prevBtn.disabled = (index === 0);
-        if (nextBtn) nextBtn.disabled = (index === slides.length - 1);
-      }
+      slides[index].classList.remove('active');
+      index = nextIndex;
+      slides[index].classList.add('active');
+    }
 
-      function show(nextIndex) {
-        if (isSlide) {
-          if (nextIndex < 0 || nextIndex >= slides.length) return;
-        } else {
-          nextIndex = (nextIndex + slides.length) % slides.length;
-        }
+    if (prevBtn) prevBtn.addEventListener('click', () => show(index - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => show(index + 1));
 
-        if (nextIndex === index) return;
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
 
-        slides[index].classList.remove('active');
-        index = nextIndex;
-        slides[index].classList.add('active');
+    // Autoplay
+    const autoplayMs = 6000;
+    let timer = setInterval(() => show(index + 1), autoplayMs);
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', () => {
+      timer = setInterval(() => show(index + 1), autoplayMs);
+    });
+  });
+}
 
-        layout();
-        updateArrows();
-      }
+/*** Physics-Based Slideshow Drag ***/
+function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+  let currentIndex = slides.findIndex(s => s.classList.contains('active'));
+  if (currentIndex < 0) currentIndex = 0;
 
-      if (isSlide) {
-        let direction = 1;
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let dragOffset = 0;
+  let velocity = 0;
+  let lastX = 0;
+  let lastTime = 0;
+  let animationFrame = null;
+  let autoplayTimer = null;
 
-        let autoTimer = setInterval(function () {
-          if (index === slides.length - 1) direction = -1;
-          if (index === 0) direction = 1;
-          show(index + direction);
-        }, 4000);
-
-        root.addEventListener('mouseenter', function () {
-          clearInterval(autoTimer);
-        });
-
-        root.addEventListener('mouseleave', function () {
-          autoTimer = setInterval(function () {
-            if (index === slides.length - 1) direction = -1;
-            if (index === 0) direction = 1;
-            show(index + direction);
-          }, 4000);
-        });
-      }
-
-      layout();
-      updateArrows();
-
-      if (prevBtn) {
-        prevBtn.addEventListener('click', () => show(index - 1));
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener('click', () => show(index + 1));
-      }
-
-      root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(index - 1);
-        if (e.key === 'ArrowRight') show(index + 1);
-      });
-
-      if (!isSlide) {
-        const autoplayMs = 6000;
-        let timer = setInterval(() => show(index + 1), autoplayMs);
-
-        root.addEventListener('mouseenter', () => clearInterval(timer));
-        root.addEventListener('mouseleave', () => {
-          timer = setInterval(() => show(index + 1), autoplayMs);
-        });
-      }
-
-      if (isSlide) {
-        // ===== MOBILE TOUCH SWIPE =====
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        root.addEventListener('touchstart', function(e) {
-          touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-        
-        root.addEventListener('touchend', function(e) {
-          touchEndX = e.changedTouches[0].screenX;
-          handleSwipe();
-        }, { passive: true });
-        
-        function handleSwipe() {
-          const swipeThreshold = 50;
-          const diff = touchStartX - touchEndX;
-          
-          if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0) {
-              if (nextBtn && !nextBtn.disabled) {
-                show(index + 1);
-              }
-            } else {
-              if (prevBtn && !prevBtn.disabled) {
-                show(index - 1);
-              }
-            }
-          }
-        }
-
-        // ===== DESKTOP MOUSE DRAG =====
-        let isDragging = false;
-        let dragStartX = 0;
-        let dragCurrentX = 0;
-        let dragThreshold = 50;
-
-        root.addEventListener('mousedown', function(e) {
-          if (e.target.classList.contains('slideshow__arrow') || 
-              e.target.classList.contains('slideshow__arrow--prev') ||
-              e.target.classList.contains('slideshow__arrow--next')) {
-            return;
-          }
-
-          isDragging = true;
-          dragStartX = e.clientX;
-          dragCurrentX = e.clientX;
-          root.style.cursor = 'grabbing';
-          e.preventDefault();
-        });
-
-        window.addEventListener('mousemove', function(e) {
-          if (!isDragging) return;
-          dragCurrentX = e.clientX;
-        });
-
-        window.addEventListener('mouseup', function(e) {
-          if (!isDragging) return;
-
-          const dragDistance = dragCurrentX - dragStartX;
-
-          if (Math.abs(dragDistance) > dragThreshold) {
-            if (dragDistance > 0) {
-              if (prevBtn && !prevBtn.disabled) {
-                show(index - 1);
-              }
-            } else {
-              if (nextBtn && !nextBtn.disabled) {
-                show(index + 1);
-              }
-            }
-          }
-
-          isDragging = false;
-          root.style.cursor = 'grab';
-        });
-
-        root.style.cursor = 'grab';
-
-        root.addEventListener('mouseleave', function() {
-          if (isDragging) {
-            isDragging = false;
-            root.style.cursor = 'grab';
-          }
-        });
-      }
+  // Position slides
+  function updatePositions(animated = true) {
+    slides.forEach((slide, idx) => {
+      const offset = (idx - currentIndex) * 100 + dragOffset;
+      slide.style.transition = animated ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+      slide.style.transform = `translate3d(${offset}%, 0, 0)`;
+      slide.style.webkitTransform = `translate3d(${offset}%, 0, 0)`;
     });
   }
 
-  window.addEventListener('DOMContentLoaded', initSlideshows);
+  // Physics animation with friction
+  function animate() {
+    if (!isDragging && Math.abs(velocity) > 0.1) {
+      dragOffset += velocity;
+      velocity *= 0.92; // Friction
+
+      const threshold = 30;
+      
+      if (Math.abs(dragOffset) > threshold) {
+        if (dragOffset > 0 && currentIndex > 0) {
+          goToSlide(currentIndex - 1);
+          return;
+        } else if (dragOffset < 0 && currentIndex < slides.length - 1) {
+          goToSlide(currentIndex + 1);
+          return;
+        }
+      }
+
+      updatePositions(false);
+      animationFrame = requestAnimationFrame(animate);
+    } else if (!isDragging && dragOffset !== 0) {
+      dragOffset = 0;
+      velocity = 0;
+      updatePositions(true);
+    }
+  }
+
+  function goToSlide(newIndex) {
+    if (newIndex < 0 || newIndex >= slides.length) {
+      dragOffset = 0;
+      velocity = 0;
+      updatePositions(true);
+      return;
+    }
+
+    slides[currentIndex].classList.remove('active');
+    currentIndex = newIndex;
+    slides[currentIndex].classList.add('active');
+    dragOffset = 0;
+    velocity = 0;
+    updatePositions(true);
+
+    if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+    if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
+  }
+
+  // DESKTOP: Mouse drag
+  function onMouseDown(e) {
+    if (e.target.classList.contains('slideshow__arrow')) return;
+
+    isDragging = true;
+    startX = e.clientX;
+    currentX = e.clientX;
+    lastX = e.clientX;
+    lastTime = Date.now();
+    velocity = 0;
+    
+    root.style.cursor = 'grabbing';
+    
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    if (autoplayTimer) clearInterval(autoplayTimer);
+
+    e.preventDefault();
+  }
+
+  function onMouseMove(e) {
+    if (!isDragging) return;
+
+    currentX = e.clientX;
+    const deltaX = currentX - startX;
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+
+    if (deltaTime > 0) {
+      const deltaMove = currentX - lastX;
+      velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+    }
+
+    lastX = currentX;
+    lastTime = now;
+
+    dragOffset = (deltaX / root.offsetWidth) * 100;
+    
+    // Edge resistance
+    if (currentIndex === 0 && dragOffset > 0) {
+      dragOffset *= 0.3;
+    } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+      dragOffset *= 0.3;
+    }
+
+    updatePositions(false);
+  }
+
+  function onMouseUp(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    root.style.cursor = 'grab';
+    animationFrame = requestAnimationFrame(animate);
+    startAutoplay();
+  }
+
+  // MOBILE: Touch drag
+  function onTouchStart(e) {
+    isDragging = true;
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    currentX = touch.clientX;
+    lastX = touch.clientX;
+    lastTime = Date.now();
+    velocity = 0;
+
+    if (animationFrame) cancelAnimationFrame(animationFrame);
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  }
+
+  function onTouchMove(e) {
+    if (!isDragging) return;
+
+    const touch = e.touches[0];
+    currentX = touch.clientX;
+    const deltaX = currentX - startX;
+    const now = Date.now();
+    const deltaTime = now - lastTime;
+
+    if (deltaTime > 0) {
+      const deltaMove = currentX - lastX;
+      velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+    }
+
+    lastX = currentX;
+    lastTime = now;
+
+    dragOffset = (deltaX / root.offsetWidth) * 100;
+
+    if (currentIndex === 0 && dragOffset > 0) {
+      dragOffset *= 0.3;
+    } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+      dragOffset *= 0.3;
+    }
+
+    updatePositions(false);
+  }
+
+  function onTouchEnd(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    animationFrame = requestAnimationFrame(animate);
+    startAutoplay();
+  }
+
+  // Autoplay
+  function startAutoplay() {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+    
+    let direction = 1;
+    autoplayTimer = setInterval(() => {
+      if (currentIndex === slides.length - 1) direction = -1;
+      if (currentIndex === 0) direction = 1;
+      goToSlide(currentIndex + direction);
+    }, 4000);
+  }
+
+  // Event listeners
+  root.addEventListener('mousedown', onMouseDown);
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+  
+  root.addEventListener('touchstart', onTouchStart, { passive: true });
+  root.addEventListener('touchmove', onTouchMove, { passive: true });
+  root.addEventListener('touchend', onTouchEnd, { passive: true });
+
+  // Stop autoplay on hover
+  root.addEventListener('mouseenter', () => {
+    if (autoplayTimer) clearInterval(autoplayTimer);
+  });
+  root.addEventListener('mouseleave', startAutoplay);
+
+  // Arrow buttons
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToSlide(currentIndex - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goToSlide(currentIndex + 1);
+    });
+  }
+
+  // Keyboard
+  root.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goToSlide(currentIndex - 1);
+    if (e.key === 'ArrowRight') goToSlide(currentIndex + 1);
+  });
+
+  // Initial setup
+  root.style.cursor = 'grab';
+  updatePositions(false);
+  
+  if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+  if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
+  
+  startAutoplay();
+}
+
+window.addEventListener('DOMContentLoaded', initSlideshows);
 
   /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
