@@ -374,6 +374,7 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
   function onMouseDown(e) {
     if (e.target.classList.contains('slideshow__arrow')) return;
 
+    pauseAutoplay(); // Pause autoplay while dragging
     isDragging = true;
     startX = e.clientX;
     currentX = e.clientX;
@@ -384,7 +385,6 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
     root.style.cursor = 'grabbing';
     
     if (animationFrame) cancelAnimationFrame(animationFrame);
-    if (autoplayTimer) clearInterval(autoplayTimer);
 
     e.preventDefault();
   }
@@ -423,11 +423,16 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
     isDragging = false;
     root.style.cursor = 'grab';
     animationFrame = requestAnimationFrame(animate);
-    startAutoplay();
+    
+    // Resume autoplay after a short delay (after throw animation settles)
+    setTimeout(() => {
+      resumeAutoplay();
+    }, 700);
   }
 
   // MOBILE: Touch drag
   function onTouchStart(e) {
+    pauseAutoplay(); // Pause autoplay while touching
     isDragging = true;
     const touch = e.touches[0];
     startX = touch.clientX;
@@ -437,7 +442,6 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
     velocity = 0;
 
     if (animationFrame) cancelAnimationFrame(animationFrame);
-    if (autoplayTimer) clearInterval(autoplayTimer);
   }
 
   function onTouchMove(e) {
@@ -473,19 +477,37 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
 
     isDragging = false;
     animationFrame = requestAnimationFrame(animate);
-    startAutoplay();
+    
+    // Resume autoplay after throw animation settles
+    setTimeout(() => {
+      resumeAutoplay();
+    }, 700);
   }
 
-  // Autoplay
+  // Autoplay - runs constantly but pauses during interaction
+  let autoplayTimer = null;
+  let isInteracting = false;
+
   function startAutoplay() {
     if (autoplayTimer) clearInterval(autoplayTimer);
     
     let direction = 1;
     autoplayTimer = setInterval(() => {
+      // Don't autoplay if user is actively interacting
+      if (isInteracting) return;
+      
       if (currentIndex === slides.length - 1) direction = -1;
       if (currentIndex === 0) direction = 1;
       goToSlide(currentIndex + direction);
     }, 4000);
+  }
+
+  function pauseAutoplay() {
+    isInteracting = true;
+  }
+
+  function resumeAutoplay() {
+    isInteracting = false;
   }
 
   // Event listeners
@@ -497,31 +519,43 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
   root.addEventListener('touchmove', onTouchMove, { passive: true });
   root.addEventListener('touchend', onTouchEnd, { passive: true });
 
-  // Stop autoplay on hover
-  root.addEventListener('mouseenter', () => {
-    if (autoplayTimer) clearInterval(autoplayTimer);
-  });
-  root.addEventListener('mouseleave', startAutoplay);
+  // Pause autoplay on hover, resume on leave
+  root.addEventListener('mouseenter', pauseAutoplay);
+  root.addEventListener('mouseleave', resumeAutoplay);
 
   // Arrow buttons
   if (prevBtn) {
     prevBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      pauseAutoplay();
       goToSlide(currentIndex - 1);
+      // Resume after a moment
+      setTimeout(resumeAutoplay, 1000);
     });
   }
 
   if (nextBtn) {
     nextBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      pauseAutoplay();
       goToSlide(currentIndex + 1);
+      // Resume after a moment
+      setTimeout(resumeAutoplay, 1000);
     });
   }
 
   // Keyboard
   root.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') goToSlide(currentIndex - 1);
-    if (e.key === 'ArrowRight') goToSlide(currentIndex + 1);
+    if (e.key === 'ArrowLeft') {
+      pauseAutoplay();
+      goToSlide(currentIndex - 1);
+      setTimeout(resumeAutoplay, 1000);
+    }
+    if (e.key === 'ArrowRight') {
+      pauseAutoplay();
+      goToSlide(currentIndex + 1);
+      setTimeout(resumeAutoplay, 1000);
+    }
   });
 
   // Initial setup
@@ -531,6 +565,7 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
   if (prevBtn) prevBtn.disabled = (currentIndex === 0);
   if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
   
+  // Start autoplay immediately
   startAutoplay();
 }
 
