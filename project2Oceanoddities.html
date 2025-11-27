@@ -153,25 +153,54 @@
             <p>In this phase, the photorealistic versions are placed on a clean white background for easy processing from image to 3D generative assets.</p>
         </div>
 
-        <div class="image-grid">
-            <img src="Other World Fish/BigRED001.1-W.LG-gpt.1.webp" alt="White background fish 1" />
-            <img src="Other World Fish/fishy-putpred.cucumber.0001-gpt05.1.webp" alt="White background fish 2" />
+         <div class="full-image">
+            <div class="slideshow slideshow--slide">
+                <img class="slideshow__image active" src="Other World Fish/BigRED001.1-W.LG-gpt.1.webp" alt="Creature 3D view 1">
+                <img class="slideshow__image" src="Other World Fish/fishy-putpred.cucumber.0001-gpt05.1.webp" alt="Creature 3D view 2">
+                <button class="slideshow__arrow slideshow__arrow--prev" aria-label="Previous">‹</button>
+                <button class="slideshow__arrow slideshow__arrow--next" aria-label="Next">›</button>
+            </div>
         </div>
+    </div>
 
-         <!-- 360 Scroll-Driven Showcase - MOBILE COMPATIBLE -->
- <section class="scroll-video-section">
-        <div class="scroll-video-container">
-            <video class="scroll-video" muted playsinline preload="auto">
-                <source src="Other World Fish/BigRED001-360-ClaytoColor_1.mp4" type="video/mp4">
+        <!-- 360 Scroll-Driven Showcase -->
+    <section class="scroll-video-section">
+        <div class="scroll-video-container" style="--poster-image: url('Other World Fish/big-red-desktop.webp');">
+            <video 
+                class="scroll-video" 
+                muted 
+                playsinline 
+                webkit-playsinline
+                x-webkit-airplay="deny"
+                preload="metadata"
+                disablePictureInPicture
+                disableRemotePlayback
+                poster="Other World Fish/big-red-desktop.webp"
+                data-mobile-poster="Other World Fish/big-red-mobile-squaure.webp"
+            >
+                <source src="Other World Fish/big-red-desktop.mp4" type="video/mp4">
+                Your browser does not support the video tag.
             </video>
         </div>
     </section>
         
-     <!-- 360 Scroll-Driven Showcase - MOBILE COMPATIBLE -->
- <section class="scroll-video-section">
-        <div class="scroll-video-container">
-            <video class="scroll-video" muted playsinline preload="auto">
-                <source src="Other World Fish/fishy-putpred-cucumber-0001-gpt05-1-gpt-360-ClaytoColor.mp4" type="video/mp4">
+     <!-- 360 Scroll-Driven Showcase -->
+    <section class="scroll-video-section">
+        <div class="scroll-video-container" style="--poster-image: url('Other World Fish/purple-fish-desktop.webp');">
+            <video 
+                class="scroll-video" 
+                muted 
+                playsinline 
+                webkit-playsinline
+                x-webkit-airplay="deny"
+                preload="metadata"
+                disablePictureInPicture
+                disableRemotePlayback
+                poster="Other World Fish/purple-fish-desktop.webp"
+                data-mobile-poster="Other World Fish/purple-fish-mobile-square.webpg"
+            >
+                <source src="Other World Fish/purple-fish-desktop.mp4" type="video/mp4">
+                Your browser does not support the video tag.
             </video>
         </div>
     </section>
