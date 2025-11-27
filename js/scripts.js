@@ -570,6 +570,7 @@ function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
 }
 
 window.addEventListener('DOMContentLoaded', initSlideshows);
+   })();
 
   /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
