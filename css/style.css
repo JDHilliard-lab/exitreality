@@ -918,25 +918,23 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
-/* === MOBILE SCROLL VIDEO BEHAVIOR (center-locked while scrubbing) === */
+/* === MOBILE SCROLL VIDEO – centered sticky square with neighbors visible === */
 @media (max-width: 768px) {
 
-  /* Let JS/scroll decide total height; no crazy overlap */
   .scroll-video-section {
-    height: auto;
-    margin-top: 0;
-    margin-bottom: 0;
+    height: auto;          /* JS will set this */
+    margin-top: -10vw;     /* small overlap: see a bit of the section above */
+    margin-bottom: -10vw;  /* and a bit of the section below */
     padding: 0;
     overflow: visible;
   }
 
-  /* Sticky square, centered vertically in the viewport */
   .scroll-video-container {
     position: sticky;
     top: calc(50vh - 50vw);  /* center a 100vw-tall square in the viewport */
     left: 0;
     width: 100vw;
-    height: 100vw;           /* square container for your 1:1 mobile video */
+    height: 100vw;           /* square for your 1:1 mobile video */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -955,7 +953,6 @@ transition: opacity 0.05s linear; */
     background: none;
   }
 }
-
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
