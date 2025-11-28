@@ -658,8 +658,8 @@
         // Mobile: use vw so it scales with width, and make the section
         // taller for longer videos.
         const squareVw    = 100;   // the square video box itself
-        const perSecondVw = 4;     // scroll length per second of video
-        const minFactor   = 1.05;   // minimum: 1.2x square height
+        const perSecondVw = 8;     // scroll length per second of video
+        const minFactor   = 1.2;   // minimum: 1.2x square height
 
         const extraVw   = d * perSecondVw;
         const totalVw   = squareVw + extraVw;
@@ -685,8 +685,8 @@
 
   // --- 4) Scroll handler: scrub each video based on its own section progress ---
 
-  const stickyStart = isMobile ? 0.4 : 0.25;
-const stickyEnd   = isMobile ? 0.8 : 0.65;
+  const stickyStart = 0.25; // start scrubbing after entering section
+  const stickyEnd   = 0.65; // finish before leaving section
 
   function updateInstance(instance) {
     const { section, video, duration, ready } = instance;
