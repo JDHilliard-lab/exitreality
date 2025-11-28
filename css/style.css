@@ -918,30 +918,44 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
-/* Mobile – square container */
+/* === MOBILE SCROLL VIDEO BEHAVIOR (center-locked while scrubbing) === */
 @media (max-width: 768px) {
+
+  /* Let JS/scroll decide total height; no crazy overlap */
   .scroll-video-section {
-    height: auto;  /* JS sets it from duration */
+    height: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    overflow: visible;
   }
 
+  /* Sticky square, centered vertically in the viewport */
   .scroll-video-container {
     position: sticky;
-    top: calc(50vh - 50vw); /* center square in viewport */
+    top: calc(50vh - 50vw);  /* center a 100vw-tall square in the viewport */
     left: 0;
     width: 100vw;
-    height: 100vw;          /* square */
+    height: 100vw;           /* square container for your 1:1 mobile video */
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
+    background: none;
+    z-index: 1;
   }
 
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* 1:1 in 1:1 → no bars */
+    object-fit: cover;       /* 1:1 video in 1:1 box → no bars */
+    display: block;
+    background: none;
   }
 }
+
 
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
