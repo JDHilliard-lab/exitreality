@@ -686,7 +686,7 @@
   // --- 4) Scroll handler: scrub each video based on its own section progress ---
 
   const stickyStart = 0.25; // start scrubbing after entering section
-  const stickyEnd   = 0.75; // finish before leaving section
+  const stickyEnd   = 0.65; // finish before leaving section
 
   function updateInstance(instance) {
     const { section, video, duration, ready } = instance;
