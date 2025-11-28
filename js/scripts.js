@@ -685,8 +685,10 @@
 
   // --- 4) Scroll handler: scrub each video based on its own section progress ---
 
-  const stickyStart = 0.25; // start scrubbing after entering section
-  const stickyEnd   = 0.75; // finish before leaving section
+ // Use a slightly later/tighter window on mobile so it scrubs
+// while the video is actually centered in view
+const stickyStart = isMobile ? 0.35 : 0.25;
+const stickyEnd   = isMobile ? 0.85 : 0.75;
 
   function updateInstance(instance) {
     const { section, video, duration, ready } = instance;
