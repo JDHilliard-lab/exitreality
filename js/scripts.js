@@ -649,43 +649,44 @@
     video.setAttribute('webkit-playsinline', '');
 
     // --- 3) When we know duration, set section height based on clip length ---
-video.addEventListener('loadedmetadata', () => {
-  const d = video.duration || 1;
-  instance.duration = d;
-  instance.ready    = true;
+    video.addEventListener('loadedmetadata', () => {
+      const d = video.duration || 1;
+      instance.duration = d;
+      instance.ready    = true;
 
-  if (isMobile) {
-    const duration = d;
+      if (isMobile) {
+        // Mobile: use vw so it scales with width, and make the section
+        // taller for longer videos.
+        const squareVw    = 100;   // the square video box itself
+        const perSecondVw = 8;     // scroll length per second of video
+        const minFactor   = 1.2;   // minimum: 1.2x square height
 
-    const squareVw    = 100;
-    const perSecondVw = 8;
-    const minFactor   = 1.3;
+        const extraVw   = d * perSecondVw;
+        const totalVw   = squareVw + extraVw;
+        const heightVw  = Math.max(totalVw, squareVw * minFactor);
 
-    const extraVw  = duration * perSecondVw;
-    const totalVw  = squareVw + extraVw;
-    const heightVw = Math.max(totalVw, squareVw * minFactor);
+        section.style.height = `${heightVw}vw`;
+      } else {
+        // Desktop: use vh – taller sections for longer clips
+        const baseVh      = 150;   // base height
+        const perSecondVh = 4;     // extra vh per second
+        const minVh       = 180;   // minimum total height
 
-    section.style.height = `${heightVw}vw`;
-    console.log("📏 Mobile sticky height:", heightVw + "vw", "duration:", duration);
-  } else {
-    // Optional: desktop section height logic here,
-    // or leave desktop controlled by CSS (e.g. 200vh)
-  }
-});
+        const totalVh = Math.max(minVh, baseVh + d * perSecondVh);
+        section.style.height = `${totalVh}vh`;
+      }
+    });
 
-// trigger load to get metadata
-video.load();
-
+    // trigger load to get metadata
+    video.load();
   });
 
   if (!instances.length) return;
 
   // --- 4) Scroll handler: scrub each video based on its own section progress ---
 
- // Use a slightly later/tighter window on mobile so it scrubs
-// while the video is actually centered in view
-const stickyStart = isMobile ? 0.35 : 0.25;
-const stickyEnd   = isMobile ? 0.85 : 0.75;
+  const stickyStart = 0.25; // start scrubbing after entering section
+  const stickyEnd   = 0.75; // finish before leaving section
 
   function updateInstance(instance) {
     const { section, video, duration, ready } = instance;
