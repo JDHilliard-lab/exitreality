@@ -918,39 +918,28 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
-/* === MOBILE SCROLL VIDEO – centered sticky square with neighbors visible === */
+/* Mobile – square container */
 @media (max-width: 768px) {
-
   .scroll-video-section {
-    height: auto;          /* JS will set this */
-    margin-top: -10vw;     /* small overlap: see a bit of the section above */
-    margin-bottom: -10vw;  /* and a bit of the section below */
-    padding: 0;
-    overflow: visible;
+    height: auto;  /* JS sets it from duration */
   }
 
   .scroll-video-container {
     position: sticky;
-    top: calc(50vh - 50vw);  /* center a 100vw-tall square in the viewport */
+    top: calc(50vh - 50vw); /* center square in viewport */
     left: 0;
     width: 100vw;
-    height: 100vw;           /* square for your 1:1 mobile video */
+    height: 100vw;          /* square */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    padding: 0;
     overflow: hidden;
-    background: none;
-    z-index: 1;
   }
 
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;       /* 1:1 video in 1:1 box → no bars */
-    display: block;
-    background: none;
+    object-fit: cover;      /* 1:1 in 1:1 → no bars */
   }
 }
 
