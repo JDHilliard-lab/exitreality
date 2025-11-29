@@ -845,6 +845,13 @@ transition: opacity 0.05s linear; */
     padding: 1rem;
   }
 }
+/* Mobile: arrows fade in when slideshow is "active" (center-ish) */
+@media (max-width: 768px) {
+  .slideshow--show-arrows .slideshow__arrow {
+    opacity: 1;
+  }
+}
+
 
 /* ===== IMAGE SLIDESHOW – SLIDE VARIANT (SIDE-BY-SIDE STRIP) ===== */
 /* Use on: <div class="slideshow slideshow--slide"> */
