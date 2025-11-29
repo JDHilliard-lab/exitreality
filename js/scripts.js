@@ -257,6 +257,30 @@
       const nextBtn = root.querySelector('.slideshow__arrow--next');
       if (!slides.length) return;
 
+       // --- Mobile arrow hint: fade in when slideshow is centered ---
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      function updateArrowHint() {
+        const rect = root.getBoundingClientRect();
+        const viewportCenter = window.innerHeight / 2;
+        const tolerance = 80; // adjust if you want tighter/looser
+
+        const inCenter =
+          rect.top <= viewportCenter + tolerance &&
+          rect.bottom >= viewportCenter - tolerance;
+
+        if (inCenter) {
+          root.classList.add('slideshow--show-arrows');
+        } else {
+          root.classList.remove('slideshow--show-arrows');
+        }
+      }
+
+      updateArrowHint();
+      window.addEventListener('scroll', updateArrowHint, { passive: true });
+      window.addEventListener('resize', updateArrowHint);
+    }
+
       const isSlide = root.classList.contains('slideshow--slide');
 
       if (isSlide) {
