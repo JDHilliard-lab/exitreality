@@ -826,5 +826,44 @@
     resizeTimer = setTimeout(loadCorrectVideo, 250);
   });
 })(); // closes initScrollVideoSource()
-
+   
+/*** 9) Before/After Slider ***/
+(function initBeforeAfterSliders() {
+  document.querySelectorAll('.ba').forEach((root) => {
+    const range = root.querySelector('.ba__range');
+    const setPct = (p) => {
+      const clamped = Math.max(0, Math.min(100, p));
+      root.style.setProperty('--x', clamped + '%');
+      range.value = clamped;
+    };
+    const toPctFromClientX = (clientX) => {
+      const rect = root.getBoundingClientRect();
+      return ((clientX - rect.left) / rect.width) * 100;
+    };
+    const onPointerDown = (e) => {
+      setPct(toPctFromClientX(e.clientX));
+      const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+      };
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    };
+    root.addEventListener('mousedown', onPointerDown);
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      setPct(toPctFromClientX(t.clientX));
+    }, { passive: true });
+    root.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      setPct(toPctFromClientX(t.clientX));
+    }, { passive: true });
+    range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+    setPct(parseFloat(range.value) || 50);
+  });
+  
+  window.addEventListener('DOMContentLoaded', initBeforeAfterSliders);
+})();
+   
 })(); // <--- ADD THIS: closes the outer (function () { ... }) at the top
