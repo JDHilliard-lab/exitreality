@@ -715,8 +715,9 @@ function initSingleScrollVideo(section, video, index) {
   }
 
   // Scroll animation: video sticks in center, plays through, then releases
-  const stickyStart = 0.0;   // Start immediately when section enters
-  const stickyEnd   = 1.0;   // End when section exits
+  // Adjusted ranges to ensure animation completes before scrolling off
+  const stickyStart = 0.1;   // Start animation after 10% scroll (video centered)
+  const stickyEnd   = 0.9;   // End animation at 90% scroll (before release)
 
   let ticking          = false;
   let scrollUpdateCount = 0;
@@ -751,8 +752,20 @@ function initSingleScrollVideo(section, video, index) {
     let progress = (startScroll - currentPos) / scrollRange;
     progress = Math.max(0, Math.min(1, progress));
 
-    // Map scroll progress directly to video progress
-    const videoProgress = progress;
+    // Map scroll progress to video with buffer zones
+    let videoProgress = 0;
+    
+    if (progress < stickyStart) {
+      // Before animation starts - show first frame
+      videoProgress = 0;
+    } else if (progress <= stickyEnd) {
+      // During animation - play through video
+      const animationRange = stickyEnd - stickyStart;
+      videoProgress = (progress - stickyStart) / animationRange;
+    } else {
+      // After animation - hold last frame
+      videoProgress = 1;
+    }
 
     if (video.duration && !isNaN(video.duration)) {
       const newTime = videoProgress * video.duration;
