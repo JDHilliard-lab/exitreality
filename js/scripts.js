@@ -884,41 +884,90 @@
 
 /*** 9) Before/After Slider ***/
 (function initBeforeAfterSliders() {
-  document.querySelectorAll('.ba').forEach((root) => {
-    const range = root.querySelector('.ba__range');
-    const setPct = (p) => {
-      const clamped = Math.max(0, Math.min(100, p));
-      root.style.setProperty('--x', clamped + '%');
-      range.value = clamped;
-    };
-    const toPctFromClientX = (clientX) => {
-      const rect = root.getBoundingClientRect();
-      return ((clientX - rect.left) / rect.width) * 100;
-    };
-    const onPointerDown = (e) => {
-      setPct(toPctFromClientX(e.clientX));
-      const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
-      const onUp = () => {
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
+  function init() {
+    document.querySelectorAll('.ba').forEach((root) => {
+      const range = root.querySelector('.ba__range');
+      const setPct = (p) => {
+        const clamped = Math.max(0, Math.min(100, p));
+        root.style.setProperty('--x', clamped + '%');
+        range.value = clamped;
       };
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onUp);
-    };
-    root.addEventListener('mousedown', onPointerDown);
-    root.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      setPct(toPctFromClientX(t.clientX));
-    }, { passive: true });
-    root.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      setPct(toPctFromClientX(t.clientX));
-    }, { passive: true });
-    range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
-    setPct(parseFloat(range.value) || 50);
-  });
+      const toPctFromClientX = (clientX) => {
+        const rect = root.getBoundingClientRect();
+        return ((clientX - rect.left) / rect.width) * 100;
+      };
+      const onPointerDown = (e) => {
+        setPct(toPctFromClientX(e.clientX));
+        const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onUp);
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+      };
+      root.addEventListener('mousedown', onPointerDown);
+      root.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        setPct(toPctFromClientX(t.clientX));
+      }, { passive: true });
+      root.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        setPct(toPctFromClientX(t.clientX));
+      }, { passive: true });
+      range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+      setPct(parseFloat(range.value) || 50);
+    });
+  }
   
-  window.addEventListener('DOMContentLoaded', initBeforeAfterSliders);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
-   
-})(); // <--- ADD THIS: closes the outer (function () { ... }) at the top
+
+/*** 10) Hide video controls on mobile until user taps ***/
+(function initMobileVideoControls() {
+  function init() {
+    if (window.innerWidth <= 768) {
+      const videos = document.querySelectorAll('.full-image video');
+      
+      videos.forEach(video => {
+        video.removeAttribute('controls');
+        
+        video.addEventListener('click', function() {
+          this.setAttribute('controls', '');
+          this.classList.add('show-controls');
+        }, { once: true });
+      });
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+/*** 11) Inject shared navbar ***/
+(function injectNavbar() {
+  function loadNavbar() {
+    fetch('navbar.html')
+      .then(function (res) { return res.text(); })
+      .then(function (html) {
+        var mount = document.getElementById('navbar-placeholder');
+        if (mount) mount.innerHTML = html;
+      })
+      .catch(function (e) { console.error('Navbar load failed:', e); });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadNavbar);
+  } else {
+    loadNavbar();
+  }
+})();
+
+})()
