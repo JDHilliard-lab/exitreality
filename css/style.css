@@ -888,12 +888,11 @@ transition: opacity 0.05s linear; */
   display: none;
 }
 
-/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - MOBILE FIXED ===== */
-/* Desktop */
+/* ===== SCROLL-DRIVEN VIDEO (360 ROTATION) - DESKTOP CENTERED STICKY ===== */
 .scroll-video-section {
   position: relative;
   width: 100%;
-  /* height will be overridden in JS based on duration */
+  height: 300vh;      /* Tall section gives room for scroll animation */
   overflow: visible;
   margin: 0;
   padding: 0;
@@ -901,15 +900,16 @@ transition: opacity 0.05s linear; */
 
 .scroll-video-container {
   position: sticky;
-  top: 0;
+  top: 50%;           /* Stick at 50% from top */
+  transform: translateY(-50%); /* Center the video vertically */
   left: 0;
   width: 100vw;
-  height: 100vh;      /* ⬅ sticky element = viewport height */
+  height: 100vh;      /* Full viewport height for 16:9 coverage */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: transparent;
+  background: #000;
   padding: 0;
   margin: 0;
   margin-left: calc(-50vw + 50%);
@@ -925,28 +925,41 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
-/* Mobile – square container */
+/* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
   .scroll-video-section {
-    height: auto;  /* JS sets it from duration */
+    height: 300vh;          /* Keep tall for scroll range */
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    overflow: visible;
   }
 
+  /* Sticky square, centered visually while pinned */
   .scroll-video-container {
     position: sticky;
-    top: calc(50vh - 50vw); /* center square in viewport */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
     left: 0;
     width: 100vw;
-    height: 100vw;          /* square */
+    height: 100vw;          /* Square = same as your 1:1 video */
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0;
+    margin-left: 0;
+    padding: 0;
     overflow: hidden;
+    background: #000;
+    z-index: 1;
   }
 
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* 1:1 in 1:1 → no bars */
+    object-fit: cover;      /* 1:1 video in 1:1 box → no bars */
+    display: block;
+    background: #000;
   }
 }
 
