@@ -715,8 +715,8 @@ function initSingleScrollVideo(section, video, index) {
   }
 
   // Only scrub through the middle of the scroll
-  const stickyStart = 0.25;
-  const stickyEnd   = 0.75;
+  const stickyStart = 0.35;
+  const stickyEnd   = 0.65;
 
   let ticking          = false;
   let scrollUpdateCount = 0;
