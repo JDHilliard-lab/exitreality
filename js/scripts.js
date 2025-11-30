@@ -714,9 +714,9 @@ function initSingleScrollVideo(section, video, index) {
     });
   }
 
-  // Only scrub through the middle of the scroll
-  const stickyStart = 0.35;
-  const stickyEnd   = 0.65;
+  // Scroll animation: video sticks in center, plays through, then releases
+  const stickyStart = 0.0;   // Start immediately when section enters
+  const stickyEnd   = 1.0;   // End when section exits
 
   let ticking          = false;
   let scrollUpdateCount = 0;
@@ -742,6 +742,7 @@ function initSingleScrollVideo(section, video, index) {
     const windowHeight  = window.innerHeight;
     const sectionHeight = rect.height;
 
+    // Progress from 0 (section entering bottom) to 1 (section exiting top)
     const startScroll = windowHeight;
     const endScroll   = -sectionHeight;
     const scrollRange = startScroll - endScroll;
@@ -750,17 +751,8 @@ function initSingleScrollVideo(section, video, index) {
     let progress = (startScroll - currentPos) / scrollRange;
     progress = Math.max(0, Math.min(1, progress));
 
-    const stickyRange  = stickyEnd - stickyStart;
-    let videoProgress  = 0;
-
-    if (progress < stickyStart) {
-      videoProgress = 0;
-    } else if (progress <= stickyEnd) {
-      const stickyProgress = (progress - stickyStart) / stickyRange;
-      videoProgress = stickyProgress;
-    } else {
-      videoProgress = 1;
-    }
+    // Map scroll progress directly to video progress
+    const videoProgress = progress;
 
     if (video.duration && !isNaN(video.duration)) {
       const newTime = videoProgress * video.duration;
