@@ -716,8 +716,8 @@ function initSingleScrollVideo(section, video, index) {
 
   // Scroll animation: video sticks in center, plays through, then releases
   // Adjusted ranges to ensure animation completes before scrolling off
-  const stickyStart = 0.1;   // Start animation after 10% scroll (video centered)
-  const stickyEnd   = 0.9;   // End animation at 90% scroll (before release)
+  const stickyStart = 0.25;   // Start animation after 10% scroll (video centered)
+  const stickyEnd   = 0.75;   // End animation at 90% scroll (before release)
 
   let ticking          = false;
   let scrollUpdateCount = 0;
