@@ -847,59 +847,62 @@ function initSingleScrollVideo(section, video, index) {
   console.log(`🎬 Video ${index + 1} setup complete. On iOS, touch the screen to enable video.`);
 }
 
-/*** 8) Auto-load correct scroll video based on screen size ***/
+/*** 8) Auto-load correct scroll video based on screen size (ALL .scroll-video) ***/
 (function initScrollVideoSource() {
-  const scrollVideo = document.querySelector('.scroll-video');
-  if (!scrollVideo) return;
-  
-  function loadCorrectVideo() {
+  function updateAllScrollVideos() {
     const isMobile = window.innerWidth <= 768;
-    
-    // Get the base path from the first source tag
-    const firstSource = scrollVideo.querySelector('source');
-    if (!firstSource) return;
-    
-    const originalSrc = firstSource.getAttribute('src');
-    
-    // Extract directory and base filename
-    // Example: "BEAST/beast-360-desktop.mp4" or "BEAST/beast-360W_mobile.mp4"
-    const lastSlash = originalSrc.lastIndexOf('/');
-    const directory = originalSrc.substring(0, lastSlash + 1);
-    const filename = originalSrc.substring(lastSlash + 1);
-    
-    // Construct mobile and desktop filenames
-    // Convention: filename-mobile-square.mp4 for mobile, original for desktop
-    const baseFilename = filename.replace('-desktop', '').replace('_mobile', '').replace('-mobile-square', '').replace('.mp4', '');
-    
-    const desktopSrc = directory + baseFilename + '-desktop.mp4';
-    const mobileSrc = directory + baseFilename + '-mobile-square.mp4';
-    
-    const correctSrc = isMobile ? mobileSrc : desktopSrc;
-    const currentSrc = firstSource.getAttribute('src');
-    
-    // Only reload if source needs to change
-    if (currentSrc !== correctSrc) {
-      const currentTime = scrollVideo.currentTime || 0;
-      scrollVideo.innerHTML = `<source src="${correctSrc}" type="video/mp4">`;
-      scrollVideo.load();
-      scrollVideo.currentTime = currentTime;
-    }
+    const videos = document.querySelectorAll('.scroll-video');
+    if (!videos.length) return;
+
+    videos.forEach(video => {
+      const firstSource = video.querySelector('source');
+      if (!firstSource) return;
+
+      const originalSrc = firstSource.getAttribute('src');
+      if (!originalSrc) return;
+
+      const lastSlash = originalSrc.lastIndexOf('/');
+      const directory = originalSrc.substring(0, lastSlash + 1);
+      const filename  = originalSrc.substring(lastSlash + 1);
+
+      // Strip known suffixes, then rebuild desktop + mobile names
+      const baseFilename = filename
+        .replace('-desktop', '')
+        .replace('_mobile', '')
+        .replace('-mobile-square', '')
+        .replace('.mp4', '');
+
+      const desktopSrc = directory + baseFilename + '-desktop.mp4';
+      const mobileSrc  = directory + baseFilename + '-mobile-square.mp4';
+      const correctSrc = isMobile ? mobileSrc : desktopSrc;
+
+      if (originalSrc !== correctSrc) {
+        const currentTime = video.currentTime || 0;
+        firstSource.setAttribute('src', correctSrc);
+        video.load();
+        try {
+          video.currentTime = currentTime;
+        } catch (e) {
+          // ignore if seek fails early
+        }
+        console.log('🎥 Updated scroll-video src to', correctSrc);
+      }
+    });
   }
-  
-  // Load on page load
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadCorrectVideo);
+    document.addEventListener('DOMContentLoaded', updateAllScrollVideos);
   } else {
-    loadCorrectVideo();
+    updateAllScrollVideos();
   }
-  
-  // Reload if window is resized
+
   let resizeTimer;
-  window.addEventListener('resize', function() {
+  window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(loadCorrectVideo, 250);
+    resizeTimer = setTimeout(updateAllScrollVideos, 250);
   });
 })();
+
 
 /*** 9) Before/After Slider ***/
 (function initBeforeAfterSliders() {
