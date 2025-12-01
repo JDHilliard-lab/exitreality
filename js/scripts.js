@@ -988,5 +988,43 @@ function initSingleScrollVideo(section, video, index) {
     loadNavbar();
   }
 })();
+   
+/*** 12) Center hint for slideshows & BA on mobile ***/
+(function initCenterHints() {
+  function init() {
+    if (window.innerWidth > 768) return; // mobile only
+
+    const blocks = Array.from(document.querySelectorAll('.slideshow, .ba'));
+    if (!blocks.length) return;
+
+    function updateAll() {
+      const viewportCenter = window.innerHeight / 2;
+      const tolerance = 100; // px around center
+
+      blocks.forEach(block => {
+        const rect = block.getBoundingClientRect();
+        const inCenter =
+          rect.top <= viewportCenter + tolerance &&
+          rect.bottom >= viewportCenter - tolerance;
+
+        if (inCenter) {
+          block.classList.add('is-centered');
+        } else {
+          block.classList.remove('is-centered');
+        }
+      });
+    }
+
+    updateAll();
+    window.addEventListener('scroll', updateAll, { passive: true });
+    window.addEventListener('resize', updateAll);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 
 })()
