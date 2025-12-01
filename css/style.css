@@ -927,6 +927,11 @@ transition: opacity 0.05s linear; */
   padding: 0;
 }
 
+body.project-page .scroll-video-section:first-of-type {
+  margin-top: 3rem;
+}
+
+
 /* ===== MOBILE SCROLL VIDEO ===== */
 @media (max-width: 768px) {
   .scroll-video-section {
