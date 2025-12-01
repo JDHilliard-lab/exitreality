@@ -1354,3 +1354,11 @@ body.project-page .full-image:first-of-type {
     margin-top: 0 !important;
   }
 }
+/* Mobile: show slideshow arrows / BA handle when the block is centered */
+@media (max-width: 768px) {
+  .is-centered .slideshow__arrow,
+  .is-centered .ba__handle {
+    opacity: 1 !important;
+  }
+}
+
