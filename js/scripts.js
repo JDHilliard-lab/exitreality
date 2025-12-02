@@ -251,6 +251,114 @@
     if (!id) return;
     smoothScrollToId(id);
   });
+  /*** 5a) Sliding slideshow (side-to-side) – simple autoplay + arrows ***/
+  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+    let index = 0;
+    let direction = 1; // 1 = forward, -1 = backward
+
+    // Ensure one slide is active
+    if (!slides.some(s => s.classList.contains('active'))) {
+      slides[0].classList.add('active');
+    } else {
+      index = slides.findIndex(s => s.classList.contains('active'));
+      if (index < 0) index = 0;
+    }
+
+    function layout() {
+      slides.forEach((slide, i) => {
+        const offset = i - index;
+        slide.style.transform = `translateX(${offset * 100}%)`;
+      });
+    }
+
+    function updateArrows() {
+      if (prevBtn) prevBtn.disabled = index === 0;
+      if (nextBtn) nextBtn.disabled = index === slides.length - 1;
+    }
+
+    function goTo(newIndex) {
+      newIndex = Math.max(0, Math.min(slides.length - 1, newIndex));
+      if (newIndex === index) return;
+
+      slides[index].classList.remove('active');
+      index = newIndex;
+      slides[index].classList.add('active');
+
+      layout();
+      updateArrows();
+    }
+
+    // ----- Autoplay with bounce + pause-on-interaction -----
+    const autoplayMs = 6000;
+    let timer = null;
+    let isInteracting = false;
+    let idleTimeout = null;
+
+    function autoStep() {
+      if (isInteracting) return;
+
+      if (index === slides.length - 1) {
+        direction = -1;
+      } else if (index === 0) {
+        direction = 1;
+      }
+      goTo(index + direction);
+    }
+
+    function startAutoplay() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(autoStep, autoplayMs);
+    }
+
+    function stopAutoplay() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function userInteracted() {
+      isInteracting = true;
+      stopAutoplay();
+
+      if (idleTimeout) clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(() => {
+        isInteracting = false;
+        startAutoplay();
+      }, autoplayMs);
+    }
+
+    // Arrow handlers
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        userInteracted();
+        goTo(index - 1);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        userInteracted();
+        goTo(index + 1);
+      });
+    }
+
+    // Pause autoplay while hovered (desktop)
+    root.addEventListener('mouseenter', () => {
+      stopAutoplay();
+    });
+
+    root.addEventListener('mouseleave', () => {
+      if (!isInteracting) {
+        startAutoplay();
+      }
+    });
+
+    // Initial layout + arrows + autoplay
+    layout();
+    updateArrows();
+    startAutoplay();
+  }
 
   //*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
 function initSlideshows() {
@@ -510,6 +618,7 @@ function initSlideshows() {
     }
   });
 })();
+   
 /*** 8) Auto-load correct scroll video based on screen size (ALL .scroll-video) ***/
 (function initScrollVideoSource() {
   function updateAllScrollVideos() {
