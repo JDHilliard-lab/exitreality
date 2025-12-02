@@ -673,7 +673,7 @@
       // 0.2 = wait until it's 20% up the screen to start moving
       // 0.8 = finish playing before it completely leaves
       // This ensures it plays mostly while "Centered/Stuck"
-      const buffer = 0.75; 
+      const buffer = 0.2; 
       
       // Remap progress to ignore the entry/exit edges
       progress = (progress - buffer) / (1 - (buffer * 2));
