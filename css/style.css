@@ -940,7 +940,7 @@ transition: opacity 0.05s linear; */
      Increase this number (e.g., 180vh) if it plays TOO fast.
   */
   .scroll-video-section {
-    height: 140vh; 
+    height: 110vh; 
     position: relative;
     z-index: 1; /* Lower than content so text slides OVER it if they overlap */
     margin: 0;
