@@ -653,20 +653,34 @@
     }
 
     // 5. Scroll Handler
-    function handleScroll() {
+  function handleScroll() {
       const rect = section.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
+      const sectionHeight = rect.height;
       
-      // Calculate progress: 0 when top of section hits bottom of screen, 1 when bottom hits top
-      // Adjusted slightly so action happens while centered
-      const start = viewportHeight; 
-      const end = -rect.height;
-      const progress = (start - rect.top) / (start - end);
+      // Calculate when the video is actually "stuck"
+      // It sticks when rect.top hits the calculated center offset
+      
+      // We start playing when the section top enters the viewport
+      const start = viewportHeight;
+      // We finish playing when the bottom of the section leaves the viewport
+      const end = -sectionHeight;
+      
+      // Calculate raw progress (0 to 1)
+      let progress = (start - rect.top) / (start - end);
+      
+      // TIGHTEN THE PLAYBACK:
+      // 0.2 = wait until it's 20% up the screen to start moving
+      // 0.8 = finish playing before it completely leaves
+      // This ensures it plays mostly while "Centered/Stuck"
+      const buffer = 0.15; 
+      
+      // Remap progress to ignore the entry/exit edges
+      progress = (progress - buffer) / (1 - (buffer * 2));
       
       // Clamp between 0 and 1
       const clampedProgress = Math.max(0, Math.min(1, progress));
 
-      // Map progress to video duration
       if (video.duration) {
         targetTime = clampedProgress * video.duration;
         startRenderLoop();
