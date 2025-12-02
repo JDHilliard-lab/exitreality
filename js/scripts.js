@@ -251,114 +251,192 @@
     if (!id) return;
     smoothScrollToId(id);
   });
-  /*** 5a) Sliding slideshow (side-to-side) – simple autoplay + arrows ***/
-  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
-    let index = 0;
-    let direction = 1; // 1 = forward, -1 = backward
+   
+  /*** 5a) Sliding slideshow (side-to-side) with grab / swipe physics ***/
+function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+  let index = 0;
+  let direction = 1; // 1 = forward, -1 = backward
 
-    // Ensure one slide is active
-    if (!slides.some(s => s.classList.contains('active'))) {
-      slides[0].classList.add('active');
-    } else {
-      index = slides.findIndex(s => s.classList.contains('active'));
-      if (index < 0) index = 0;
-    }
-
-    function layout() {
-      slides.forEach((slide, i) => {
-        const offset = i - index;
-        slide.style.transform = `translateX(${offset * 100}%)`;
-      });
-    }
-
-    function updateArrows() {
-      if (prevBtn) prevBtn.disabled = index === 0;
-      if (nextBtn) nextBtn.disabled = index === slides.length - 1;
-    }
-
-    function goTo(newIndex) {
-      newIndex = Math.max(0, Math.min(slides.length - 1, newIndex));
-      if (newIndex === index) return;
-
-      slides[index].classList.remove('active');
-      index = newIndex;
-      slides[index].classList.add('active');
-
-      layout();
-      updateArrows();
-    }
-
-    // ----- Autoplay with bounce + pause-on-interaction -----
-    const autoplayMs = 6000;
-    let timer = null;
-    let isInteracting = false;
-    let idleTimeout = null;
-
-    function autoStep() {
-      if (isInteracting) return;
-
-      if (index === slides.length - 1) {
-        direction = -1;
-      } else if (index === 0) {
-        direction = 1;
-      }
-      goTo(index + direction);
-    }
-
-    function startAutoplay() {
-      if (timer) clearInterval(timer);
-      timer = setInterval(autoStep, autoplayMs);
-    }
-
-    function stopAutoplay() {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    function userInteracted() {
-      isInteracting = true;
-      stopAutoplay();
-
-      if (idleTimeout) clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(() => {
-        isInteracting = false;
-        startAutoplay();
-      }, autoplayMs);
-    }
-
-    // Arrow handlers
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        userInteracted();
-        goTo(index - 1);
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        userInteracted();
-        goTo(index + 1);
-      });
-    }
-
-    // Pause autoplay while hovered (desktop)
-    root.addEventListener('mouseenter', () => {
-      stopAutoplay();
-    });
-
-    root.addEventListener('mouseleave', () => {
-      if (!isInteracting) {
-        startAutoplay();
-      }
-    });
-
-    // Initial layout + arrows + autoplay
-    layout();
-    updateArrows();
-    startAutoplay();
+  // Make sure something is active
+  const activeIndex = slides.findIndex(s => s.classList.contains('active'));
+  if (activeIndex >= 0) {
+    index = activeIndex;
+  } else {
+    index = 0;
+    slides[0].classList.add('active');
   }
+
+  // Show slides side-by-side using translateX
+  function layout(extraOffsetPx = 0) {
+    const width = root.clientWidth || root.offsetWidth || 1;
+    slides.forEach((slide, i) => {
+      const base = (i - index) * width;
+      const total = base + extraOffsetPx;
+      slide.style.transform = `translateX(${total}px)`;
+    });
+  }
+
+  function updateArrows() {
+    if (prevBtn) prevBtn.disabled = index === 0;
+    if (nextBtn) nextBtn.disabled = index === slides.length - 1;
+  }
+
+  function goTo(newIndex) {
+    newIndex = Math.max(0, Math.min(slides.length - 1, newIndex));
+    if (newIndex === index) {
+      // snap back to current
+      layout(0);
+      return;
+    }
+
+    slides[index].classList.remove('active');
+    index = newIndex;
+    slides[index].classList.add('active');
+
+    layout(0);
+    updateArrows();
+  }
+
+  // ----- Autoplay with bounce + pause-on-interaction -----
+  const autoplayMs = 6000;
+  let timer = null;
+  let isInteracting = false;
+  let idleTimeout = null;
+
+  function autoStep() {
+    if (isInteracting) return;
+
+    if (index === slides.length - 1) {
+      direction = -1;
+    } else if (index === 0) {
+      direction = 1;
+    }
+    goTo(index + direction);
+  }
+
+  function startAutoplay() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(autoStep, autoplayMs);
+  }
+
+  function stopAutoplay() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  }
+
+  function userInteracted() {
+    isInteracting = true;
+    stopAutoplay();
+
+    if (idleTimeout) clearTimeout(idleTimeout);
+    idleTimeout = setTimeout(() => {
+      isInteracting = false;
+      startAutoplay();
+    }, autoplayMs);
+  }
+
+  // ----- Grab / swipe handling (pointer events) -----
+  let isDragging = false;
+  let startX = 0;
+  let lastX = 0;
+
+  // helps the browser know we want horizontal drag, vertical scroll
+  root.style.touchAction = 'pan-y';
+
+  function onPointerDown(e) {
+    if (e.button !== undefined && e.button !== 0) return; // left button only
+    isDragging = true;
+    startX = e.clientX;
+    lastX = e.clientX;
+
+    userInteracted();      // pause autoplay while dragging
+    stopAutoplay();
+
+    // turn off transitions during drag for snappy feel
+    slides.forEach(slide => {
+      slide.style.transition = 'none';
+    });
+
+    root.setPointerCapture && root.setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    lastX = e.clientX;
+    layout(dx);
+  }
+
+  function onPointerUp(e) {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const dx = lastX - startX;
+    const width = root.clientWidth || root.offsetWidth || 1;
+    const threshold = width * 0.15; // 15% drag to change slide
+
+    // restore transitions
+    slides.forEach(slide => {
+      // match your CSS transition for slide variant
+      slide.style.transition = 'transform 0.6s ease';
+    });
+
+    // Decide which slide to land on
+    let targetIndex = index;
+    if (dx > threshold && index > 0) {
+      targetIndex = index - 1;
+    } else if (dx < -threshold && index < slides.length - 1) {
+      targetIndex = index + 1;
+    }
+
+    goTo(targetIndex);
+
+    // release capture if used
+    root.releasePointerCapture && root.releasePointerCapture(e.pointerId);
+  }
+
+  root.addEventListener('pointerdown', onPointerDown);
+  root.addEventListener('pointermove', onPointerMove);
+  root.addEventListener('pointerup', onPointerUp);
+  root.addEventListener('pointercancel', onPointerUp);
+  root.addEventListener('pointerleave', e => {
+    if (isDragging) onPointerUp(e);
+  });
+
+  // ----- Arrow buttons still work and also pause/resume autoplay -----
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      userInteracted();
+      goTo(index - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      userInteracted();
+      goTo(index + 1);
+    });
+  }
+
+  // Pause autoplay on hover (desktop)
+  root.addEventListener('mouseenter', () => {
+    stopAutoplay();
+  });
+
+  root.addEventListener('mouseleave', () => {
+    if (!isInteracting) {
+      startAutoplay();
+    }
+  });
+
+  // Initial setup
+  layout(0);
+  updateArrows();
+  startAutoplay();
+}
+
 
   //*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
 function initSlideshows() {
