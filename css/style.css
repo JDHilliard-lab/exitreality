@@ -793,7 +793,8 @@ transition: opacity 0.05s linear; */
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.01s ease-out;
+  /* nice smooth fade */
+  transition: opacity 0.3s ease-in-out;
   display: block;
   vertical-align: top;
   line-height: 0;
