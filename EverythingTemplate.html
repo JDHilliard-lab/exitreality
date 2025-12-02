@@ -163,16 +163,8 @@
         <div class="section-label">Display Option 5</div>
         <div class="section-title">Scroll-Driven 360° Video (Single)</div>
         <div class="section-description">
-            <p>This layout ties the playback of a 360° turntable (or any clip) to the user’s scroll position. As they scroll, the video scrubs smoothly from start to end, creating an interactive “spin-to-reveal” feel.</p>
-            <p style="color:#777; font-size:0.95rem;">
-                Dev notes:
-                <br>• HTML structure: a <code>&lt;section class="scroll-video-section"&gt;</code> containing
-                <code>.scroll-video-container</code> and a <code>&lt;video class="scroll-video"&gt;</code>.
-                <br>• Speed: change <code>height</code> on <code>.scroll-video-section</code> in <code>style.css</code>
-                (e.g. from <code>250vh</code> to <code>200vh</code> for faster playback).
-                <br>• Smoothing: tweak <code>smoothFactor</code> in <code>initScrollVideo()</code>
-                inside <code>scripts.js</code> (higher = snappier, lower = smoother).
-            </p>
+            <p>This layout ties the playback of a 360° turntable (or any clip) to the user’s scroll position. 
+             As they scroll, the video scrubs smoothly from start to end, creating an interactive “spin-to-reveal” feel.</p
         </div>
     </div>
 
@@ -208,16 +200,8 @@
         <div class="section-label">Display Option 6</div>
         <div class="section-title">Scroll-Driven 360° Video (Multiple)</div>
         <div class="section-description">
-            <p>You can stack several scroll-driven videos one after another. Each section becomes its own scroll “track,” and the script automatically handles all of them independently.</p>
-            <p style="color:#777; font-size:0.95rem;">
-                Dev notes:
-                <br>• To add more, just duplicate a full
-                <code>&lt;section class="scroll-video-section"&gt;…&lt;/section&gt;</code>.
-                <br>• Make sure each video has <code>class="scroll-video"</code> and its own desktop/mobile
-                source pair following the same naming pattern.
-                <br>• Posters: the CSS uses <code>--poster-image</code> plus the <code>poster</code> attribute
-                so you don’t get a black flash before the video loads.
-            </p>
+            <p>You can stack several scroll-driven videos one after another. Each section becomes its own 
+                scroll “track,” and the script automatically handles all of them independently.</p>
         </div>
     </div>
 
