@@ -597,256 +597,93 @@
     handleScroll();
   })();
 
-/*** 7) Scroll-Driven Video (360° rotation effect) - iOS SAFARI FIX ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - SMOOTHED & FIXED ***/
 (function initScrollVideo() {
   const sections = document.querySelectorAll('.scroll-video-section');
+  if (!sections.length) return;
 
-  console.log('🎬 Found', sections.length, 'scroll video sections');
-
-  // Bail out cleanly on pages that don't have the scroll video
-  if (sections.length === 0) {
-    console.warn('ℹ️ Scroll-video section not found on this page – skipping scroll video init.');
-    return;
-  }
-
-  // Initialize each scroll video independently
-  sections.forEach((section, sectionIndex) => {
+  sections.forEach((section, index) => {
+    const container = section.querySelector('.scroll-video-container');
     const video = section.querySelector('.scroll-video');
+    if (!video || !container) return;
+
+    // 1. Setup Video Properties
+    video.pause();
+    video.currentTime = 0;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.muted = true;
     
-    if (!video) {
-      console.warn(`⚠️ No video found in section ${sectionIndex + 1}`);
-      return;
+    // 2. State for Smoothing (Lerp)
+    let targetTime = 0;
+    let currentTime = 0;
+    let isRenderLoopRunning = false;
+    
+    // Physics constant: Lower = smoother/slower catchup (0.05), Higher = snappier (0.2)
+    const smoothFactor = 0.1; 
+
+    // 3. Render Loop (Decouples scroll from video update for smoothness)
+    function render() {
+      // Calculate difference between where we are and where we want to be
+      const diff = targetTime - currentTime;
+      
+      // If difference is small enough, stop the loop to save battery
+      if (Math.abs(diff) < 0.01) {
+        isRenderLoopRunning = false;
+        return; 
+      }
+
+      // Ease current time towards target
+      currentTime += diff * smoothFactor;
+      
+      // Safety check for video duration
+      if (video.duration) {
+         video.currentTime = Math.max(0, Math.min(currentTime, video.duration));
+      }
+
+      requestAnimationFrame(render);
     }
+
+    // 4. Start Smoothing Loop
+    function startRenderLoop() {
+      if (!isRenderLoopRunning) {
+        isRenderLoopRunning = true;
+        render();
+      }
+    }
+
+    // 5. Scroll Handler
+    function handleScroll() {
+      const rect = section.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate progress: 0 when top of section hits bottom of screen, 1 when bottom hits top
+      // Adjusted slightly so action happens while centered
+      const start = viewportHeight; 
+      const end = -rect.height;
+      const progress = (start - rect.top) / (start - end);
+      
+      // Clamp between 0 and 1
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+
+      // Map progress to video duration
+      if (video.duration) {
+        targetTime = clampedProgress * video.duration;
+        startRenderLoop();
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
     
-    console.log(`🎬 Initializing video ${sectionIndex + 1}/${sections.length}`);
-    initSingleScrollVideo(section, video, sectionIndex);
+    // Initial Trigger
+    if (video.readyState >= 1) {
+      handleScroll();
+    } else {
+      video.addEventListener('loadedmetadata', handleScroll);
+    }
   });
 })();
-
-function initSingleScrollVideo(section, video, index) {
-
-  // Only access poster/data-* after we know video exists
-  const defaultPoster = video.getAttribute('poster') || '';
-  const mobilePoster  = video.dataset.mobilePoster || defaultPoster;
-
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-  const isIOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  // Set poster based on device
-  video.setAttribute('poster', isMobile ? mobilePoster : defaultPoster);
-
-  // Update poster when screen size changes (mobile ↔ desktop)
-  window.addEventListener('resize', () => {
-    const nowMobile = window.innerWidth <= 768;
-    video.setAttribute('poster', nowMobile ? mobilePoster : defaultPoster);
-  });
-
-  console.log(`📱 Video ${index + 1} - Is Mobile:`, isMobile);
-  console.log(`🍎 Video ${index + 1} - Is iOS:`, isIOS);
-  console.log(`📹 Video ${index + 1} - Src:`, (video.querySelector('source') && video.querySelector('source').src) || 'NO SOURCE');
-
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');
-  video.muted       = true;
-  video.playsInline = true;
-  video.preload     = 'metadata'; // better for iOS
-
-  // iOS-specific: Force load and enable seeking
-  let videoReady      = false;
-  let userInteracted  = false;
-
-  video.addEventListener('loadstart', () => {
-    console.log(`⏳ Video ${index + 1} loading started`);
-  });
-
-  video.addEventListener('loadedmetadata', () => {
-    console.log(`✅ Video ${index + 1} metadata loaded - Duration:`, video.duration);
-    videoReady = true;
-  });
-
-  video.addEventListener('loadeddata', () => {
-    console.log(`✅ Video ${index + 1} data loaded - Ready state:`, video.readyState);
-    videoReady = true;
-  });
-
-  video.addEventListener('canplay', () => {
-    console.log(`✅ Video ${index + 1} can play`);
-    videoReady = true;
-  });
-
-  video.addEventListener('error', (e) => {
-    console.error(`❌ Video ${index + 1} ERROR:`, e);
-    console.error('Error code:', video.error?.code);
-    console.error('Error message:', video.error?.message);
-  });
-
-  function enableIOSVideo() {
-    if (userInteracted) return;
-
-    console.log(`🍎 iOS: Enabling video ${index + 1} on user interaction...`);
-
-    // Mark as interacted *immediately* so scroll updates are allowed
-    userInteracted = true;
-
-    const playPromise = video.play && video.play();
-    if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.then(() => {
-        video.pause();
-        video.currentTime = 0;
-        console.log(`✅ iOS video ${index + 1} enabled for seeking`);
-        updateVideo(); // Update immediately after enabling
-      }).catch(err => {
-        console.log(`⚠️ iOS video ${index + 1} play failed:`, err.message);
-        // Even if play fails, we still allow scrolling to scrub frames
-        updateVideo();
-      });
-    } else {
-      // Older browsers or no promise – just try to update
-      updateVideo();
-    }
-  }
-
-  // Listen for ANY user interaction to enable video
-  if (isIOS) {
-    const enableEvents = ['touchstart', 'touchend', 'scroll', 'click'];
-    enableEvents.forEach(eventType => {
-      document.addEventListener(eventType, enableIOSVideo, { once: true, passive: true });
-    });
-  }
-
-  // Scroll animation: video sticks in center, plays through, then releases
-  // Adjusted ranges to ensure animation completes before scrolling off
-  const stickyStart = 0.25;   // Start animation after 10% scroll (video centered)
-  const stickyEnd   = 0.75;   // End animation at 90% scroll (before release)
-
-  let ticking          = false;
-  let scrollUpdateCount = 0;
-  let lastTime         = -1;
-
-  function updateVideo() {
-    // Don't update if video not ready
-    if (!videoReady) {
-      if (scrollUpdateCount === 0) {
-        console.warn('⚠️ Video not ready yet');
-      }
-      ticking = false;
-      return;
-    }
-
-    // iOS: Don't update until user has interacted
-    if (isIOS && !userInteracted) {
-      ticking = false;
-      return;
-    }
-
-    const rect          = section.getBoundingClientRect();
-    const windowHeight  = window.innerHeight;
-    const sectionHeight = rect.height;
-
-    // Progress from 0 (section entering bottom) to 1 (section exiting top)
-    const startScroll = windowHeight;
-    const endScroll   = -sectionHeight;
-    const scrollRange = startScroll - endScroll;
-    const currentPos  = rect.top;
-
-    let progress = (startScroll - currentPos) / scrollRange;
-    progress = Math.max(0, Math.min(1, progress));
-
-    // Map scroll progress to video with buffer zones
-    let videoProgress = 0;
-    
-    if (progress < stickyStart) {
-      // Before animation starts - show first frame
-      videoProgress = 0;
-    } else if (progress <= stickyEnd) {
-      // During animation - play through video
-      const animationRange = stickyEnd - stickyStart;
-      videoProgress = (progress - stickyStart) / animationRange;
-    } else {
-      // After animation - hold last frame
-      videoProgress = 1;
-    }
-
-    if (video.duration && !isNaN(video.duration)) {
-      const newTime = videoProgress * video.duration;
-
-      // Only update if time changed significantly (helps iOS performance)
-      if (Math.abs(newTime - lastTime) > 0.03) {
-        try {
-          video.currentTime = newTime;
-          lastTime          = newTime;
-
-          scrollUpdateCount++;
-          if (scrollUpdateCount <= 5) {
-            console.log(`📊 Video ${index + 1} Update #${scrollUpdateCount}: progress=${progress.toFixed(2)}, time=${newTime.toFixed(2)}s`);
-          }
-        } catch (e) {
-          console.error('❌ Error setting currentTime:', e);
-        }
-      }
-    }
-
-    ticking = false;
-  }
-
-  function onScroll() {
-    if (!ticking) {
-      window.requestAnimationFrame(updateVideo);
-      ticking = true;
-    }
-  }
-
-  // Load the video
-  video.load();
-
-  // Attach scroll when video is ready
-  const startScrollHandler = () => {
-    window.addEventListener('scroll', onScroll, { passive: true });
-    console.log(`🎬 Scroll handler attached for video ${index + 1}`);
-    updateVideo();
-  };
-
-  if (video.readyState >= 1) {
-    console.log(`✅ Video ${index + 1} metadata ready`);
-    videoReady = true;
-    startScrollHandler();
-  } else {
-    video.addEventListener('loadedmetadata', () => {
-      videoReady = true;
-      startScrollHandler();
-    }, { once: true });
-
-    // Fallback
-    setTimeout(() => {
-      if (!videoReady) {
-        console.warn(`⚠️ Video ${index + 1} still loading, starting anyway`);
-        videoReady = true;
-        startScrollHandler();
-      }
-    }, 2000);
-  }
-
-  // Lazy load when section is near
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          console.log(`👀 Video ${index + 1} section in view`);
-          video.load();
-          if (isIOS && !userInteracted) {
-            console.log(`💡 Video ${index + 1}: Tap or scroll to enable video on iOS`);
-          }
-        }
-      });
-    }, { threshold: 0.01, rootMargin: '200px' });
-
-    observer.observe(section);
-  }
-
-  video.pause();
-  console.log(`🎬 Video ${index + 1} setup complete. On iOS, touch the screen to enable video.`);
-}
-
 /*** 8) Auto-load correct scroll video based on screen size (ALL .scroll-video) ***/
 (function initScrollVideoSource() {
   function updateAllScrollVideos() {
