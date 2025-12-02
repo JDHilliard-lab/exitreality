@@ -941,7 +941,7 @@ transition: opacity 0.05s linear; */
        300vh = Long stick (slow scrub)
        Adjust this number to control the "duration" 
     */
-    height: 150vh; 
+    height: 110vh; 
     z-index: 2;
   }
 
