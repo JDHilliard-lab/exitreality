@@ -983,7 +983,7 @@ transition: opacity 0.05s linear; */
   .project-header, 
   .full-image {
     position: relative;
-    z-index: 10; /* Higher than video */
+    z-index: 5; /* Higher than video */
     background: #ffffff; /* Must be solid color, not transparent */
   }
 }
