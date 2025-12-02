@@ -932,45 +932,61 @@ transition: opacity 0.05s linear; */
   z-index: 2;
 }
 
-/* ===== MOBILE SCROLL VIDEO (SQUARE FIX) ===== */
+/* ===== MOBILE SCROLL VIDEO (CENTER STICKY + SQUARE) ===== */
 @media (max-width: 768px) {
-  /* 1. The Track: This controls the "Duration" of the sticky effect */
+  
+  /* 1. The "Track" Length
+     140vh = Very short scroll (fast playback). 
+     Increase this number (e.g., 180vh) if it plays TOO fast.
+  */
   .scroll-video-section {
-    /* 100vh = Video scrolls normally (no stick)
-       150vh = Short stick (fast scrub)
-       300vh = Long stick (slow scrub)
-       Adjust this number to control the "duration" 
-    */
-    height: 105vh; 
-    z-index: 2;
+    height: 140vh; 
+    position: relative;
+    z-index: 1; /* Lower than content so text slides OVER it if they overlap */
+    margin: 0;
+    padding: 0;
   }
 
-  /* 2. The Container: Force it to be a Square (1:1) */
+  /* 2. The Container: Square & Center Locked */
   .scroll-video-container {
+    position: sticky;
+    
+    /* THE MAGIC FORMULA:
+       (Viewport Height / 2) - (Video Width / 2)
+       This makes it stick exactly in the vertical center.
+    */
+    top: calc(50vh - 50vw); 
+    
     width: 100vw;
-    height: 100vw; /* Matches width exactly = SQUARE */
+    height: 100vw; /* Perfect Square */
     
-    /* 3. Center the square vertically in the viewport */
-    /* Calculation: (Viewport Height / 2) - (Video Height / 2) */
-    top: calc(50vh - 50vw);
-    
-    /* 4. Remove the black background (Letterbox) */
-    background: transparent;
-    background-image: none; /* Optional: hide poster if causing issues */
-    
-    /* Ensure clean edges */
-    margin: 0;
+    background: transparent; /* Removes black bars */
     overflow: hidden;
+    margin: 0 auto;
+    
+    /* Smooth out edge rendering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .scroll-video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures video fills the square container perfectly */
-    background: transparent;
+    object-fit: cover;
+  }
+  
+  /* 3. CRITICAL: Prevent Crashing
+     The sections ABOVE and BELOW the video need a background
+     so the video slides underneath them cleanly.
+  */
+  .content-section, 
+  .project-header, 
+  .full-image {
+    position: relative;
+    z-index: 10; /* Higher than video */
+    background: #ffffff; /* Must be solid color, not transparent */
   }
 }
-
 /* ===== PARALLAX SECTION ===== */
 .parallax-section {
   position: relative;
