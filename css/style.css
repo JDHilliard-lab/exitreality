@@ -1417,11 +1417,11 @@ body.project-page .full-image:first-of-type {
 .slideshow {
     /* Stabilizes 3D transforms */
     perspective: 1000px;
-    /* Prevents any tiny gap from 'inline' elements */
-    font-size: 0; 
+    /* REMOVED: font-size: 0; <-- This was collapsing your arrows */
 }
 
 /* Target the individual slides within the sliding slideshow */
+/* Assuming your slides are direct children of .slideshow */
 .slideshow > * { 
     /* Prevents rendering glitches during the transform animation */
     backface-visibility: hidden;
