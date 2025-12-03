@@ -1382,4 +1382,21 @@ body.project-page .full-image:first-of-type {
     opacity: 1 !important;
   }
 }
-
+/* ********************************************* */
+/* * MOBILE FIXES (Added for Hero Video Gap) * */
+/* ********************************************* */
+@media (max-width: 768px) {
+    /* Overlaps the first video by 1px on all three sides (top, left, right)
+     * to eliminate random white lines caused by sub-pixel rendering.
+     */
+    body.project-page .full-image:first-of-type {
+        /* Pulls the container up 1px to overlap the bottom of the project header */
+        margin-top: -1px !important; 
+        
+        /* Pulls the container left 1px */
+        margin-left: -1px;
+        
+        /* Makes the container 2px wider (100% + 1px left + 1px right) */
+        width: calc(100% + 2px);
+    }
+}
