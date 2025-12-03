@@ -3,7 +3,7 @@
    - Dynamic --nav-h (nav height) CSS var
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
-   - Swipe gestures for slide slideshows
+   - Swipe gestures for slide slideshows (UPDATED: Now includes desktop drag)
    - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
    - Scroll-driven video (360° rotation effect) with mobile debugging
    - Before/After slider functionality
@@ -252,6 +252,215 @@
     smoothScrollToId(id);
   });
 
+  //*** HELPER: Physics-based swipe/drag for sliding slideshows ***/
+  function initPhysicsDrag(root, slides, prevBtn, nextBtn, userInteractedCallback, autoplayNextCallback) {
+    // This function assumes the slideshow has a CSS setup for sliding (e.g., using flex or grid)
+    // and relies on setting a CSS variable --x to control the horizontal offset.
+
+    const container = slides[0].parentNode; // Assumes slides are direct children of a container inside root
+    if (!container) return;
+
+    let index = slides.findIndex(s => s.classList.contains('active'));
+    if (index < 0) index = 0;
+
+    let posX = 0; // Current position in px
+    let targetX = 0; // Target position in px
+    let dragging = false;
+    let startX = 0;
+    let deltaX = 0;
+    let animationFrame = null;
+    const SPRINGINESS = 0.15; // How fast it snaps back
+
+    function setIndex(newIndex, isAutoplay = false) {
+      newIndex = (newIndex + slides.length) % slides.length;
+      if (newIndex === index && !isAutoplay) return; // Prevent unnecessary snaps on user interaction
+
+      index = newIndex;
+      targetX = -index * slides[0].offsetWidth; // Calculate target based on current slide width
+
+      // Update active classes for fade-style fallbacks or other indicators
+      slides.forEach((s, i) => s.classList.toggle('active', i === index));
+      
+      // If triggered by autoplay, we jump to the target position instantly
+      // Otherwise, the spring animation will handle the movement
+      if (isAutoplay) {
+        posX = targetX;
+        root.style.setProperty('--x', posX + 'px');
+      } else {
+         startAnimationLoop();
+      }
+    }
+    
+    // Initial setup
+    setIndex(index);
+
+    // Main animation loop for smooth, spring-like movement
+    function animate() {
+      if (!dragging) {
+        deltaX = targetX - posX;
+        posX += deltaX * SPRINGINESS;
+      }
+
+      // Stop animation loop if we are close enough to the target (and not dragging)
+      if (Math.abs(deltaX) < 0.1 && !dragging) {
+        posX = targetX;
+        root.style.setProperty('--x', posX + 'px');
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+        return;
+      }
+      
+      root.style.setProperty('--x', posX + 'px');
+      animationFrame = requestAnimationFrame(animate);
+    }
+
+    function startAnimationLoop() {
+      if (animationFrame === null) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    }
+    
+    // Event Handlers (Mouse/Touch)
+    function onStart(clientX) {
+      userInteractedCallback(); // Stop/pause autoplay
+      dragging = true;
+      startX = clientX;
+      container.classList.add('is-dragging');
+      // Set the container to the current visual position to prevent jump
+      posX = parseFloat(root.style.getPropertyValue('--x') || 0);
+    }
+
+    function onMove(clientX) {
+      if (!dragging) return;
+      const moveX = clientX - startX;
+      posX = targetX + moveX;
+      root.style.setProperty('--x', posX + 'px');
+    }
+
+    function onEnd(clientX, velocity) {
+      if (!dragging) return;
+      
+      dragging = false;
+      container.classList.remove('is-dragging');
+
+      const dragDistance = clientX - startX;
+      const slideWidth = slides[0].offsetWidth;
+      const threshold = slideWidth * 0.2; // 20% swipe threshold
+
+      let newIndex = index;
+      
+      // Check for swipe/drag past threshold
+      if (dragDistance > threshold || velocity > 0.5) {
+        newIndex = Math.max(0, index - 1); // Swiped right (to previous)
+      } else if (dragDistance < -threshold || velocity < -0.5) {
+        newIndex = Math.min(slides.length - 1, index + 1); // Swiped left (to next)
+      } else {
+        // If not enough drag, snap back to the current slide
+        newIndex = index;
+      }
+      
+      setIndex(newIndex);
+    }
+    
+    // Mouse Events
+    let lastMoveTime = 0;
+    let lastClientX = 0;
+    let velX = 0;
+
+    root.addEventListener('mousedown', (e) => {
+      onStart(e.clientX);
+      lastMoveTime = Date.now();
+      lastClientX = e.clientX;
+
+      const mouseMove = (ev) => {
+        const now = Date.now();
+        const deltaTime = now - lastMoveTime;
+        
+        // Calculate velocity (pixels per millisecond)
+        if (deltaTime > 0) {
+          velX = (ev.clientX - lastClientX) / deltaTime;
+        }
+
+        onMove(ev.clientX);
+        lastMoveTime = now;
+        lastClientX = ev.clientX;
+        e.preventDefault();
+      };
+
+      const mouseUp = (ev) => {
+        window.removeEventListener('mousemove', mouseMove);
+        window.removeEventListener('mouseup', mouseUp);
+        onEnd(ev.clientX, velX);
+        velX = 0;
+      };
+
+      window.addEventListener('mousemove', mouseMove);
+      window.addEventListener('mouseup', mouseUp);
+    });
+
+    // Touch Events
+    root.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      onStart(t.clientX);
+      lastMoveTime = Date.now();
+      lastClientX = t.clientX;
+    }, { passive: true });
+
+    root.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      const now = Date.now();
+      const deltaTime = now - lastMoveTime;
+      
+      if (deltaTime > 0) {
+        velX = (t.clientX - lastClientX) / deltaTime;
+      }
+
+      onMove(t.clientX);
+      lastMoveTime = now;
+      lastClientX = t.clientX;
+    }, { passive: true });
+
+    root.addEventListener('touchend', (e) => {
+      // Use the last recorded clientX from touchmove
+      onEnd(lastClientX, velX * 5); // Boost touch velocity factor
+      velX = 0;
+    });
+    
+    // Arrow buttons
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        userInteractedCallback();
+        setIndex(index - 1);
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        userInteractedCallback();
+        setIndex(index + 1);
+      });
+    }
+
+    // Keyboard navigation (shared logic with fade)
+    root.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') {
+        userInteractedCallback();
+        setIndex(index - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        userInteractedCallback();
+        setIndex(index + 1);
+      }
+    });
+    
+    // Autoplay Next callback for slide
+    autoplayNextCallback.current = () => setIndex(index + 1, true);
+    
+    // Recalculate position on resize
+    window.addEventListener('resize', debounce(() => setIndex(index, true), 100));
+  }
+
+
   //*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
 function initSlideshows() {
   document.querySelectorAll('.slideshow').forEach(function (root) {
@@ -260,11 +469,56 @@ function initSlideshows() {
     const nextBtn = root.querySelector('.slideshow__arrow--next');
     if (!slides.length) return;
 
+    // --- Shared Autoplay Logic ---
+    const autoplayMs = 6000; // Autoplay interval
+    let timer = null;
+    let isInteracting = false;
+    let idleTimeout = null;
+    let autoplayNext = { current: null }; // Reference to the function that advances the slide
+
+    function startAutoplay() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(function () {
+        // Do not advance while the user is actively interacting or no advance function is set
+        if (isInteracting || !autoplayNext.current) return;
+        autoplayNext.current();
+      }, autoplayMs);
+    }
+
+    function stopAutoplay() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    // Call when user clicks arrows, uses keyboard, or starts drag/swipe
+    function userInteracted() {
+      isInteracting = true;
+      stopAutoplay();
+
+      // Restart autoplay after a period of no interaction
+      if (idleTimeout) clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(function () {
+        isInteracting = false;
+        startAutoplay();
+      }, autoplayMs); // Autoplay resumes after this delay
+    }
+    
+    // Hover: pause while hovered, resume when mouse leaves (if not interacting)
+    root.addEventListener('mouseenter', stopAutoplay);
+    root.addEventListener('mouseleave', function () {
+      if (!isInteracting) {
+        startAutoplay();
+      }
+    });
+
     const isSlide = root.classList.contains('slideshow--slide');
 
-    // Use existing physics-drag logic for the sliding variant
+    // ===== SLIDING Slideshow with Physics Drag =====
     if (isSlide) {
-      initPhysicsDrag(root, slides, prevBtn, nextBtn);
+      initPhysicsDrag(root, slides, prevBtn, nextBtn, userInteracted, autoplayNext);
+      startAutoplay();
       return;
     }
 
@@ -283,41 +537,7 @@ function initSlideshows() {
       index = nextIndex;
       slides[index].classList.add('active');
     }
-
-    const autoplayMs = 6000; // autoplay interval
-    let timer = null;
-    let isInteracting = false;
-    let idleTimeout = null;
-
-    function startAutoplay() {
-      if (timer) clearInterval(timer);
-      timer = setInterval(function () {
-        // Do not advance while the user is actively interacting
-        if (isInteracting) return;
-        show(index + 1);
-      }, autoplayMs);
-    }
-
-    function stopAutoplay() {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    // Call when user clicks arrows or uses keyboard
-    function userInteracted() {
-      isInteracting = true;
-      stopAutoplay();
-
-      // Restart autoplay after a period of no interaction
-      if (idleTimeout) clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(function () {
-        isInteracting = false;
-        startAutoplay();
-      }, autoplayMs); // change this delay if you want faster/slower resume
-    }
-
+    
     // Arrow buttons
     if (prevBtn) {
       prevBtn.addEventListener('click', function () {
@@ -345,17 +565,9 @@ function initSlideshows() {
       }
     });
 
-    // Hover: pause while hovered, resume when mouse leaves (if not interacting)
-    root.addEventListener('mouseenter', function () {
-      stopAutoplay();
-    });
-
-    root.addEventListener('mouseleave', function () {
-      if (!isInteracting) {
-        startAutoplay();
-      }
-    });
-
+    // Autoplay Next callback for fade
+    autoplayNext.current = () => show(index + 1);
+    
     // Kick off autoplay
     startAutoplay();
   });
