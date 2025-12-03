@@ -266,12 +266,32 @@
         initPhysicsDrag(root, slides, prevBtn, nextBtn);
         return;
       }
-
-      // Regular fade slideshow
+// Regular fade slideshow
       let index = slides.findIndex(s => s.classList.contains('active'));
       if (index < 0) {
         index = 0;
         slides[0].classList.add('active');
+      }
+
+      // New Autoplay Variables and Control Functions
+      const autoplayMs = 6000;
+      let timer = null;
+      let restartTimer = null; 
+
+      function stopAutoplay() {
+        if (timer) clearInterval(timer);
+        if (restartTimer) clearTimeout(restartTimer);
+      }
+
+      function startAutoplay() {
+        stopAutoplay();
+        timer = setInterval(() => show(index + 1), autoplayMs);
+      }
+
+      function resumeAutoplay() {
+        stopAutoplay();
+        // Wait 3 seconds, then start again
+        restartTimer = setTimeout(startAutoplay, 3000); 
       }
 
       function show(nextIndex) {
@@ -283,20 +303,37 @@
         slides[index].classList.add('active');
       }
 
-      if (prevBtn) prevBtn.addEventListener('click', () => show(index - 1));
-      if (nextBtn) nextBtn.addEventListener('click', () => show(index + 1));
+      // 🔄 UPDATED EVENT LISTENERS (Stop on interaction, resume after 3s)
+      if (prevBtn) prevBtn.addEventListener('click', () => { 
+        stopAutoplay(); 
+        show(index - 1); 
+        resumeAutoplay(); 
+      });
+      if (nextBtn) nextBtn.addEventListener('click', () => { 
+        stopAutoplay(); 
+        show(index + 1); 
+        resumeAutoplay(); 
+      });
 
       root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') show(index - 1);
-        if (e.key === 'ArrowRight') show(index + 1);
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { 
+          stopAutoplay();
+          show(e.key === 'ArrowLeft' ? index - 1 : index + 1); 
+          resumeAutoplay();
+        }
       });
 
-      const autoplayMs = 6000;
-      let timer = setInterval(() => show(index + 1), autoplayMs);
-      root.addEventListener('mouseenter', () => clearInterval(timer));
-      root.addEventListener('mouseleave', () => {
-        timer = setInterval(() => show(index + 1), autoplayMs);
-      });
+      // Mouse hover and Touch handling
+      root.addEventListener('mouseenter', stopAutoplay);
+      root.addEventListener('mouseleave', resumeAutoplay);
+      
+      // Mobile touch events
+      root.addEventListener('touchstart', stopAutoplay, { passive: true });
+      root.addEventListener('touchend', resumeAutoplay, { passive: true });
+      
+      // Initial start
+      startAutoplay();
+    
     });
   }
 
