@@ -1410,25 +1410,23 @@ body.project-page .full-image:first-of-type {
 
 
 /* ********************************************* */
-/* * FIX: SLIDESHOW VERTICAL LINE JITTER * */
+/* * FINAL FIX: SLIDESHOW VERTICAL LINE JITTER (GLOBAL) * */
 /* ********************************************* */
 
 /* Target the main slideshow container */
 .slideshow {
     /* Stabilizes 3D transforms */
-    perspective: 1000px;
-    /* REMOVED: font-size: 0; <-- This was collapsing your arrows */
+    perspective: 1000px !important;
 }
 
 /* Target the individual slides within the sliding slideshow */
-/* Assuming your slides are direct children of .slideshow */
 .slideshow > * { 
     /* Prevents rendering glitches during the transform animation */
-    backface-visibility: hidden;
+    backface-visibility: hidden !important;
     
     /* CRITICAL: Force a slight overlap (0.1%) to cover any sub-pixel gaps */
-    width: 100.1%; 
+    width: 100.1% !important; 
     
     /* Ensures hardware acceleration (GPU) is fully engaged for smoother sliding */
-    transform: translateZ(0); 
+    transform: translateZ(0) !important; 
 }
