@@ -605,6 +605,14 @@ footer {
   background: #000;
 }
 
+/* Mobile Hero Video Gap Fix */
+    body.project-page .full-image:first-of-type video {
+        width: calc(100% + 2px) !important;
+        height: calc(100% + 2px) !important;
+        transform: translate(-1px, -1px) !important; 
+    }
+}
+
 /* Hide video controls on mobile until interaction */
 @media (max-width: 768px) {
   .full-image video:not(.show-controls) {
