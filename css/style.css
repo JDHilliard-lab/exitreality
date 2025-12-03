@@ -793,7 +793,7 @@ transition: opacity 0.05s linear; */
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 1.0s ease-out;
+  transition: opacity 0.75s ease-out;
   display: block;
   vertical-align: top;
   line-height: 0;
@@ -1382,3 +1382,4 @@ body.project-page .full-image:first-of-type {
     opacity: 1 !important;
   }
 }
+
