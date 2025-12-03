@@ -1382,4 +1382,28 @@ body.project-page .full-image:first-of-type {
     opacity: 1 !important;
   }
 }
+/* ********************************************* */
+/* * FIX: SLIDESHOW VERTICAL LINE JITTER * */
+/* ********************************************* */
+
+/* Target the main slideshow container */
+.slideshow {
+    /* Stabilizes 3D transforms */
+    perspective: 1000px;
+    /* Prevents any tiny gap from 'inline' elements */
+    font-size: 0; 
+}
+
+/* Target the individual slides within the sliding slideshow */
+/* Assuming your slides are direct children of .slideshow */
+.slideshow > * { 
+    /* Prevents rendering glitches during the transform animation */
+    backface-visibility: hidden;
+    
+    /* CRITICAL: Force a slight overlap (0.1%) to cover any sub-pixel gaps */
+    width: 100.1%; 
+    
+    /* Ensures hardware acceleration (GPU) is fully engaged for smoother sliding */
+    transform: translateZ(0); 
+}
 
