@@ -1383,51 +1383,37 @@ body.project-page .full-image:first-of-type {
   }
 }
 /* ********************************************* */
-/* * MOBILE HERO VIDEO GAP FIX (PROJECT PAGES) * */
+/* * FINAL COMPREHENSIVE FIX (VIDEO, SLIDESHOW, ARROWS) * */
 /* ********************************************* */
+
+/* --- 1. MOBILE HERO VIDEO GAP FIX (applies to project pages only) --- */
 @media (max-width: 768px) {
     
-    /* FIX 1: Ensure Navbar is visible (using an element common in your HTML) */
+    /* Ensure Navbar is visible (highest stacking context) */
     #navbar-placeholder {
-        z-index: 99999 !important; /* Extremely high Z-index */
+        z-index: 99999 !important;
     }
     
-    /* A) Revert any aggressive margin/width rules from the container */
-    body.project-page .full-image:first-of-type {
-        margin-top: 0 !important; /* Prevents navbar overlap */
-        margin-left: 0;
-        width: 100%; 
-    }
-
-    /* B) Force the inner <video> element to overlap all edges to hide sub-pixel gaps */
+    /* Force the inner <video> element to overlap all edges to hide sub-pixel gaps */
     body.project-page .full-image:first-of-type video {
         width: calc(100% + 2px) !important;
         height: calc(100% + 2px) !important;
-        /* Shifts the video up and left by 1px to cover all four edges */
         transform: translate(-1px, -1px) !important; 
     }
 }
 
 
-/* ********************************************* */
-/* * FINAL FIX: SLIDESHOW JITTER & ARROW RESTORE (GLOBAL) * */
-/* ********************************************* */
+/* --- 2. SLIDESHOW JITTER & ARROW RESTORE (GLOBAL) --- */
 
-/* 1. JITTER FIX: Target the individual slides to force overlap */
-/* NOTE: We avoid targeting the parent .slideshow to prevent collateral damage (like font-size:0) */
-.slideshow > * { 
-    /* Prevents rendering glitches during the transform animation */
-    backface-visibility: hidden !important;
-    
-    /* CRITICAL: Force a slight overlap (0.1%) to cover any sub-pixel gaps */
-    width: 100.1% !important; 
-    
-    /* Ensures hardware acceleration (GPU) is fully engaged for smoother sliding */
-    transform: translateZ(0) !important; 
+/* Fix Collapsed Arrows: Restore font-size and ensure they stack on top */
+.slideshow__arrow {
+    font-size: 1.5rem !important; /* Forces a visible size for arrow icons */
+    z-index: 99999 !important;   /* Ensures arrows are never covered by slides */
 }
 
-/* 2. ARROW RESTORE: Ensure the arrows are placed on top of the sliding content */
-.slideshow__arrow {
-    z-index: 100 !important; 
-    /* This ensures the arrows are visible even if the sliding images cover them. */
+/* Fix Jitter: Target the individual slides to force overlap and stabilize GPU */
+.slideshow > * { 
+    backface-visibility: hidden !important;
+    width: 100.1% !important; /* CRITICAL: Forces 0.1% overlap to hide sub-pixel lines */
+    transform: translateZ(0) !important; 
 }
