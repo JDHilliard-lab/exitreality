@@ -1382,33 +1382,3 @@ body.project-page .full-image:first-of-type {
     opacity: 1 !important;
   }
 }
-/* ********************************************* */
-/* * MOBILE FIXES (Added for Hero Video Gap) * */
-/* ********************************************* */
-@media (max-width: 768px) {
-    
-    /* FIX 1: Ensure Navbar is visible */
-    /* If your navbar is injected into #navbar-placeholder, this ensures it stacks above all project content */
-    #navbar-placeholder {
-        z-index: 9999;
-    }
-    
-    /* FIX 2: Mobile Hero Video Gap Resolution (Best Practice) */
-    
-    /* A) Remove the problematic margin/width rules from the container */
-    body.project-page .full-image:first-of-type {
-        margin-top: 0 !important; /* Revert this to prevent navbar overlap */
-        margin-left: 0;
-        width: 100%; 
-    }
-
-    /* B) Force the inner <video> element to overlap all edges */
-    body.project-page .full-image:first-of-type video {
-        /* Add 2px to width/height */
-        width: calc(100% + 2px);
-        height: calc(100% + 2px);
-        
-        /* Shift the video up and left by 1px to cover all four edges (top/bottom/left/right) */
-        transform: translate(-1px, -1px); 
-    }
-}
