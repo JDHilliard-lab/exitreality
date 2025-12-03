@@ -1387,9 +1387,9 @@ body.project-page .full-image:first-of-type {
 /* ********************************************* */
 @media (max-width: 768px) {
     
-    /* FIX 1: Ensure Navbar is visible */
+    /* FIX 1: Ensure Navbar is visible (using an element common in your HTML) */
     #navbar-placeholder {
-        z-index: 9999;
+        z-index: 99999 !important; /* Extremely high Z-index */
     }
     
     /* A) Revert any aggressive margin/width rules from the container */
@@ -1410,17 +1410,11 @@ body.project-page .full-image:first-of-type {
 
 
 /* ********************************************* */
-/* * FINAL FIX: SLIDESHOW VERTICAL LINE JITTER (GLOBAL) * */
+/* * FINAL FIX: SLIDESHOW JITTER & ARROW RESTORE (GLOBAL) * */
 /* ********************************************* */
 
-/* Target the main slideshow container */
-.slideshow {
-    /* Stabilizes 3D transforms */
-    perspective: 1000px !important;
-    /* WARNING: font-size: 0; is REMOVED to keep your arrows visible! */
-}
-
-/* Target the individual slides within the sliding slideshow */
+/* 1. JITTER FIX: Target the individual slides to force overlap */
+/* NOTE: We avoid targeting the parent .slideshow to prevent collateral damage (like font-size:0) */
 .slideshow > * { 
     /* Prevents rendering glitches during the transform animation */
     backface-visibility: hidden !important;
@@ -1430,4 +1424,10 @@ body.project-page .full-image:first-of-type {
     
     /* Ensures hardware acceleration (GPU) is fully engaged for smoother sliding */
     transform: translateZ(0) !important; 
+}
+
+/* 2. ARROW RESTORE: Ensure the arrows are placed on top of the sliding content */
+.slideshow__arrow {
+    z-index: 100 !important; 
+    /* This ensures the arrows are visible even if the sliding images cover them. */
 }
