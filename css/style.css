@@ -1386,17 +1386,25 @@ body.project-page .full-image:first-of-type {
 /* * MOBILE FIXES (Added for Hero Video Gap) * */
 /* ********************************************* */
 @media (max-width: 768px) {
-    /* Overlaps the first video by 1px on all three sides (top, left, right)
-     * to eliminate random white lines caused by sub-pixel rendering.
-     */
+    /* 1. Ensure the parent container extends past the edges */
     body.project-page .full-image:first-of-type {
-        /* Pulls the container up 1px to overlap the bottom of the project header */
+        /* Pulls container up 1px to overlap the header gap */
         margin-top: -1px !important; 
         
-        /* Pulls the container left 1px */
+        /* Pulls container left 1px */
         margin-left: -1px;
         
-        /* Makes the container 2px wider (100% + 1px left + 1px right) */
+        /* Makes container 2px wider (100% + 1px left + 1px right) */
+        width: calc(100% + 2px); 
+    }
+
+    /* 2. Ensure the video *inside* the container is also slightly oversized */
+    body.project-page .full-image:first-of-type video {
+        /* Makes video 100% of the parent + 2px on the width/height to overlap all edges */
         width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        
+        /* Shifts the video back 1px up and 1px left to fill the negative margins */
+        transform: translate(-1px, -1px); 
     }
 }
