@@ -3,8 +3,7 @@
    - Dynamic --nav-h (nav height) CSS var
    - Smooth scrolling with fixed-nav offset
    - Loading bar for page and video content
-   - Physics-based drag for slideshows (mobile & desktop)
-   - Smart autoplay (pauses on interaction)
+   - Swipe gestures for slide slideshows
    - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
    - Scroll-driven video (360° rotation effect) with mobile debugging
    - Before/After slider functionality
@@ -68,6 +67,7 @@
       }
 
       videos.forEach(video => {
+        // Skip scroll-video from loading bar (loads separately)
         if (video.classList.contains('scroll-video')) {
           totalVideos--;
           if (totalVideos === 0) updateProgress();
@@ -252,284 +252,119 @@
     smoothScrollToId(id);
   });
 
-  /*** 5) Physics-Based Drag Slideshow with Smart Autoplay ***/
-  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
-    let index = 0;
-    let offsetX = 0;
-    let velocity = 0;
-    let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
-    let lastX = 0;
-    let lastTime = Date.now();
-    let animationFrame = null;
+  //*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
+function initSlideshows() {
+  document.querySelectorAll('.slideshow').forEach(function (root) {
+    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+    const prevBtn = root.querySelector('.slideshow__arrow--prev');
+    const nextBtn = root.querySelector('.slideshow__arrow--next');
+    if (!slides.length) return;
 
-    // Autoplay state
-    let autoplayTimer = null;
+    const isSlide = root.classList.contains('slideshow--slide');
+
+    // Use existing physics-drag logic for the sliding variant
+    if (isSlide) {
+      initPhysicsDrag(root, slides, prevBtn, nextBtn);
+      return;
+    }
+
+    // ===== Regular FADE slideshow with smart autoplay pause/resume =====
+    let index = slides.findIndex(s => s.classList.contains('active'));
+    if (index < 0) {
+      index = 0;
+      slides[0].classList.add('active');
+    }
+
+    function show(nextIndex) {
+      nextIndex = (nextIndex + slides.length) % slides.length;
+      if (nextIndex === index) return;
+
+      slides[index].classList.remove('active');
+      index = nextIndex;
+      slides[index].classList.add('active');
+    }
+
+    const autoplayMs = 6000; // autoplay interval
+    let timer = null;
     let isInteracting = false;
     let idleTimeout = null;
-    const autoplayMs = 6000;
 
-    const container = document.createElement('div');
-    container.className = 'slideshow__track';
-    slides.forEach(s => container.appendChild(s));
-    root.insertBefore(container, root.firstChild);
-
-    function setTransform(x, transition = false) {
-      container.style.transition = transition ? 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none';
-      container.style.transform = `translateX(${x}px)`;
-    }
-
-    function snapToIndex(targetIndex, useVelocity = false) {
-      targetIndex = Math.max(0, Math.min(slides.length - 1, targetIndex));
-      index = targetIndex;
-      const targetX = -index * root.offsetWidth;
-      
-      if (useVelocity && Math.abs(velocity) > 0.5) {
-        const momentumX = targetX + velocity * 50;
-        const finalIndex = Math.round(-momentumX / root.offsetWidth);
-        index = Math.max(0, Math.min(slides.length - 1, finalIndex));
-      }
-      
-      offsetX = -index * root.offsetWidth;
-      setTransform(offsetX, true);
-      velocity = 0;
-    }
-
-    function animate() {
-      if (!isDragging && Math.abs(velocity) > 0.01) {
-        velocity *= 0.92;
-        offsetX += velocity;
-        setTransform(offsetX);
-        animationFrame = requestAnimationFrame(animate);
-      } else if (!isDragging) {
-        const nearestIndex = Math.round(-offsetX / root.offsetWidth);
-        snapToIndex(nearestIndex, true);
-      }
-    }
-
-    // Autoplay functions
     function startAutoplay() {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(() => {
-        if (!isInteracting && !isDragging) {
-          snapToIndex(index + 1);
-        }
+      if (timer) clearInterval(timer);
+      timer = setInterval(function () {
+        // Do not advance while the user is actively interacting
+        if (isInteracting) return;
+        show(index + 1);
       }, autoplayMs);
     }
 
     function stopAutoplay() {
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = null;
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
       }
     }
 
+    // Call when user clicks arrows or uses keyboard
     function userInteracted() {
       isInteracting = true;
       stopAutoplay();
 
+      // Restart autoplay after a period of no interaction
       if (idleTimeout) clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(() => {
+      idleTimeout = setTimeout(function () {
         isInteracting = false;
         startAutoplay();
-      }, autoplayMs);
+      }, autoplayMs); // change this delay if you want faster/slower resume
     }
-
-    // Mouse/Touch Events
-    function onStart(e) {
-      userInteracted();
-      isDragging = true;
-      startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      currentX = startX;
-      lastX = startX;
-      lastTime = Date.now();
-      velocity = 0;
-      
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-        animationFrame = null;
-      }
-      
-      container.style.transition = 'none';
-    }
-
-    function onMove(e) {
-      if (!isDragging) return;
-      
-      currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-      const deltaX = currentX - lastX;
-      const deltaTime = Date.now() - lastTime;
-      
-      if (deltaTime > 0) {
-        velocity = deltaX / deltaTime * 16;
-      }
-      
-      offsetX += deltaX;
-      setTransform(offsetX);
-      
-      lastX = currentX;
-      lastTime = Date.now();
-    }
-
-    function onEnd() {
-      if (!isDragging) return;
-      isDragging = false;
-      animationFrame = requestAnimationFrame(animate);
-    }
-
-    // Desktop
-    root.addEventListener('mousedown', onStart);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onEnd);
-
-    // Mobile
-    root.addEventListener('touchstart', onStart, { passive: true });
-    root.addEventListener('touchmove', onMove, { passive: true });
-    root.addEventListener('touchend', onEnd);
 
     // Arrow buttons
     if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
+      prevBtn.addEventListener('click', function () {
         userInteracted();
-        snapToIndex(index - 1);
+        show(index - 1);
       });
     }
 
     if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
+      nextBtn.addEventListener('click', function () {
         userInteracted();
-        snapToIndex(index + 1);
+        show(index + 1);
       });
     }
 
-    // Hover pause
-    root.addEventListener('mouseenter', stopAutoplay);
-    root.addEventListener('mouseleave', () => {
-      if (!isInteracting) startAutoplay();
-    });
-
-    // Keyboard
-    root.addEventListener('keydown', (e) => {
+    // Keyboard navigation
+    root.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowLeft') {
         userInteracted();
-        snapToIndex(index - 1);
+        show(index - 1);
       }
       if (e.key === 'ArrowRight') {
         userInteracted();
-        snapToIndex(index + 1);
+        show(index + 1);
       }
     });
 
-    // Initial position and start autoplay
-    snapToIndex(0);
+    // Hover: pause while hovered, resume when mouse leaves (if not interacting)
+    root.addEventListener('mouseenter', function () {
+      stopAutoplay();
+    });
+
+    root.addEventListener('mouseleave', function () {
+      if (!isInteracting) {
+        startAutoplay();
+      }
+    });
+
+    // Kick off autoplay
     startAutoplay();
-  }
+  });
+}
 
-  /*** 6) Global Slideshow Support - Fade & Slide variants ***/
-  function initSlideshows() {
-    document.querySelectorAll('.slideshow').forEach(function (root) {
-      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-      const prevBtn = root.querySelector('.slideshow__arrow--prev');
-      const nextBtn = root.querySelector('.slideshow__arrow--next');
-      if (!slides.length) return;
-
-      const isSlide = root.classList.contains('slideshow--slide');
-
-      // Use physics drag for sliding variant
-      if (isSlide) {
-        initPhysicsDrag(root, slides, prevBtn, nextBtn);
-        return;
-      }
-
-      // ===== FADE slideshow with smart autoplay =====
-      let index = slides.findIndex(s => s.classList.contains('active'));
-      if (index < 0) {
-        index = 0;
-        slides[0].classList.add('active');
-      }
-
-      function show(nextIndex) {
-        nextIndex = (nextIndex + slides.length) % slides.length;
-        if (nextIndex === index) return;
-
-        slides[index].classList.remove('active');
-        index = nextIndex;
-        slides[index].classList.add('active');
-      }
-
-      const autoplayMs = 6000;
-      let timer = null;
-      let isInteracting = false;
-      let idleTimeout = null;
-
-      function startAutoplay() {
-        if (timer) clearInterval(timer);
-        timer = setInterval(function () {
-          if (isInteracting) return;
-          show(index + 1);
-        }, autoplayMs);
-      }
-
-      function stopAutoplay() {
-        if (timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-      }
-
-      function userInteracted() {
-        isInteracting = true;
-        stopAutoplay();
-
-        if (idleTimeout) clearTimeout(idleTimeout);
-        idleTimeout = setTimeout(function () {
-          isInteracting = false;
-          startAutoplay();
-        }, autoplayMs);
-      }
-
-      // Arrow buttons
-      if (prevBtn) {
-        prevBtn.addEventListener('click', function () {
-          userInteracted();
-          show(index - 1);
-        });
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener('click', function () {
-          userInteracted();
-          show(index + 1);
-        });
-      }
-
-      // Keyboard navigation
-      root.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowLeft') {
-          userInteracted();
-          show(index - 1);
-        }
-        if (e.key === 'ArrowRight') {
-          userInteracted();
-          show(index + 1);
-        }
-      });
-
-      // Hover: pause while hovered, resume when mouse leaves
-      root.addEventListener('mouseenter', stopAutoplay);
-      root.addEventListener('mouseleave', function () {
-        if (!isInteracting) startAutoplay();
-      });
-
-      // Start autoplay
-      startAutoplay();
-    });
-  }
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
-  /*** 7) Parallax scrolling effect ***/
+  /*** 6) Parallax scrolling effect - Works on both desktop and mobile ***/
   (function initParallax() {
     const parallaxSections = document.querySelectorAll('.parallax-section');
     
@@ -574,7 +409,7 @@
     handleScroll();
   })();
 
-/*** 8) Scroll-Driven Video (360° rotation effect) ***/
+/*** 7) Scroll-Driven Video (360° rotation effect) - SMOOTHED & FIXED ***/
 (function initScrollVideo() {
   const sections = document.querySelectorAll('.scroll-video-section');
   if (!sections.length) return;
@@ -584,28 +419,36 @@
     const video = section.querySelector('.scroll-video');
     if (!video || !container) return;
 
+    // 1. Setup Video Properties
     video.pause();
     video.currentTime = 0;
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
     video.muted = true;
     
+    // 2. State for Smoothing (Lerp)
     let targetTime = 0;
     let currentTime = 0;
     let isRenderLoopRunning = false;
     
+    // Physics constant: Lower = smoother/slower catchup (0.05), Higher = snappier (0.2)
     const smoothFactor = 0.1; 
 
+    // 3. Render Loop (Decouples scroll from video update for smoothness)
     function render() {
+      // Calculate difference between where we are and where we want to be
       const diff = targetTime - currentTime;
       
+      // If difference is small enough, stop the loop to save battery
       if (Math.abs(diff) < 0.01) {
         isRenderLoopRunning = false;
         return; 
       }
 
+      // Ease current time towards target
       currentTime += diff * smoothFactor;
       
+      // Safety check for video duration
       if (video.duration) {
          video.currentTime = Math.max(0, Math.min(currentTime, video.duration));
       }
@@ -613,6 +456,7 @@
       requestAnimationFrame(render);
     }
 
+    // 4. Start Smoothing Loop
     function startRenderLoop() {
       if (!isRenderLoopRunning) {
         isRenderLoopRunning = true;
@@ -620,18 +464,33 @@
       }
     }
 
-    function handleScroll() {
+    // 5. Scroll Handler
+  function handleScroll() {
       const rect = section.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const sectionHeight = rect.height;
       
+      // Calculate when the video is actually "stuck"
+      // It sticks when rect.top hits the calculated center offset
+      
+      // We start playing when the section top enters the viewport
       const start = viewportHeight;
+      // We finish playing when the bottom of the section leaves the viewport
       const end = -sectionHeight;
       
+      // Calculate raw progress (0 to 1)
       let progress = (start - rect.top) / (start - end);
       
+      // TIGHTEN THE PLAYBACK:
+      // 0.2 = wait until it's 20% up the screen to start moving
+      // 0.8 = finish playing before it completely leaves
+      // This ensures it plays mostly while "Centered/Stuck"
       const buffer = 0.2; 
+      
+      // Remap progress to ignore the entry/exit edges
       progress = (progress - buffer) / (1 - (buffer * 2));
+      
+      // Clamp between 0 and 1
       const clampedProgress = Math.max(0, Math.min(1, progress));
 
       if (video.duration) {
@@ -643,6 +502,7 @@
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
     
+    // Initial Trigger
     if (video.readyState >= 1) {
       handleScroll();
     } else {
@@ -650,8 +510,7 @@
     }
   });
 })();
-
-/*** 9) Auto-load correct scroll video based on screen size ***/
+/*** 8) Auto-load correct scroll video based on screen size (ALL .scroll-video) ***/
 (function initScrollVideoSource() {
   function updateAllScrollVideos() {
     const isMobile = window.innerWidth <= 768;
@@ -669,6 +528,7 @@
       const directory = originalSrc.substring(0, lastSlash + 1);
       const filename  = originalSrc.substring(lastSlash + 1);
 
+      // Strip known suffixes, then rebuild desktop + mobile names
       const baseFilename = filename
         .replace('-desktop', '')
         .replace('_mobile', '')
@@ -685,7 +545,10 @@
         video.load();
         try {
           video.currentTime = currentTime;
-        } catch (e) {}
+        } catch (e) {
+          // ignore if seek fails early
+        }
+        console.log('🎥 Updated scroll-video src to', correctSrc);
       }
     });
   }
@@ -703,7 +566,8 @@
   });
 })();
 
-/*** 10) Before/After Slider ***/
+
+/*** 9) Before/After Slider ***/
 (function initBeforeAfterSliders() {
   function init() {
     document.querySelectorAll('.ba').forEach((root) => {
@@ -748,7 +612,7 @@
   }
 })();
 
-/*** 11) Hide video controls on mobile until user taps ***/
+/*** 10) Hide video controls on mobile until user taps ***/
 (function initMobileVideoControls() {
   function init() {
     if (window.innerWidth <= 768) {
@@ -772,7 +636,7 @@
   }
 })();
 
-/*** 12) Inject shared navbar ***/
+/*** 11) Inject shared navbar ***/
 (function injectNavbar() {
   function loadNavbar() {
     fetch('navbar.html')
@@ -791,17 +655,17 @@
   }
 })();
    
-/*** 13) Center hint for slideshows & BA on mobile ***/
+/*** 12) Center hint for slideshows & BA on mobile ***/
 (function initCenterHints() {
   function init() {
-    if (window.innerWidth > 768) return;
+    if (window.innerWidth > 768) return; // mobile only
 
     const blocks = Array.from(document.querySelectorAll('.slideshow, .ba'));
     if (!blocks.length) return;
 
     function updateAll() {
       const viewportCenter = window.innerHeight / 2;
-      const tolerance = 100;
+      const tolerance = 100; // px around center
 
       blocks.forEach(block => {
         const rect = block.getBoundingClientRect();
@@ -829,4 +693,4 @@
   }
 })();
 
-})();
+})()
