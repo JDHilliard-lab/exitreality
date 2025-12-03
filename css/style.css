@@ -1386,25 +1386,29 @@ body.project-page .full-image:first-of-type {
 /* * MOBILE FIXES (Added for Hero Video Gap) * */
 /* ********************************************* */
 @media (max-width: 768px) {
-    /* 1. Ensure the parent container extends past the edges */
+    
+    /* FIX 1: Ensure Navbar is visible */
+    /* If your navbar is injected into #navbar-placeholder, this ensures it stacks above all project content */
+    #navbar-placeholder {
+        z-index: 9999;
+    }
+    
+    /* FIX 2: Mobile Hero Video Gap Resolution (Best Practice) */
+    
+    /* A) Remove the problematic margin/width rules from the container */
     body.project-page .full-image:first-of-type {
-        /* Pulls container up 1px to overlap the header gap */
-        margin-top: -1px !important; 
-        
-        /* Pulls container left 1px */
-        margin-left: -1px;
-        
-        /* Makes container 2px wider (100% + 1px left + 1px right) */
-        width: calc(100% + 2px); 
+        margin-top: 0 !important; /* Revert this to prevent navbar overlap */
+        margin-left: 0;
+        width: 100%; 
     }
 
-    /* 2. Ensure the video *inside* the container is also slightly oversized */
+    /* B) Force the inner <video> element to overlap all edges */
     body.project-page .full-image:first-of-type video {
-        /* Makes video 100% of the parent + 2px on the width/height to overlap all edges */
+        /* Add 2px to width/height */
         width: calc(100% + 2px);
         height: calc(100% + 2px);
         
-        /* Shifts the video back 1px up and 1px left to fill the negative margins */
+        /* Shift the video up and left by 1px to cover all four edges (top/bottom/left/right) */
         transform: translate(-1px, -1px); 
     }
 }
