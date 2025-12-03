@@ -1401,10 +1401,10 @@ body.project-page .full-image:first-of-type {
 
     /* B) Force the inner <video> element to overlap all edges to hide sub-pixel gaps */
     body.project-page .full-image:first-of-type video {
-        width: calc(100% + 2px);
-        height: calc(100% + 2px);
+        width: calc(100% + 2px) !important;
+        height: calc(100% + 2px) !important;
         /* Shifts the video up and left by 1px to cover all four edges */
-        transform: translate(-1px, -1px); 
+        transform: translate(-1px, -1px) !important; 
     }
 }
 
@@ -1417,6 +1417,7 @@ body.project-page .full-image:first-of-type {
 .slideshow {
     /* Stabilizes 3D transforms */
     perspective: 1000px !important;
+    /* WARNING: font-size: 0; is REMOVED to keep your arrows visible! */
 }
 
 /* Target the individual slides within the sliding slideshow */
