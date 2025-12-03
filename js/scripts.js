@@ -251,256 +251,304 @@
     if (!id) return;
     smoothScrollToId(id);
   });
-  
-  //*** 5a) Slideshow Physics Drag Core Logic ***/
-  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
-    const slideCount = slides.length;
-    let currentIndex = 0;
-    let currentX = 0;
-    let targetX = 0;
-    let isDragging = false;
-    let lastTime = 0;
-    let velocity = 0;
-    const springConstant = 0.15; // How stiff the spring is (lower = looser)
-    const dampingFactor = 0.85; // Friction (lower = more friction)
-    const velocityThreshold = 0.5; // Stop when velocity is low
-    
-    // Set initial position
-    function setPosition(index) {
-      targetX = -index * root.clientWidth;
-      currentIndex = index;
-      render(); // Instant update when setting position via buttons
-      updateButtons();
-    }
-    
-    // Update buttons state
-    function updateButtons() {
-        if (prevBtn) prevBtn.disabled = currentIndex === 0;
-        if (nextBtn) nextBtn.disabled = currentIndex === slideCount - 1;
-    }
 
-    // Main animation loop
-    function render(timestamp) {
-      const dt = timestamp && lastTime ? (timestamp - lastTime) / 1000 : 0.016; // Delta time in seconds
-      lastTime = timestamp;
+  /*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
+  function initSlideshows() {
+    document.querySelectorAll('.slideshow').forEach(function (root) {
+      const slides = Array.from(root.querySelectorAll('.slideshow__image'));
+      const prevBtn = root.querySelector('.slideshow__arrow--prev');
+      const nextBtn = root.querySelector('.slideshow__arrow--next');
+      if (!slides.length) return;
 
-      const diff = targetX - currentX;
-      
-      if (!isDragging) {
-        // Spring physics calculation
-        const acceleration = diff * springConstant;
-        velocity += acceleration * dt;
-        velocity *= dampingFactor;
-        
-        // Stop animation if nearly settled
-        if (Math.abs(diff) < 0.1 && Math.abs(velocity) < velocityThreshold) {
-          currentX = targetX;
-          velocity = 0;
-          slides.forEach(s => s.style.transform = `translate3d(${currentX}px, 0, 0)`);
-          return;
-        }
+      const isSlide = root.classList.contains('slideshow--slide');
+
+      if (isSlide) {
+        initPhysicsDrag(root, slides, prevBtn, nextBtn);
+        return;
       }
-      
-      currentX += velocity * dt;
 
-      // Apply transformation to all slides at once
-      slides.forEach((s, i) => {
-        // Calculate the base slide position
-        const baseOffset = i * root.clientWidth;
-        // Apply the overall currentX offset
-        const translate = currentX + baseOffset; 
-        s.style.transform = `translate3d(${translate}px, 0, 0)`;
+      // Regular fade slideshow
+      let index = slides.findIndex(s => s.classList.contains('active'));
+      if (index < 0) {
+        index = 0;
+        slides[0].classList.add('active');
+      }
+
+      function show(nextIndex) {
+        nextIndex = (nextIndex + slides.length) % slides.length;
+        if (nextIndex === index) return;
+
+        slides[index].classList.remove('active');
+        index = nextIndex;
+        slides[index].classList.add('active');
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', () => show(index - 1));
+      if (nextBtn) nextBtn.addEventListener('click', () => show(index + 1));
+
+      root.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') show(index - 1);
+        if (e.key === 'ArrowRight') show(index + 1);
       });
-      
-      window.requestAnimationFrame(render);
-    }
-    
-    // Drag functionality
-    let startX = 0;
-    let startTime = 0;
-    let startScrollX = 0;
 
-    function onStart(clientX) {
-      isDragging = true;
-      startX = clientX;
-      startScrollX = currentX;
-      startTime = Date.now();
-      velocity = 0;
-      window.requestAnimationFrame(render); // Start loop if not running
-    }
-    
-    function onMove(clientX) {
-      if (!isDragging) return;
-      const dx = clientX - startX;
-      currentX = startScrollX + dx;
-      
-      // Implement soft boundary resistance (rubber banding)
-      if (currentIndex === 0 && dx > 0) {
-        currentX = startScrollX + (dx / 3);
-      } else if (currentIndex === slideCount - 1 && dx < 0) {
-        currentX = startScrollX + (dx / 3);
-      }
-    }
-    
-    function onEnd(clientX) {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      const dx = clientX - startX;
-      const deltaTime = Date.now() - startTime;
-      
-      // Calculate final velocity for throw effect
-      if (deltaTime > 50) { // Ignore very fast taps
-        velocity = (dx / deltaTime) * 1000; // px/sec
-      }
-      
-      // Determine the final slide index
-      const slideWidth = root.clientWidth;
-      let newIndex = currentIndex;
-      
-      // Throw threshold: must exceed 100px/sec velocity OR 50% distance
-      const throwThreshold = 100;
-      const distanceThreshold = slideWidth * 0.5;
-
-      if (velocity > throwThreshold || dx > distanceThreshold) {
-        newIndex = Math.max(0, currentIndex - 1); // Swiping right/prev
-      } else if (velocity < -throwThreshold || dx < -distanceThreshold) {
-        newIndex = Math.min(slideCount - 1, currentIndex + 1); // Swiping left/next
-      }
-
-      setPosition(newIndex);
-    }
-    
-    // Mouse events
-    root.addEventListener('mousedown', (e) => onStart(e.clientX));
-    window.addEventListener('mousemove', (e) => onMove(e.clientX));
-    window.addEventListener('mouseup', (e) => onEnd(e.clientX));
-    
-    // Touch events
-    root.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX), { passive: true });
-    root.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX), { passive: true });
-    root.addEventListener('touchend', (e) => onEnd(e.changedTouches[0].clientX));
-
-    // Button events
-    if (prevBtn) prevBtn.addEventListener('click', () => setPosition(currentIndex - 1));
-    if (nextBtn) nextBtn.addEventListener('click', () => setPosition(currentIndex + 1));
-    
-    // Initialize
-    window.addEventListener('resize', debounce(() => setPosition(currentIndex), 150));
-    setPosition(currentIndex);
-    updateButtons();
+      const autoplayMs = 6000;
+      let timer = setInterval(() => show(index + 1), autoplayMs);
+      root.addEventListener('mouseenter', () => clearInterval(timer));
+      root.addEventListener('mouseleave', () => {
+        timer = setInterval(() => show(index + 1), autoplayMs);
+      });
+    });
   }
 
+  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+    let currentIndex = slides.findIndex(s => s.classList.contains('active'));
+    if (currentIndex < 0) currentIndex = 0;
 
-  //*** 5) Global Slideshow Support - WITH PHYSICS DRAG ***/
-function initSlideshows() {
-  document.querySelectorAll('.slideshow').forEach(function (root) {
-    const slides = Array.from(root.querySelectorAll('.slideshow__image'));
-    const prevBtn = root.querySelector('.slideshow__arrow--prev');
-    const nextBtn = root.querySelector('.slideshow__arrow--next');
-    if (!slides.length) return;
-
-    const isSlide = root.classList.contains('slideshow--slide');
-
-    // Use physics-drag logic for the sliding variant
-    if (isSlide) {
-      initPhysicsDrag(root, slides, prevBtn, nextBtn);
-      return;
-    }
-
-    // ===== Regular FADE slideshow with smart autoplay pause/resume =====
-    let index = slides.findIndex(s => s.classList.contains('active'));
-    if (index < 0) {
-      index = 0;
-      slides[0].classList.add('active');
-    }
-
-    function show(nextIndex) {
-      nextIndex = (nextIndex + slides.length) % slides.length;
-      if (nextIndex === index) return;
-
-      slides[index].classList.remove('active');
-      index = nextIndex;
-      slides[index].classList.add('active');
-    }
-
-    const autoplayMs = 6000; // autoplay interval
-    let timer = null;
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let dragOffset = 0;
+    let velocity = 0;
+    let lastX = 0;
+    let lastTime = 0;
+    let animationFrame = null;
+    let autoplayTimer = null;
     let isInteracting = false;
-    let idleTimeout = null;
 
-    function startAutoplay() {
-      if (timer) clearInterval(timer);
-      timer = setInterval(function () {
-        // Do not advance while the user is actively interacting
-        if (isInteracting) return;
-        show(index + 1);
-      }, autoplayMs);
+    function updatePositions(animated = true) {
+      slides.forEach((slide, idx) => {
+        const offset = (idx - currentIndex) * 100 + dragOffset;
+        slide.style.transition = animated ? 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+        slide.style.transform = `translate3d(${offset}%, 0, 0)`;
+        slide.style.webkitTransform = `translate3d(${offset}%, 0, 0)`;
+      });
     }
 
-    function stopAutoplay() {
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
+    function animate() {
+      if (!isDragging && Math.abs(velocity) > 0.1) {
+        dragOffset += velocity;
+        velocity *= 0.92;
+
+        const threshold = 30;
+        
+        if (Math.abs(dragOffset) > threshold) {
+          if (dragOffset > 0 && currentIndex > 0) {
+            goToSlide(currentIndex - 1);
+            return;
+          } else if (dragOffset < 0 && currentIndex < slides.length - 1) {
+            goToSlide(currentIndex + 1);
+            return;
+          }
+        }
+
+        updatePositions(false);
+        animationFrame = requestAnimationFrame(animate);
+      } else if (!isDragging && dragOffset !== 0) {
+        dragOffset = 0;
+        velocity = 0;
+        updatePositions(true);
       }
     }
 
-    // Call when user clicks arrows or uses keyboard
-    function userInteracted() {
-      isInteracting = true;
-      stopAutoplay();
+    function goToSlide(newIndex) {
+      if (newIndex < 0 || newIndex >= slides.length) {
+        dragOffset = 0;
+        velocity = 0;
+        updatePositions(true);
+        return;
+      }
 
-      // Restart autoplay after a period of no interaction
-      if (idleTimeout) clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(function () {
-        isInteracting = false;
-        startAutoplay();
-      }, autoplayMs); // change this delay if you want faster/slower resume
+      slides[currentIndex].classList.remove('active');
+      currentIndex = newIndex;
+      slides[currentIndex].classList.add('active');
+      dragOffset = 0;
+      velocity = 0;
+      updatePositions(true);
+
+      if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+      if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
     }
 
-    // Arrow buttons
+    function startAutoplay() {
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      
+      let direction = 1;
+      autoplayTimer = setInterval(() => {
+        if (isInteracting) return;
+        
+        if (currentIndex === slides.length - 1) direction = -1;
+        if (currentIndex === 0) direction = 1;
+        goToSlide(currentIndex + direction);
+      }, 4000);
+    }
+
+    function pauseAutoplay() {
+      isInteracting = true;
+    }
+
+    function resumeAutoplay() {
+      isInteracting = false;
+    }
+
+    function onMouseDown(e) {
+      if (e.target.classList.contains('slideshow__arrow')) return;
+
+      pauseAutoplay();
+      isDragging = true;
+      startX = e.clientX;
+      currentX = e.clientX;
+      lastX = e.clientX;
+      lastTime = Date.now();
+      velocity = 0;
+      
+      root.style.cursor = 'grabbing';
+      
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+
+      e.preventDefault();
+    }
+
+    function onMouseMove(e) {
+      if (!isDragging) return;
+
+      currentX = e.clientX;
+      const deltaX = currentX - startX;
+      const now = Date.now();
+      const deltaTime = now - lastTime;
+
+      if (deltaTime > 0) {
+        const deltaMove = currentX - lastX;
+        velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+      }
+
+      lastX = currentX;
+      lastTime = now;
+
+      dragOffset = (deltaX / root.offsetWidth) * 100;
+      
+      if (currentIndex === 0 && dragOffset > 0) {
+        dragOffset *= 0.3;
+      } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+        dragOffset *= 0.3;
+      }
+
+      updatePositions(false);
+    }
+
+    function onMouseUp(e) {
+      if (!isDragging) return;
+
+      isDragging = false;
+      root.style.cursor = 'grab';
+      animationFrame = requestAnimationFrame(animate);
+      
+      setTimeout(() => {
+        resumeAutoplay();
+      }, 700);
+    }
+
+    function onTouchStart(e) {
+      pauseAutoplay();
+      isDragging = true;
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      currentX = touch.clientX;
+      lastX = touch.clientX;
+      lastTime = Date.now();
+      velocity = 0;
+
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    }
+
+    function onTouchMove(e) {
+      if (!isDragging) return;
+
+      const touch = e.touches[0];
+      currentX = touch.clientX;
+      const deltaX = currentX - startX;
+      const now = Date.now();
+      const deltaTime = now - lastTime;
+
+      if (deltaTime > 0) {
+        const deltaMove = currentX - lastX;
+        velocity = (deltaMove / root.offsetWidth) * 100 / (deltaTime / 16);
+      }
+
+      lastX = currentX;
+      lastTime = now;
+
+      dragOffset = (deltaX / root.offsetWidth) * 100;
+
+      if (currentIndex === 0 && dragOffset > 0) {
+        dragOffset *= 0.3;
+      } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
+        dragOffset *= 0.3;
+      }
+
+      updatePositions(false);
+    }
+
+    function onTouchEnd(e) {
+      if (!isDragging) return;
+
+      isDragging = false;
+      animationFrame = requestAnimationFrame(animate);
+      
+      setTimeout(() => {
+        resumeAutoplay();
+      }, 700);
+    }
+
+    root.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    
+    root.addEventListener('touchstart', onTouchStart, { passive: true });
+    root.addEventListener('touchmove', onTouchMove, { passive: true });
+    root.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    root.addEventListener('mouseenter', pauseAutoplay);
+    root.addEventListener('mouseleave', resumeAutoplay);
+
     if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
-        userInteracted();
-        show(index - 1);
+      prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pauseAutoplay();
+        goToSlide(currentIndex - 1);
+        setTimeout(resumeAutoplay, 1000);
       });
     }
 
     if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
-        userInteracted();
-        show(index + 1);
+      nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pauseAutoplay();
+        goToSlide(currentIndex + 1);
+        setTimeout(resumeAutoplay, 1000);
       });
     }
 
-    // Keyboard navigation
-    root.addEventListener('keydown', function (e) {
+    root.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') {
-        userInteracted();
-        show(index - 1);
+        pauseAutoplay();
+        goToSlide(currentIndex - 1);
+        setTimeout(resumeAutoplay, 1000);
       }
       if (e.key === 'ArrowRight') {
-        userInteracted();
-        show(index + 1);
+        pauseAutoplay();
+        goToSlide(currentIndex + 1);
+        setTimeout(resumeAutoplay, 1000);
       }
     });
 
-    // Hover: pause while hovered, resume when mouse leaves (if not interacting)
-    root.addEventListener('mouseenter', function () {
-      stopAutoplay();
-    });
-
-    root.addEventListener('mouseleave', function () {
-      if (!isInteracting) {
-        startAutoplay();
-      }
-    });
-
-    // Kick off autoplay
+    root.style.cursor = 'grab';
+    updatePositions(false);
+    
+    if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+    if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
+    
     startAutoplay();
-  });
-}
-
+  }
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
@@ -604,25 +652,39 @@ function initSlideshows() {
       }
     }
 
-    // 5. Scroll Handler (Simplified back to full-section scrub)
-    function handleScroll() {
-        const rect = section.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-        
-        // Calculate progress: 0 when top of section hits bottom of screen, 1 when bottom hits top
-        const start = viewportHeight;
-        const end = -rect.height;
-        
-        // Calculate raw progress (0 to 1)
-        const progress = (start - rect.top) / (start - end);
-        
-        // Clamp between 0 and 1
-        const clampedProgress = Math.max(0, Math.min(1, progress));
+    // 5. Scroll Handler
+  function handleScroll() {
+      const rect = section.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const sectionHeight = rect.height;
+      
+      // Calculate when the video is actually "stuck"
+      // It sticks when rect.top hits the calculated center offset
+      
+      // We start playing when the section top enters the viewport
+      const start = viewportHeight;
+      // We finish playing when the bottom of the section leaves the viewport
+      const end = -sectionHeight;
+      
+      // Calculate raw progress (0 to 1)
+      let progress = (start - rect.top) / (start - end);
+      
+      // TIGHTEN THE PLAYBACK:
+      // 0.2 = wait until it's 20% up the screen to start moving
+      // 0.8 = finish playing before it completely leaves
+      // This ensures it plays mostly while "Centered/Stuck"
+      const buffer = 0.2; 
+      
+      // Remap progress to ignore the entry/exit edges
+      progress = (progress - buffer) / (1 - (buffer * 2));
+      
+      // Clamp between 0 and 1
+      const clampedProgress = Math.max(0, Math.min(1, progress));
 
-        if (video.duration) {
-          targetTime = clampedProgress * video.duration;
-          startRenderLoop();
-        }
+      if (video.duration) {
+        targetTime = clampedProgress * video.duration;
+        startRenderLoop();
+      }
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
