@@ -1382,38 +1382,4 @@ body.project-page .full-image:first-of-type {
     opacity: 1 !important;
   }
 }
-/* ********************************************* */
-/* * FINAL COMPREHENSIVE FIX (VIDEO, SLIDESHOW, ARROWS) * */
-/* ********************************************* */
 
-/* --- 1. MOBILE HERO VIDEO GAP FIX (applies to project pages only) --- */
-@media (max-width: 768px) {
-    
-    /* Ensure Navbar is visible (highest stacking context) */
-    #navbar-placeholder {
-        z-index: 99999 !important;
-    }
-    
-    /* Force the inner <video> element to overlap all edges to hide sub-pixel gaps */
-    body.project-page .full-image:first-of-type video {
-        width: calc(100% + 2px) !important;
-        height: calc(100% + 2px) !important;
-        transform: translate(-1px, -1px) !important; 
-    }
-}
-
-
-/* --- 2. SLIDESHOW JITTER & ARROW RESTORE (GLOBAL) --- */
-
-/* Fix Collapsed Arrows: Restore font-size and ensure they stack on top */
-.slideshow__arrow {
-    font-size: 1.5rem !important; /* Forces a visible size for arrow icons */
-    z-index: 99999 !important;   /* Ensures arrows are never covered by slides */
-}
-
-/* Fix Jitter: Target the individual slides to force overlap and stabilize GPU */
-.slideshow > * { 
-    backface-visibility: hidden !important;
-    width: 100.1% !important; /* CRITICAL: Forces 0.1% overlap to hide sub-pixel lines */
-    transform: translateZ(0) !important; 
-}
