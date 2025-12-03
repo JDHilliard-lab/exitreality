@@ -793,8 +793,7 @@ transition: opacity 0.05s linear; */
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  /* nice smooth fade */
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.01s ease-out;
   display: block;
   vertical-align: top;
   line-height: 0;
@@ -860,23 +859,14 @@ transition: opacity 0.05s linear; */
 .slideshow--slide {
   line-height: 0 !important;
   font-size: 0 !important;
-  overflow: hidden; /* Added to clip images off-screen */
   background: transparent;
 }
 
-/* CRITICAL FIX: Forces images to be absolutely positioned and stacked for horizontal sliding */
 .slideshow--slide .slideshow__image {
-  position: absolute; 
-  inset: 0; /* Equivalent to top: 0; left: 0; width: 100%; height: 100%; */
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  
   /* We override the fade behavior: all slides are fully opaque,
      and JS will position them horizontally via translateX. */
-  opacity: 1; 
-  
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing for drag effect */
+  opacity: 1;
+  transition: transform 0.6s ease;
   line-height: 0;
   font-size: 0;
   display: block;
@@ -890,7 +880,7 @@ transition: opacity 0.05s linear; */
 
 /* Keep active on top if you ever need overlays, but visibility is from position */
 .slideshow--slide .slideshow__image.active {
-  z-index: 2; /* Increased z-index for active slide */
+  z-index: 1;
 }
 
 /* Completely hide disabled arrows in the slideshow */
@@ -1370,37 +1360,26 @@ body.project-page .full-image:first-of-type {
 
 /* Mobile: Remove any border/gap between header and first video */
 @media (max-width: 768px) {
-    
-    /* CRITICAL 1: Ensure the body background is black at the top */
-    body.project-page {
-      background: #000000 !important; /* Matches dark-theme header */
-      padding-top: 0 !important; 
-    }
-    
-    /* CRITICAL 2: Ensure the dark header is flush and black */
-    body.project-page .project-header.dark-theme {
-        margin-bottom: 0 !important;
-        border-bottom: none !important;
-        /* Force background to black to hide any gaps */
-        background: #000000 !important; 
-        padding-bottom: 0.75rem !important; 
-        position: relative;
-        z-index: 10;
-    }
-    
-    /* CRITICAL 3: Ensure the hero video container is flush and black */
-    body.project-page .full-image:first-of-type {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        /* Force background to black to hide any gaps */
-        background: #000000 !important; 
-        
-        /* Ensure the content sits flush */
-        line-height: 0;
-        font-size: 0;
-        display: block;
-        position: relative;
-        z-index: 9; 
-    }
+  body.project-page .project-header {
+    margin-bottom: 0 !important;
+    border-bottom: none !important;
+    padding-bottom: 0.75rem !important;
+  }
+  
+  body.project-page .project-header.dark-theme {
+    border-bottom: none !important;
+    padding-bottom: 1rem !important;
+  }
+  
+  body.project-page .full-image:first-of-type {
+    margin-top: 0 !important;
+  }
+}
+/* Mobile: show slideshow arrows / BA handle when the block is centered */
+@media (max-width: 768px) {
+  .is-centered .slideshow__arrow,
+  .is-centered .ba__handle {
+    opacity: 1 !important;
+  }
 }
 
