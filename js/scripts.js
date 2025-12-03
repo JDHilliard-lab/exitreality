@@ -1,443 +1,321 @@
-/* ===== GLOBAL SITE SCRIPT (reset) =====
-   - Loading bar for images & videos (#loading-bar)
-   - Navbar injection into #navbar-placeholder
-   - Smooth scrolling with fixed nav offset
-   - Before/After sliders (.ba)
-   - Mobile video controls (tap once to show controls)
-   - Scroll-driven 360° videos (.scroll-video-section)
-     * Uses -desktop.mp4 on desktop
-     * Uses -mobile-square.mp4 + square poster on mobile
-   - Slideshows:
-     * .slideshow           -> fade variant with autoplay pause/resume
-     * .slideshow--slide    -> grab/drag variant with autoplay pause/resume
-   - Parallax sections (.parallax-section > .parallax-layer)
+/* ===== GLOBAL SITE SCRIPT =====
+   - Base-path safeguard for GitHub Pages
+   - Dynamic --nav-h (nav height) CSS var
+   - Smooth scrolling with fixed-nav offset
+   - Loading bar for page and video content
+   - Physics-based drag for slideshows (mobile & desktop)
+   - Smart autoplay (pauses on interaction)
+   - Parallax scrolling effect (works on mobile and desktop with 1920x1080 images)
+   - Scroll-driven video (360° rotation effect) with mobile debugging
+   - Before/After slider functionality
+   - Mobile video controls
+   - Navbar injection
 */
 
 (function () {
   'use strict';
 
-  /* ==============================
-   * 0) Small utility
-   * ============================== */
-  function debounce(fn, delay) {
+  /*** Utils ***/
+  function debounce(fn, wait) {
     let t;
     return function () {
-      const ctx = this;
-      const args = arguments;
       clearTimeout(t);
-      t = setTimeout(function () {
-        fn.apply(ctx, args);
-      }, delay);
+      t = setTimeout(() => fn.apply(this, arguments), wait);
     };
   }
 
-  /* ==============================
-   * 1) LOADING BAR
-   * ============================== */
+  /*** LOADING BAR ***/
   (function initLoadingBar() {
-    let loadingBar = document.getElementById('loading-bar');
-    if (!loadingBar) {
-      // Fallback: create it if it's missing
-      loadingBar = document.createElement('div');
-      loadingBar.id = 'loading-bar';
-      document.body.insertBefore(loadingBar, document.body.firstChild);
-    }
+    const loadingBar = document.createElement('div');
+    loadingBar.id = 'loading-bar';
+    document.body.insertBefore(loadingBar, document.body.firstChild);
 
-    const media = Array.from(document.querySelectorAll('img, video'));
-    const total = media.length;
-    if (!total) {
-      loadingBar.style.width = '100%';
-      loadingBar.classList.add('complete');
-      return;
-    }
+    let progress = 0;
+    let totalVideos = 0;
+    let loadedVideos = 0;
+    let totalImages = 0;
+    let loadedImages = 0;
 
-    let loaded = 0;
-
-    function update() {
-      loaded++;
-      const pct = Math.min(100, (loaded / total) * 100);
-      loadingBar.style.width = pct + '%';
-      if (pct >= 100) {
-        setTimeout(function () {
-          loadingBar.classList.add('complete');
-        }, 400);
-      }
-    }
-
-    media.forEach(function (el) {
-      if (el.tagName === 'IMG') {
-        if (el.complete && el.naturalWidth !== 0) {
-          update();
-        } else {
-          el.addEventListener('load', update, { once: true });
-          el.addEventListener('error', update, { once: true });
-        }
-      } else if (el.tagName === 'VIDEO') {
-        // We treat video as "loaded enough" when metadata is ready
-        if (el.readyState >= 1) {
-          update();
-        } else {
-          el.addEventListener('loadedmetadata', update, { once: true });
-          el.addEventListener('error', update, { once: true });
-        }
-      }
-    });
-  })();
-
-  /* ==============================
-   * 2) NAVBAR INJECTION
-   * ============================== */
-  (function initNavbar() {
-    const placeholder = document.getElementById('navbar-placeholder');
-    if (!placeholder) return;
-
-    fetch('navbar.html')
-      .then(function (res) {
-        if (!res.ok) throw new Error('Navbar fetch failed');
-        return res.text();
-      })
-      .then(function (html) {
-        placeholder.innerHTML = html;
-      })
-      .catch(function (err) {
-        console.warn('Navbar load error:', err);
-      });
-  })();
-
-  /* ==============================
-   * 3) SMOOTH SCROLL FOR ANCHORS
-   * ============================== */
-  (function initSmoothScroll() {
-    function scrollToId(id) {
-      const target = document.getElementById(id);
-      if (!target) return;
-
-      const nav = document.querySelector('nav');
-      const navH = nav ? nav.getBoundingClientRect().height : 0;
-
-      const rect = target.getBoundingClientRect();
-      const offset = rect.top + window.scrollY - navH;
-
-      window.scrollTo({
-        top: offset,
-        behavior: 'smooth'
-      });
-    }
-
-    document.addEventListener('click', function (e) {
-      const link = e.target.closest('a[href^="#"]');
-      if (!link) return;
-
-      const href = link.getAttribute('href');
-      const id = href.slice(1);
-      if (!id) return;
-
-      if (document.getElementById(id)) {
-        e.preventDefault();
-        scrollToId(id);
-      }
-    });
-
-    window.addEventListener('load', function () {
-      const hash = window.location.hash;
-      if (hash && hash.length > 1) {
-        const id = hash.slice(1);
-        if (document.getElementById(id)) {
-          setTimeout(function () {
-            scrollToId(id);
-          }, 0);
-        }
-      }
-    });
-  })();
-
-  /* ==============================
-   * 4) BEFORE/AFTER SLIDERS
-   * ============================== */
-  (function initBeforeAfter() {
-    const sliders = Array.from(document.querySelectorAll('.ba'));
-    if (!sliders.length) return;
-
-    sliders.forEach(function (root) {
-      const range = root.querySelector('.ba__range');
-      if (!range) return;
-
-      function update(val) {
-        const x = Number(val);
-        root.style.setProperty('--x', x + '%');
-      }
-
-      range.addEventListener('input', function () {
-        update(this.value);
-      });
-
-      update(range.value || 50);
-    });
-  })();
-
-  /* ==============================
-   * 5) MOBILE VIDEO CONTROLS
-   * ============================== */
-  (function initMobileVideoControls() {
-    if (window.innerWidth > 768) return;
-
-    const videos = Array.from(document.querySelectorAll('.full-image video'));
-    if (!videos.length) return;
-
-    videos.forEach(function (video) {
-      try {
-        video.controls = false;
-      } catch (e) {}
-
-      let shown = false;
-
-      function showControls() {
-        if (shown) return;
-        shown = true;
-        try {
-          video.controls = true;
-        } catch (e) {}
-        video.classList.add('show-controls');
-        video.removeEventListener('click', showControls);
-        video.removeEventListener('touchstart', showControls);
-      }
-
-      video.addEventListener('click', showControls);
-      video.addEventListener('touchstart', showControls, { passive: true });
-    });
-  })();
-
-  /* ==============================
-   * 6) SCROLL-DRIVEN 360° VIDEOS
-   * ============================== */
-  (function initScrollVideos() {
-    const sections = Array.from(document.querySelectorAll('.scroll-video-section'));
-    if (!sections.length) return;
-
-    const items = [];
-
-    function setupSourcesAndPosters() {
-      const isMobile = window.innerWidth <= 768;
-
-      sections.forEach(function (section) {
-        const video = section.querySelector('video.scroll-video');
-        const container = section.querySelector('.scroll-video-container');
-        if (!video) return;
-
-        const sourceEl = video.querySelector('source');
-        if (!sourceEl) return;
-
-        const currentSrc = sourceEl.getAttribute('src');
-        if (!currentSrc) return;
-
-        const lastSlash = currentSrc.lastIndexOf('/');
-        const dir = lastSlash >= 0 ? currentSrc.slice(0, lastSlash + 1) : '';
-        const file = lastSlash >= 0 ? currentSrc.slice(lastSlash + 1) : currentSrc;
-
-        const baseName = file
-          .replace('-desktop', '')
-          .replace('-mobile-square', '')
-          .replace('.mp4', '');
-
-        const desktopSrc = dir + baseName + '-desktop.mp4';
-        const mobileSrc = dir + baseName + '-mobile-square.mp4';
-
-        const desktopPoster =
-          video.getAttribute('data-desktop-poster') ||
-          video.getAttribute('poster') ||
-          '';
-
-        const mobilePoster =
-          video.getAttribute('data-mobile-poster') ||
-          video.dataset.mobilePoster ||
-          '';
-
-        const wantedSrc = isMobile && mobileSrc ? mobileSrc : desktopSrc;
-        const wantedPoster = isMobile && mobilePoster ? mobilePoster : desktopPoster;
-
-        if (currentSrc !== wantedSrc) {
-          const t = video.currentTime || 0;
-          sourceEl.setAttribute('src', wantedSrc);
-          video.load();
-          try {
-            video.currentTime = t;
-          } catch (e) {}
-        }
-
-        if (wantedPoster) {
-          video.setAttribute('poster', wantedPoster);
-          if (container) {
-            container.style.setProperty('--poster-image', "url('" + wantedPoster + "')");
-          }
-        }
-      });
-    }
-
-    // Prepare items for scroll scrubbing
-    sections.forEach(function (section) {
-      const video = section.querySelector('video.scroll-video');
-      if (!video) return;
-
-      video.pause();
-      video.muted = true;
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', '');
-
-      const item = {
-        section: section,
-        video: video,
-        duration: 0,
-        ready: false,
-        targetTime: 0,
-        currentTime: 0
-      };
-
-      function onMeta() {
-        item.duration = video.duration || 0;
-        item.ready = true;
-      }
-
-      if (video.readyState >= 1) {
-        onMeta();
+    function updateProgress() {
+      const totalMedia = totalVideos + totalImages;
+      const loadedMedia = loadedVideos + loadedImages;
+      
+      if (totalMedia === 0) {
+        progress = 100;
       } else {
-        video.addEventListener('loadedmetadata', onMeta, { once: true });
+        progress = (loadedMedia / totalMedia) * 100;
       }
-
-      items.push(item);
-    });
-
-    function updateTargets() {
-      const vh = window.innerHeight;
-
-      items.forEach(function (item) {
-        if (!item.ready || !item.duration) return;
-
-        const rect = item.section.getBoundingClientRect();
-        const sectionHeight = rect.height || 1;
-
-        // progress based on section center vs viewport center
-        const viewportCenter = vh / 2;
-        const sectionCenter = rect.top + sectionHeight / 2;
-        let progress = 1 - Math.abs(sectionCenter - viewportCenter) / (vh + sectionHeight / 2);
-        progress = Math.max(0, Math.min(1, progress));
-
-        item.targetTime = progress * item.duration;
-      });
+      
+      loadingBar.style.width = progress + '%';
+      
+      if (progress >= 100) {
+        setTimeout(() => {
+          loadingBar.classList.add('complete');
+          setTimeout(() => {
+            loadingBar.remove();
+          }, 300);
+        }, 200);
+      }
     }
 
-    function tick() {
-      items.forEach(function (item) {
-        if (!item.ready || !item.duration) return;
-        const diff = item.targetTime - item.currentTime;
-        const smoothing = 0.15;
-        item.currentTime += diff * smoothing;
-        if (!isNaN(item.currentTime)) {
-          try {
-            item.video.currentTime = item.currentTime;
-          } catch (e) {}
-        }
-      });
-      requestAnimationFrame(tick);
-    }
+    function trackVideos() {
+      const videos = document.querySelectorAll('video');
+      totalVideos = videos.length;
 
-    setupSourcesAndPosters();
-    updateTargets();
-    requestAnimationFrame(tick);
-
-    window.addEventListener(
-      'scroll',
-      function () {
-        updateTargets();
-      },
-      { passive: true }
-    );
-
-    window.addEventListener(
-      'resize',
-      debounce(function () {
-        setupSourcesAndPosters();
-        updateTargets();
-      }, 200)
-    );
-  })();
-
-  /* ==============================
-   * 7) SLIDESHOWS (FADE + SLIDE)
-   * ============================== */
-
-  // 7a) Sliding slideshow with grab / swipe physics
-  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
-    if (slides.length <= 1) {
-      if (prevBtn) prevBtn.disabled = true;
-      if (nextBtn) nextBtn.disabled = true;
-      return;
-    }
-
-    let index = slides.findIndex(function (s) {
-      return s.classList.contains('active');
-    });
-    if (index < 0) {
-      index = 0;
-      slides[0].classList.add('active');
-    }
-
-    let isDragging = false;
-    let startX = 0;
-    let lastX = 0;
-    let dragOffset = 0;
-    let velocity = 0;
-    let animationFrame = null;
-    let isInteracting = false;
-    let autoplayTimer = null;
-
-    function layout(extraPx) {
-      if (extraPx === void 0) extraPx = 0;
-      const width = root.clientWidth || root.offsetWidth || 1;
-      const extraPct = (extraPx / width) * 100;
-
-      slides.forEach(function (slide, i) {
-        const base = (i - index) * 100;
-        const total = base + extraPct;
-        slide.style.transform = 'translate3d(' + total + '%, 0, 0)';
-      });
-    }
-
-    function updateArrows() {
-      if (prevBtn) prevBtn.disabled = index === 0;
-      if (nextBtn) nextBtn.disabled = index === slides.length - 1;
-    }
-
-    function goTo(newIndex) {
-      newIndex = Math.max(0, Math.min(slides.length - 1, newIndex));
-      if (newIndex === index) {
-        dragOffset = 0;
-        velocity = 0;
-        layout(0);
+      if (totalVideos === 0) {
+        updateProgress();
         return;
       }
-      slides[index].classList.remove('active');
-      index = newIndex;
-      slides[index].classList.add('active');
-      dragOffset = 0;
-      velocity = 0;
-      layout(0);
-      updateArrows();
+
+      videos.forEach(video => {
+        if (video.classList.contains('scroll-video')) {
+          totalVideos--;
+          if (totalVideos === 0) updateProgress();
+          return;
+        }
+
+        if (video.readyState >= 3) {
+          loadedVideos++;
+          updateProgress();
+        } else {
+          video.addEventListener('canplaythrough', function onLoad() {
+            loadedVideos++;
+            updateProgress();
+            video.removeEventListener('canplaythrough', onLoad);
+          }, { once: true });
+
+          video.addEventListener('error', function onError() {
+            loadedVideos++;
+            updateProgress();
+            video.removeEventListener('error', onError);
+          }, { once: true });
+        }
+      });
     }
 
-    const autoplayMs = 6000;
+    function trackImages() {
+      const images = document.querySelectorAll('img');
+      totalImages = images.length;
+
+      if (totalImages === 0) {
+        updateProgress();
+        return;
+      }
+
+      images.forEach(img => {
+        if (img.complete) {
+          loadedImages++;
+          updateProgress();
+        } else {
+          img.addEventListener('load', function onLoad() {
+            loadedImages++;
+            updateProgress();
+            img.removeEventListener('load', onLoad);
+          }, { once: true });
+
+          img.addEventListener('error', function onError() {
+            loadedImages++;
+            updateProgress();
+            img.removeEventListener('error', onError);
+          }, { once: true });
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        trackVideos();
+        trackImages();
+      });
+    } else {
+      trackVideos();
+      trackImages();
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (progress < 100) {
+          progress = 100;
+          updateProgress();
+        }
+      }, 500);
+    });
+  })();
+
+  /*** 1) Dynamic --nav-h CSS variable ***/
+  function setNavHeightVar() {
+    const nav = document.querySelector('nav');
+    if (!nav) return;
+    const h = nav.offsetHeight || 0;
+    document.documentElement.style.setProperty('--nav-h', h + 'px');
+  }
+  
+  window.addEventListener('load', setNavHeightVar);
+  window.addEventListener('resize', debounce(setNavHeightVar, 150));
+
+  /*** 2) Base-path safeguard (home preserves hashes) ***/
+  function basePathSafeguard() {
+    try {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const base = parts.length ? '/' + parts[0] : '';
+      const here = window.location.pathname || '/';
+      const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
+
+      document.querySelectorAll('nav a').forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const low = href.toLowerCase();
+        const isHashOnly = href.charAt(0) === '#';
+        const isIndex = low === 'index.html' || low === './index.html' || low === '/index.html';
+        const isIndexHash = low.indexOf('index.html#') === 0 || low.indexOf('./index.html#') === 0 || low.indexOf('/index.html#') === 0;
+        const isLogo = link.classList.contains('logo');
+
+        if (isLogo) {
+          if (!isHome && !isHashOnly) {
+            link.setAttribute('href', base || '/');
+          }
+          return;
+        }
+
+        if (isIndex) {
+          link.setAttribute('href', base || '/');
+          return;
+        }
+
+        if (isHome && isHashOnly) {
+          return;
+        }
+
+        if (!isHome && (isHashOnly || isIndexHash)) {
+          const anchor = isHashOnly ? href.slice(1) : (href.split('#')[1] || '');
+          link.setAttribute('href', (base ? base : '') + '/index.html' + (anchor ? ('#' + anchor) : ''));
+        }
+      });
+    } catch (e) {
+      if (window.console && console.warn) console.warn('Nav safeguard error:', e);
+    }
+  }
+  
+  window.addEventListener('DOMContentLoaded', basePathSafeguard);
+
+  /*** 3) Smooth scroll with fixed-nav offset (homepage only) ***/
+  function getNavHeight() {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--nav-h').trim();
+    const n = parseInt(v, 10);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function smoothScrollToId(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const navH = getNavHeight();
+    const target = window.scrollY + rect.top - (navH || 0);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  }
+
+  function interceptHashClicks() {
+    const here = window.location.pathname || '/';
+    const parts = here.split('/').filter(Boolean);
+    const base = parts.length ? '/' + parts[0] : '';
+    const isHome = here === '/' || here.endsWith('/index.html') || here === (base + '/');
+    if (!isHome) return;
+
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        const href = a.getAttribute('href');
+        if (!href || href === '#') return;
+        const id = href.slice(1);
+        if (!id) return;
+        e.preventDefault();
+        smoothScrollToId(id);
+        history.pushState(null, '', '#' + id);
+      });
+    });
+  }
+  
+  window.addEventListener('DOMContentLoaded', interceptHashClicks);
+
+  /*** 4) Correct deep links on load/hashchange (fixed-nav offset) ***/
+  function correctInitialHash() {
+    const hash = window.location.hash;
+    if (!hash || hash.length < 2) return;
+    const id = hash.slice(1);
+    setTimeout(function () { smoothScrollToId(id); }, 0);
+  }
+  
+  window.addEventListener('load', correctInitialHash);
+  window.addEventListener('hashchange', function () {
+    const id = (window.location.hash || '').replace(/^#/, '');
+    if (!id) return;
+    smoothScrollToId(id);
+  });
+
+  /*** 5) Physics-Based Drag Slideshow with Smart Autoplay ***/
+  function initPhysicsDrag(root, slides, prevBtn, nextBtn) {
+    let index = 0;
+    let offsetX = 0;
+    let velocity = 0;
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let lastX = 0;
+    let lastTime = Date.now();
+    let animationFrame = null;
+
+    // Autoplay state
+    let autoplayTimer = null;
+    let isInteracting = false;
     let idleTimeout = null;
+    const autoplayMs = 6000;
 
-    function autoStep() {
-      if (isInteracting) return;
-      let direction = 1;
-      if (index === slides.length - 1) direction = -1;
-      if (index === 0) direction = 1;
-      goTo(index + direction);
+    const container = document.createElement('div');
+    container.className = 'slideshow__track';
+    slides.forEach(s => container.appendChild(s));
+    root.insertBefore(container, root.firstChild);
+
+    function setTransform(x, transition = false) {
+      container.style.transition = transition ? 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none';
+      container.style.transform = `translateX(${x}px)`;
     }
 
+    function snapToIndex(targetIndex, useVelocity = false) {
+      targetIndex = Math.max(0, Math.min(slides.length - 1, targetIndex));
+      index = targetIndex;
+      const targetX = -index * root.offsetWidth;
+      
+      if (useVelocity && Math.abs(velocity) > 0.5) {
+        const momentumX = targetX + velocity * 50;
+        const finalIndex = Math.round(-momentumX / root.offsetWidth);
+        index = Math.max(0, Math.min(slides.length - 1, finalIndex));
+      }
+      
+      offsetX = -index * root.offsetWidth;
+      setTransform(offsetX, true);
+      velocity = 0;
+    }
+
+    function animate() {
+      if (!isDragging && Math.abs(velocity) > 0.01) {
+        velocity *= 0.92;
+        offsetX += velocity;
+        setTransform(offsetX);
+        animationFrame = requestAnimationFrame(animate);
+      } else if (!isDragging) {
+        const nearestIndex = Math.round(-offsetX / root.offsetWidth);
+        snapToIndex(nearestIndex, true);
+      }
+    }
+
+    // Autoplay functions
     function startAutoplay() {
       if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(autoStep, autoplayMs);
+      autoplayTimer = setInterval(() => {
+        if (!isInteracting && !isDragging) {
+          snapToIndex(index + 1);
+        }
+      }, autoplayMs);
     }
 
     function stopAutoplay() {
@@ -450,126 +328,105 @@
     function userInteracted() {
       isInteracting = true;
       stopAutoplay();
+
       if (idleTimeout) clearTimeout(idleTimeout);
-      idleTimeout = setTimeout(function () {
+      idleTimeout = setTimeout(() => {
         isInteracting = false;
         startAutoplay();
       }, autoplayMs);
     }
 
-    // Drag / swipe (pointer events)
-    root.style.touchAction = 'pan-y';
-
-    function onPointerDown(e) {
-      if (e.button !== undefined && e.button !== 0) return;
-      if (e.target.closest('.slideshow__arrow')) return;
-
-      isDragging = true;
-      startX = e.clientX;
-      lastX = e.clientX;
-      dragOffset = 0;
-      velocity = 0;
-
+    // Mouse/Touch Events
+    function onStart(e) {
       userInteracted();
-
-      slides.forEach(function (slide) {
-        slide.style.transition = 'none';
-      });
-
-      if (root.setPointerCapture && e.pointerId != null) {
-        root.setPointerCapture(e.pointerId);
+      isDragging = true;
+      startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      currentX = startX;
+      lastX = startX;
+      lastTime = Date.now();
+      velocity = 0;
+      
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+        animationFrame = null;
       }
+      
+      container.style.transition = 'none';
     }
 
-    function onPointerMove(e) {
+    function onMove(e) {
       if (!isDragging) return;
-      const currentX = e.clientX;
-      const dx = currentX - startX;
-      const now = Date.now();
-
-      const dt = now - (onPointerMove._lastTime || now);
-      if (dt > 0) {
-        const deltaMove = currentX - lastX;
-        velocity = ((deltaMove / (root.clientWidth || 1)) * 100) / (dt / 16);
+      
+      currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const deltaX = currentX - lastX;
+      const deltaTime = Date.now() - lastTime;
+      
+      if (deltaTime > 0) {
+        velocity = deltaX / deltaTime * 16;
       }
-
-      onPointerMove._lastTime = now;
+      
+      offsetX += deltaX;
+      setTransform(offsetX);
+      
       lastX = currentX;
-      dragOffset = (dx / (root.clientWidth || 1)) * 100;
-
-      if (index === 0 && dragOffset > 0) {
-        dragOffset *= 0.3;
-      } else if (index === slides.length - 1 && dragOffset < 0) {
-        dragOffset *= 0.3;
-      }
-
-      layout(dragOffset * (root.clientWidth || 1) / 100);
+      lastTime = Date.now();
     }
 
-    function onPointerUp(e) {
+    function onEnd() {
       if (!isDragging) return;
       isDragging = false;
-
-      slides.forEach(function (slide) {
-        slide.style.transition = 'transform 0.6s ease';
-      });
-
-      const width = root.clientWidth || 1;
-      const threshold = width * 0.15;
-      const finalDx = lastX - startX;
-
-      let targetIndex = index;
-      if (finalDx > threshold && index > 0) {
-        targetIndex = index - 1;
-      } else if (finalDx < -threshold && index < slides.length - 1) {
-        targetIndex = index + 1;
-      }
-
-      goTo(targetIndex);
-
-      if (root.releasePointerCapture && e.pointerId != null) {
-        root.releasePointerCapture(e.pointerId);
-      }
+      animationFrame = requestAnimationFrame(animate);
     }
 
-    root.addEventListener('pointerdown', onPointerDown);
-    root.addEventListener('pointermove', onPointerMove);
-    root.addEventListener('pointerup', onPointerUp);
-    root.addEventListener('pointercancel', onPointerUp);
-    root.addEventListener('pointerleave', function (e) {
-      if (isDragging) onPointerUp(e);
-    });
+    // Desktop
+    root.addEventListener('mousedown', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+
+    // Mobile
+    root.addEventListener('touchstart', onStart, { passive: true });
+    root.addEventListener('touchmove', onMove, { passive: true });
+    root.addEventListener('touchend', onEnd);
 
     // Arrow buttons
     if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
+      prevBtn.addEventListener('click', () => {
         userInteracted();
-        goTo(index - 1);
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
-        userInteracted();
-        goTo(index + 1);
+        snapToIndex(index - 1);
       });
     }
 
-    root.addEventListener('mouseenter', function () {
-      stopAutoplay();
-    });
-    root.addEventListener('mouseleave', function () {
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        userInteracted();
+        snapToIndex(index + 1);
+      });
+    }
+
+    // Hover pause
+    root.addEventListener('mouseenter', stopAutoplay);
+    root.addEventListener('mouseleave', () => {
       if (!isInteracting) startAutoplay();
     });
 
-    slides.forEach(function (slide) {
-      slide.style.transition = 'transform 0.6s ease';
+    // Keyboard
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        userInteracted();
+        snapToIndex(index - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        userInteracted();
+        snapToIndex(index + 1);
+      }
     });
-    layout(0);
-    updateArrows();
+
+    // Initial position and start autoplay
+    snapToIndex(0);
     startAutoplay();
   }
 
-  // 7b) Fade slideshows
+  /*** 6) Global Slideshow Support - Fade & Slide variants ***/
   function initSlideshows() {
     document.querySelectorAll('.slideshow').forEach(function (root) {
       const slides = Array.from(root.querySelectorAll('.slideshow__image'));
@@ -579,14 +436,14 @@
 
       const isSlide = root.classList.contains('slideshow--slide');
 
+      // Use physics drag for sliding variant
       if (isSlide) {
         initPhysicsDrag(root, slides, prevBtn, nextBtn);
         return;
       }
 
-      let index = slides.findIndex(function (s) {
-        return s.classList.contains('active');
-      });
+      // ===== FADE slideshow with smart autoplay =====
+      let index = slides.findIndex(s => s.classList.contains('active'));
       if (index < 0) {
         index = 0;
         slides[0].classList.add('active');
@@ -624,6 +481,7 @@
       function userInteracted() {
         isInteracting = true;
         stopAutoplay();
+
         if (idleTimeout) clearTimeout(idleTimeout);
         idleTimeout = setTimeout(function () {
           isInteracting = false;
@@ -631,12 +489,14 @@
         }, autoplayMs);
       }
 
+      // Arrow buttons
       if (prevBtn) {
         prevBtn.addEventListener('click', function () {
           userInteracted();
           show(index - 1);
         });
       }
+
       if (nextBtn) {
         nextBtn.addEventListener('click', function () {
           userInteracted();
@@ -644,59 +504,329 @@
         });
       }
 
+      // Keyboard navigation
       root.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft') {
           userInteracted();
           show(index - 1);
-        } else if (e.key === 'ArrowRight') {
+        }
+        if (e.key === 'ArrowRight') {
           userInteracted();
           show(index + 1);
         }
       });
 
-      root.addEventListener('mouseenter', function () {
-        stopAutoplay();
-      });
+      // Hover: pause while hovered, resume when mouse leaves
+      root.addEventListener('mouseenter', stopAutoplay);
       root.addEventListener('mouseleave', function () {
         if (!isInteracting) startAutoplay();
       });
 
+      // Start autoplay
       startAutoplay();
     });
   }
 
   window.addEventListener('DOMContentLoaded', initSlideshows);
 
-  /* ==============================
-   * 8) PARALLAX SECTIONS
-   * ============================== */
+  /*** 7) Parallax scrolling effect ***/
   (function initParallax() {
-    const sections = Array.from(document.querySelectorAll('.parallax-section'));
-    if (!sections.length) return;
-
-    function handle() {
-      const vh = window.innerHeight;
-
-      sections.forEach(function (section) {
+    const parallaxSections = document.querySelectorAll('.parallax-section');
+    
+    if (parallaxSections.length === 0) return;
+    
+    const isMobile = window.innerWidth <= 768;
+    const mobileMultiplier = 0.2;
+    
+    function handleScroll() {
+      parallaxSections.forEach(section => {
+        const layers = section.querySelectorAll('.parallax-layer');
         const rect = section.getBoundingClientRect();
-        const center = rect.top + rect.height / 2;
-        const viewportCenter = vh / 2;
-        const rel = (center - viewportCenter) / vh; // ~ -1 to +1
-
-        const layers = Array.from(section.querySelectorAll('.parallax-layer'));
-        layers.forEach(function (layer, i) {
-          const speedAttr = layer.getAttribute('data-speed');
-          const speed = speedAttr ? parseFloat(speedAttr) : (i + 1) * 0.3;
-          const offset = -rel * speed * 200; // bigger = more visible
-          layer.style.transform = 'translate3d(0,' + offset + 'px,0)';
+        const scrolled = rect.top;
+        
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          layers.forEach((layer, index) => {
+            let speed = layer.dataset.speed ? parseFloat(layer.dataset.speed) : (index + 1) * 0.3;
+            
+            if (isMobile) {
+              speed *= mobileMultiplier;
+            }
+            
+            const yPos = -(scrolled * speed);
+            layer.style.transform = `translate3d(0, ${yPos}px, 0)`;
+          });
+        }
+      });
+    }
+    
+    let ticking = false;
+    
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          handleScroll();
+          ticking = false;
         });
+        ticking = true;
+      }
+    });
+    
+    handleScroll();
+  })();
+
+/*** 8) Scroll-Driven Video (360° rotation effect) ***/
+(function initScrollVideo() {
+  const sections = document.querySelectorAll('.scroll-video-section');
+  if (!sections.length) return;
+
+  sections.forEach((section, index) => {
+    const container = section.querySelector('.scroll-video-container');
+    const video = section.querySelector('.scroll-video');
+    if (!video || !container) return;
+
+    video.pause();
+    video.currentTime = 0;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.muted = true;
+    
+    let targetTime = 0;
+    let currentTime = 0;
+    let isRenderLoopRunning = false;
+    
+    const smoothFactor = 0.1; 
+
+    function render() {
+      const diff = targetTime - currentTime;
+      
+      if (Math.abs(diff) < 0.01) {
+        isRenderLoopRunning = false;
+        return; 
+      }
+
+      currentTime += diff * smoothFactor;
+      
+      if (video.duration) {
+         video.currentTime = Math.max(0, Math.min(currentTime, video.duration));
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    function startRenderLoop() {
+      if (!isRenderLoopRunning) {
+        isRenderLoopRunning = true;
+        render();
+      }
+    }
+
+    function handleScroll() {
+      const rect = section.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const sectionHeight = rect.height;
+      
+      const start = viewportHeight;
+      const end = -sectionHeight;
+      
+      let progress = (start - rect.top) / (start - end);
+      
+      const buffer = 0.2; 
+      progress = (progress - buffer) / (1 - (buffer * 2));
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+
+      if (video.duration) {
+        targetTime = clampedProgress * video.duration;
+        startRenderLoop();
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    
+    if (video.readyState >= 1) {
+      handleScroll();
+    } else {
+      video.addEventListener('loadedmetadata', handleScroll);
+    }
+  });
+})();
+
+/*** 9) Auto-load correct scroll video based on screen size ***/
+(function initScrollVideoSource() {
+  function updateAllScrollVideos() {
+    const isMobile = window.innerWidth <= 768;
+    const videos = document.querySelectorAll('.scroll-video');
+    if (!videos.length) return;
+
+    videos.forEach(video => {
+      const firstSource = video.querySelector('source');
+      if (!firstSource) return;
+
+      const originalSrc = firstSource.getAttribute('src');
+      if (!originalSrc) return;
+
+      const lastSlash = originalSrc.lastIndexOf('/');
+      const directory = originalSrc.substring(0, lastSlash + 1);
+      const filename  = originalSrc.substring(lastSlash + 1);
+
+      const baseFilename = filename
+        .replace('-desktop', '')
+        .replace('_mobile', '')
+        .replace('-mobile-square', '')
+        .replace('.mp4', '');
+
+      const desktopSrc = directory + baseFilename + '-desktop.mp4';
+      const mobileSrc  = directory + baseFilename + '-mobile-square.mp4';
+      const correctSrc = isMobile ? mobileSrc : desktopSrc;
+
+      if (originalSrc !== correctSrc) {
+        const currentTime = video.currentTime || 0;
+        firstSource.setAttribute('src', correctSrc);
+        video.load();
+        try {
+          video.currentTime = currentTime;
+        } catch (e) {}
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateAllScrollVideos);
+  } else {
+    updateAllScrollVideos();
+  }
+
+  let resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateAllScrollVideos, 250);
+  });
+})();
+
+/*** 10) Before/After Slider ***/
+(function initBeforeAfterSliders() {
+  function init() {
+    document.querySelectorAll('.ba').forEach((root) => {
+      const range = root.querySelector('.ba__range');
+      const setPct = (p) => {
+        const clamped = Math.max(0, Math.min(100, p));
+        root.style.setProperty('--x', clamped + '%');
+        range.value = clamped;
+      };
+      const toPctFromClientX = (clientX) => {
+        const rect = root.getBoundingClientRect();
+        return ((clientX - rect.left) / rect.width) * 100;
+      };
+      const onPointerDown = (e) => {
+        setPct(toPctFromClientX(e.clientX));
+        const onMove = (ev) => setPct(toPctFromClientX(ev.clientX));
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onUp);
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+      };
+      root.addEventListener('mousedown', onPointerDown);
+      root.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        setPct(toPctFromClientX(t.clientX));
+      }, { passive: true });
+      root.addEventListener('touchmove', (e) => {
+        const t = e.touches[0];
+        setPct(toPctFromClientX(t.clientX));
+      }, { passive: true });
+      range.addEventListener('input', (e) => setPct(parseFloat(e.target.value)));
+      setPct(parseFloat(range.value) || 50);
+    });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+/*** 11) Hide video controls on mobile until user taps ***/
+(function initMobileVideoControls() {
+  function init() {
+    if (window.innerWidth <= 768) {
+      const videos = document.querySelectorAll('.full-image video');
+      
+      videos.forEach(video => {
+        video.removeAttribute('controls');
+        
+        video.addEventListener('click', function() {
+          this.setAttribute('controls', '');
+          this.classList.add('show-controls');
+        }, { once: true });
+      });
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+/*** 12) Inject shared navbar ***/
+(function injectNavbar() {
+  function loadNavbar() {
+    fetch('navbar.html')
+      .then(function (res) { return res.text(); })
+      .then(function (html) {
+        var mount = document.getElementById('navbar-placeholder');
+        if (mount) mount.innerHTML = html;
+      })
+      .catch(function (e) { console.error('Navbar load failed:', e); });
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadNavbar);
+  } else {
+    loadNavbar();
+  }
+})();
+   
+/*** 13) Center hint for slideshows & BA on mobile ***/
+(function initCenterHints() {
+  function init() {
+    if (window.innerWidth > 768) return;
+
+    const blocks = Array.from(document.querySelectorAll('.slideshow, .ba'));
+    if (!blocks.length) return;
+
+    function updateAll() {
+      const viewportCenter = window.innerHeight / 2;
+      const tolerance = 100;
+
+      blocks.forEach(block => {
+        const rect = block.getBoundingClientRect();
+        const inCenter =
+          rect.top <= viewportCenter + tolerance &&
+          rect.bottom >= viewportCenter - tolerance;
+
+        if (inCenter) {
+          block.classList.add('is-centered');
+        } else {
+          block.classList.remove('is-centered');
+        }
       });
     }
 
-    const onScroll = debounce(handle, 10);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    handle();
-  })();
+    updateAll();
+    window.addEventListener('scroll', updateAll, { passive: true });
+    window.addEventListener('resize', updateAll);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 
 })();
