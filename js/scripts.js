@@ -312,8 +312,11 @@
     let lastX = 0;
     let lastTime = 0;
     let animationFrame = null;
+    
+    // New Timer Variables
     let autoplayTimer = null;
-    let isInteracting = false;
+    let restartTimer = null; 
+    let direction = 1; // 1 = forward, -1 = backward
 
     function updatePositions(animated = true) {
       slides.forEach((slide, idx) => {
@@ -369,31 +372,42 @@
       if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
     }
 
+    // --- UPDATED AUTOPLAY LOGIC ---
+    
     function startAutoplay() {
+      // Clear any existing timers just in case
       if (autoplayTimer) clearInterval(autoplayTimer);
-      
-      let direction = 1;
+      if (restartTimer) clearTimeout(restartTimer);
+
       autoplayTimer = setInterval(() => {
-        if (isInteracting) return;
-        
+        // Bounce logic: reverse direction at ends
         if (currentIndex === slides.length - 1) direction = -1;
         if (currentIndex === 0) direction = 1;
+        
         goToSlide(currentIndex + direction);
-      }, 4000);
+      }, 4000); // Slide duration
     }
 
     function pauseAutoplay() {
-      isInteracting = true;
+      // Completely stop the movement
+      if (autoplayTimer) clearInterval(autoplayTimer);
+      if (restartTimer) clearTimeout(restartTimer);
     }
 
     function resumeAutoplay() {
-      isInteracting = false;
+      // Wait 3 seconds, then start again
+      if (restartTimer) clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => {
+        startAutoplay();
+      }, 3000); // 3 Seconds of inactivity
     }
+
+    // --- EVENT LISTENERS ---
 
     function onMouseDown(e) {
       if (e.target.classList.contains('slideshow__arrow')) return;
 
-      pauseAutoplay();
+      pauseAutoplay(); // STOP immediately
       isDragging = true;
       startX = e.clientX;
       currentX = e.clientX;
@@ -402,7 +416,6 @@
       velocity = 0;
       
       root.style.cursor = 'grabbing';
-      
       if (animationFrame) cancelAnimationFrame(animationFrame);
 
       e.preventDefault();
@@ -410,6 +423,9 @@
 
     function onMouseMove(e) {
       if (!isDragging) return;
+
+      // Pause again just to be safe while moving
+      pauseAutoplay(); 
 
       currentX = e.clientX;
       const deltaX = currentX - startX;
@@ -426,6 +442,7 @@
 
       dragOffset = (deltaX / root.offsetWidth) * 100;
       
+      // Resistance at edges
       if (currentIndex === 0 && dragOffset > 0) {
         dragOffset *= 0.3;
       } else if (currentIndex === slides.length - 1 && dragOffset < 0) {
@@ -442,13 +459,11 @@
       root.style.cursor = 'grab';
       animationFrame = requestAnimationFrame(animate);
       
-      setTimeout(() => {
-        resumeAutoplay();
-      }, 700);
+      resumeAutoplay(); // Queue the 3s restart
     }
 
     function onTouchStart(e) {
-      pauseAutoplay();
+      pauseAutoplay(); // STOP immediately
       isDragging = true;
       const touch = e.touches[0];
       startX = touch.clientX;
@@ -462,6 +477,7 @@
 
     function onTouchMove(e) {
       if (!isDragging) return;
+      pauseAutoplay(); // Ensure it stays stopped
 
       const touch = e.touches[0];
       currentX = touch.clientX;
@@ -490,32 +506,33 @@
 
     function onTouchEnd(e) {
       if (!isDragging) return;
-
       isDragging = false;
       animationFrame = requestAnimationFrame(animate);
       
-      setTimeout(() => {
-        resumeAutoplay();
-      }, 700);
+      resumeAutoplay(); // Queue the 3s restart
     }
 
+    // Mouse bindings
     root.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     
+    // Touch bindings
     root.addEventListener('touchstart', onTouchStart, { passive: true });
     root.addEventListener('touchmove', onTouchMove, { passive: true });
     root.addEventListener('touchend', onTouchEnd, { passive: true });
 
+    // Hover bindings (Stop on hover, wait 3s on leave)
     root.addEventListener('mouseenter', pauseAutoplay);
     root.addEventListener('mouseleave', resumeAutoplay);
 
+    // Arrow bindings
     if (prevBtn) {
       prevBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         pauseAutoplay();
         goToSlide(currentIndex - 1);
-        setTimeout(resumeAutoplay, 1000);
+        resumeAutoplay(); // Wait 3s then start
       });
     }
 
@@ -524,20 +541,21 @@
         e.stopPropagation();
         pauseAutoplay();
         goToSlide(currentIndex + 1);
-        setTimeout(resumeAutoplay, 1000);
+        resumeAutoplay(); // Wait 3s then start
       });
     }
 
+    // Keyboard bindings
     root.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') {
         pauseAutoplay();
         goToSlide(currentIndex - 1);
-        setTimeout(resumeAutoplay, 1000);
+        resumeAutoplay();
       }
       if (e.key === 'ArrowRight') {
         pauseAutoplay();
         goToSlide(currentIndex + 1);
-        setTimeout(resumeAutoplay, 1000);
+        resumeAutoplay();
       }
     });
 
@@ -547,6 +565,7 @@
     if (prevBtn) prevBtn.disabled = (currentIndex === 0);
     if (nextBtn) nextBtn.disabled = (currentIndex === slides.length - 1);
     
+    // Initial start
     startAutoplay();
   }
 
